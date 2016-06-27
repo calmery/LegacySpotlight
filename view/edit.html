@@ -1,0 +1,270 @@
+<html lang="ja">
+
+    <head>
+        <meta http-equiv="content-type" content="text/html;charset=utf-8">
+        <meta http-equiv="pragma" content="no-cache">
+        <meta http-equiv="cache-control" content="no-cache">
+        <meta http-equiv="content-style-type" content="text/css">
+        <meta http-equiv="content-script-type" content="text/javascript">
+        <link rel="stylesheet" href="resources/css/base.css">
+        <link rel="stylesheet" href="resources/css/layout.css">
+        <script src="resources/js/binding.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+
+            var socketio = io()
+
+            socketio.on( 'connect', function(){ console.log( 'connected' ) } )
+            socketio.on( 'disconnect', function(){ console.log( 'disconnected' ) } )
+
+            socketio.on( 'result', function( data ){
+                if( data.type == 'searchResult' ) parseSearch( data.value )
+                else if( data.type == 'postedResult' ){
+
+                    if( data.value.flg == true ){
+                        alert( '保存しました．\n' + data.value.value.data + '\n' + data.value.value.raw )
+                        document.getElementById('savedblock').style.display = 'block'
+                        document.getElementById('saved').style.display = 'block'
+                    }else{
+                        alert( '保存時にエラーが発生しました．' )
+                    }
+
+                }else if( data.type == 'error' ) alert( 'エラーが発生しました．' + data.value )
+                    } )
+
+            var fstWrite = false
+            var dataObject = []
+            var resultObject = []
+            var loaded = []
+            
+
+            function parseSearch( tweets ){
+
+                dataObject.push( JSON.stringify(tweets) )
+
+                var meta   = tweets.search_metadata,
+                    tweets = tweets.statuses
+
+                var data = [], now, time
+
+                for( var i=0; i<tweets.length; i++ ){
+
+                    now = tweets[i]
+
+                    time = now.created_at.split( /\s+/ )
+                    time.splice( 4, 1 )
+                    // Wed Jun 22 18:53:22 +0000 2016
+
+                    if( loaded.indexOf( now.id ) >= 0 ){
+                        console.log( now.id + ' already loaded' )
+                    } else {
+                        loaded.push( now.id )
+                        data.push( {
+                            retweet_count: now.retweet_count,
+                            created_at: time.join( ' ' ),
+                            id: now.id_str,
+                            in_reply_to_screen_name: now.in_reply_to_screen_name,
+                            in_reply_to_status_id: now.in_reply_to_status_id_str,
+                            in_reply_to_user_id: now.in_reply_to_user_id_str,
+                            text: now.text,
+                            id: now.id,
+                            user: {
+                                name: now.user.name,
+                                created_at: now.user.created_at,
+                                description: now.user.description,
+                                followers_count: now.user.followers_count,
+                                friends_count: now.user.friends_count,
+                                id: now.user.id_str,
+                                lang: now.user.lang,
+                                screen_name: now.user.screen_name,
+                                statuses_count: now.user.statuses_count,
+                                profile_image_url: now.user.profile_image_url
+                            }
+                        } )
+                    }
+
+                }
+
+                if( !fstWrite ) bind.binding( 'tweet', data )
+                else bind.binding( 'tweet', data, {
+                    rewrite: false
+                } )
+                bind.view( 'tweet' )
+
+                fstWrite = true
+
+                var element = document.getElementsByClassName( 'tw' )
+                for( var i=0; i<element.length; i++ ){
+                    element[i].addEventListener( 'click', function(){
+                        if( this.getAttribute( 'flg' ) == 'none' ){
+                            this.style.opacity = '0.5'
+                            this.style.borderLeft = '5px solid rgba(126,211,33,1)'
+                            this.setAttribute( 'flg', 'safe' )
+                        } else {
+                            this.style.opacity = '1'
+                            this.style.borderLeft = '5px solid rgba( 2, 159, 218, 1 )'
+                            this.setAttribute( 'flg', 'none' )
+                        }
+                    } )
+                }
+
+            }
+
+            function save(){
+
+                var error = ''
+
+                if( !fstWrite ){
+                    error += '検索結果が存在しないため保存ができません．'
+                }
+
+                if( !document.getElementById('dataName').value ){
+                    error += '名前を付けづに保存はできません．'
+                }
+
+                if( error ){
+                    alert( '以下のエラーを確認してください．' + error )
+                    return false
+                }
+
+                var result = []
+
+                var elem
+                for( var i=1; i<=bind.constant.NOW_INDEX; i++ ){
+                    elem = document.getElementById( 'n' + i )
+                    result.push( {
+                        flg: elem.getAttribute( 'flg' ),
+                        userid: elem.getAttribute( 'userid' ),
+                        text: document.getElementById( 'text' + i ).innerHTML,
+                        id: elem.getAttribute( 'tweetid' ),
+                        profile_image_url:elem.getAttribute('profile'),
+                        created_at:elem.getAttribute('create'),
+                        name:elem.getAttribute('username'),
+                        screen_name: elem.getAttribute( 'screen' )
+                    } )
+                }
+
+                resultObject.push( result )
+
+                socketio.emit( 'postResult', {
+                    name: document.getElementById('dataName').value,
+                    data: result,
+                    raw: dataObject
+                } )
+
+                return true
+
+            }
+
+            function resetData(){
+
+                console.log('a')
+                var flg = confirm( '保存していない情報は失われます．保存するには左メニューより名前を入力し保存をクリックします．\n\n終了しますか？' )
+
+                if( flg ){
+
+                    window.location.href = '/list'
+
+                }
+
+            }
+
+            window.onload = function(){
+
+                bind.hide( 'tweet' )
+                
+                var data = JSON.parse(sessionStorage.getItem( 'editList' ))
+                sessionStorage.removeItem( 'editList' )
+                
+                var raw = JSON.parse(data.raw[data.raw.length-1])
+                parseSearch( raw )
+                
+                document.getElementById('dataName').value = sessionStorage.getItem('editName')
+                
+                var tws = document.getElementsByClassName( 'tw' )
+                for( var i=0; i<tws.length; i++ ){
+                    if(data.data[data.data.length-1-i].flg == 'safe'){
+                        tws[i].style.opacity = '0.5'
+                        tws[i].style.borderLeft = '5px solid rgba(126,211,33,1)'
+                        tws[i].setAttribute( 'flg', 'safe' )
+                    }
+                }
+
+            }
+
+        </script>
+    </head>
+
+    <body>
+
+        <div id="application">
+
+            <div id="nav">
+                <div id="appName">APP</div>
+                <a href="/">
+                    <div class="menu">メインページ</div>
+                </a>
+                <a href="/search">
+                    <div class="menu">検索</div>
+                </a>
+                <a href="/list">
+                    <div class="menu selected">ランク/リスト</div>
+                </a>
+                <a href="/update">
+                    <div class="menu">更新</div>
+                </a>
+                <a href="/setting">
+                    <div class="menu">設定</div>
+                </a>
+                <div class="not"></div>
+                <div id="dataBox">
+                    <textarea id="dataName" placeholder="名前をつける"></textarea>
+                </div>
+                <a href="javascript:void(0)" onclick="save()">
+                    <div class="menu">保存</div>
+                </a>
+                <div class="not"></div>
+                <a href="javascript:void(0)" onclick="resetData()">
+                    <div class="menu">終了</div>
+                </a>
+                <div class="not" id="savedblock"></div>
+                <div class="menu selected" id="saved">保存済み</div>
+            </div>
+
+            <div id="article">
+                <div id="header">
+                    <div class="htext">EDIT</div>
+                </div>
+                <div id="padding">
+
+                    <div class="label">Result</div>
+
+                    <div id="tweet">
+                        <div class="tw clearfix" id="n{{INDEX}}" flg="none" userid="{{user.id}}" tweetid="{{id}}" profile="{{user.profile_image_url}}" create="{{created_at}}" username="{{user.name}}" screen="{{user.screen_name}}">
+                            <div class="icon">
+                                <img src="{{user.profile_image_url}}">
+                            </div>
+                            <div class="data">
+                                <span class="userid">{{user.id}}</span>
+                                <br>
+                                <span class="username">{{user.name}}</span>
+                                <span class="userscreenname">@{{user.screen_name}}</span>
+                                ( Friends : {{user.friends_count}} / Followsers : {{user.followers_count}} )
+                                <br><br>
+                                <span id="text{{INDEX}}">{{text}}</span>
+                                <br><br>
+                                <span class="created_at">{{created_at}}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <a href="#" onclick="window.location.reload()" style="bottom:0;right:0;position:fixed">UNDERDEV</a>
+
+        </div>
+
+    </body>
+
+</html>
