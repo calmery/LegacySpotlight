@@ -1,0 +1,228 @@
+@font-face {
+    src: url( ../font/Quicksand.woff );
+    font-family: Quicksand;
+}
+
+body {
+    font-size: 12px;
+    color: rgba( 60, 60, 60, 1 );
+    line-height: 15px;
+    background: rgba( 245, 245, 245, 1 );
+    font-family: sans-serif;
+    user-select: none;
+}
+
+body::-webkit-scrollbar{
+    display: none
+}
+
+div#application {
+    width: 100%;
+    height: 100%
+}
+
+#nav {
+    width: 150px;
+    height: 100%;
+    float: left;
+    background: rgba( 2, 159, 218, 1 );
+    top: 0;
+    left: 0;
+    position: fixed;
+    z-index: 9;
+}
+
+#appName {
+    width: auto;
+    height: 54px;
+    border-bottom: 1px solid rgba( 42, 189, 248, 1 );
+    font-family: Quicksand;
+    text-align: center;
+    color: rgba( 255, 255, 255, 1 );
+    font-size: 20px;
+    line-height: 42pt;
+}
+
+.menu {
+    padding-left: 25px;
+    height: 39px;
+    border-bottom: 1px solid rgba( 42, 189, 248, 1 );
+    line-height: 30pt;
+    font-size: 12px;
+    color: #fff;
+    font-weight: 600;
+}
+.menu.selected {
+    height: 38px;
+    border-top: 1px solid rgba( 0, 99, 158, 1 );
+    border-bottom: 1px solid rgba( 42, 189, 248, 1 );
+    background: rgba( 0, 119, 178, 1 )
+}
+.menu:hover {
+    -webkit-transition: ease 0.5s;
+    background: rgba( 0, 119, 178, 1 );
+}
+.not{
+    padding-left: 25px;
+    height: 39px;
+    border-bottom: 1px solid rgba( 42, 189, 248, 1 );
+    line-height: 30pt;
+    font-size: 12px;
+    color: #fff;
+    font-weight: 600;
+}
+
+#article {
+    width: 650px;
+    top: 0;
+    right: 0;
+    position: absolute
+}
+
+#header {
+    width: 650px;
+    height: 55px;
+    background: rgba(230,230,230,1);
+    top: 0;
+    right: 0;
+    z-index: 1;
+    position: fixed;
+}
+
+#padding {
+    top: 55px;
+    right: 25px;
+    position: absolute;
+    width: 600px;
+    background: rgba(255,255,255,1)
+}
+
+.label {
+    font-size: 15px;
+    margin: 10px 20px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    font-weight: 600;
+    font-family: Quicksand, sans-serif;
+    border-bottom: 5px solid rgba(0,119,178,1);
+}
+
+textarea#searchWord {
+    width: 200px;
+    height: 35px;
+    padding: 10px 20px;
+    font-weight: normal;
+    border: 0;
+    background: rgba(255,255,255,1);
+    margin: 10px 0;
+    right: 135px;
+    position: fixed;
+    border-radius: 3px;
+}
+#searchCount {
+    width: 50px;
+    height: 35px;
+    margin: 10px 0;
+    right: 80px;
+    position: fixed;
+    font-weight: normal;
+    border: 0;
+    background: rgba(255,255,255,1);
+    border-radius: 3px;
+    padding: 10px 10px;
+}
+#searchBtn {
+    width: 50px;
+    height: 35px;
+    background: rgba( 2, 159, 218, 1 );
+    text-align: center;
+    color: rgba(255,255,255,1);
+    right: 25px;
+    position: fixed;
+    margin: 10px 0;
+    border-radius: 3px;
+    line-height: 28pt;
+}
+#searchBtn:hover {
+    -webkit-transition: ease 0.5s;
+    background: rgba( 0, 119, 178, 1 )
+}
+
+#tweet, #tweet2 {
+    margin-bottom: 20px;
+}
+
+.tw {
+    background: rgba( 245,245,245,1 );
+    border-left: 5px solid rgba( 2, 159, 218, 1 );
+    margin: 0 25px;
+    width: 505px;
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.tw .icon {
+    width: 70px;
+    float: left;
+}
+.tw .icon img {
+    width: 45px;
+    border-radius: 100%;
+    text-align: center;
+    border: 3px solid rgba( 2, 159, 218, 1 );
+}
+
+.tw .data {
+    width: 430px;
+    float: left;
+}
+
+.userid {
+    color: rgba( 0, 119, 178, 1 );
+    font-weight: 600;
+}
+.username {
+    font-weight: bold;
+}
+
+.query {
+    background: rgba( 0, 119, 178, 1 );
+    color: rgba(255,255,255,1)
+}
+
+#dataBox {
+    height: 39px;
+    border-bottom: 1px solid rgba( 42, 189, 248, 1 );
+    line-height: 30pt;
+    font-size: 12px;
+    color: #fff;
+    font-weight: 600;
+}
+#dataName::-webkit-input-placeholder {
+    color: rgba(255,255,255,.5)
+}
+#dataName {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    padding: 0 25px;
+    padding-top: 14px;
+    color: #fff;
+    
+    background: rgba(0,0,0,0)
+}
+#dataName:focus {
+    -webkit-transition: ease 0.5s;
+    background: rgba( 0, 119, 178, 1 )
+}
+
+#saved, #savedblock {
+    display: none;
+}
+
+.htext {
+    padding-left: 25px;
+    font-family: Quicksand;
+    font-size: 20px;
+    line-height: 43pt;
+}
