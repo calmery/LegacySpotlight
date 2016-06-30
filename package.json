@@ -1,19 +1,28 @@
 {
-    "name"        : "cyber",
-    "version"     : "0.1.0",
-    "main"        : "index.js",
-    "author"      : "Marei Kikukawa",
-    "license"     : "GPL-2.0",
-    "scripts": {
-        "build": "./node_modules/.bin/electron ."
-    },
-    "dependencies": {
-        "electron-prebuilt": "1.2.3",
-        "express"          : "4.14.0",
-        "socket.io"        : "1.4.6",
-        "twitter"          : "1.3.0",
-        "request"          : "2.72.0",
-        "node-fs-extra"    : "0.8.1",
-        "sqlite3"          : "3.1.4"
-    }
+  "name": "spotlight",
+  "version": "0.1.0",
+  "description": "The latest stable version in Jun.",
+  "main": "index.js",
+  "scripts": {
+    "test": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/calmery/spotlight.git"
+  },
+  "author": "Marei Kikukawa",
+  "license": "GPL-2.0",
+  "bugs": {
+    "url": "https://github.com/calmery/spotlight/issues"
+  },
+  "homepage": "https://github.com/calmery/spotlight#readme",
+  "dependencies": {
+    "electron": "^0.4.1",
+    "express": "^4.14.0",
+    "express-session": "^1.13.0",
+    "passport": "^0.3.2",
+    "passport-twitter": "^1.0.4",
+    "socket.io": "^1.4.8",
+    "twitter": "^1.3.0"
+  }
 }

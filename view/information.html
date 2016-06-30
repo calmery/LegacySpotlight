@@ -1,0 +1,42 @@
+<html lang="ja">
+
+    <head>
+        <meta http-equiv="content-type" content="text/html;charset=utf-8">
+        <meta http-equiv="pragma" content="no-cache">
+        <meta http-equiv="cache-control" content="no-cache">
+        <meta http-equiv="content-style-type" content="text/css">
+        <meta http-equiv="content-script-type" content="text/javascript">
+        <link rel="stylesheet" href="resources/css/base.css">
+        <link rel="stylesheet" href="resources/css/layout.css">
+        
+        <script>
+        
+            window.onload = function(){
+                
+                var message = sessionStorage.getItem( 'Message' ),
+                    e       = document.getElementById( 'button' )
+                
+                if( message )
+                    e.innerHTML = message
+                else
+                    e.style.display = 'none'
+            }
+            
+        </script>
+        
+    </head>
+
+    <body>
+
+        <div id="application" class="setup">
+
+            <div id="logo">SPOTLIGHT</div>
+
+            
+            <div id="button"></div>
+
+        </div>
+
+    </body>
+
+</html>

@@ -1,5 +1,5 @@
 <html lang="ja">
-    
+
     <head>
         <meta http-equiv="content-type" content="text/html;charset=utf-8">
         <meta http-equiv="pragma" content="no-cache">
@@ -13,30 +13,29 @@
         <script>
 
             var socketio = io()
-            
+
             window.onload = function(){
 
-                if( !sessionStorage.getItem( 'myprofile' ) ){
-
+                if( !sessionStorage.getItem( 'myprofile' ) )
                     socketio.emit( 'getMyProfile', {
                         value: true
                     } )
-
-                }else{
-                    profileParser( JSON.parse(unescape(sessionStorage.getItem( 'myprofile' ))) )
-                }
-
-                socketio.on( 'result', function( data ){
-                    if( data.type == 'gotMyProfile' ){
-                        sessionStorage.setItem( 'myprofile', escape(JSON.stringify(data.value)) )
-                        profileParser(data.value)
-                    }
+                else
+                    profileParser( JSON.parse( unescape( sessionStorage.getItem( 'myprofile' ) ) ) )
+                
+                // Return my profile on Twitter.
+                socketio.on( 'gotMyProfile', function( data ){
+                    sessionStorage.setItem( 'myprofile', escape( JSON.stringify( data.value ) ) )
+                    profileParser( data.value )
+                } )
+                
+                socketio.on( 'error', function( error ){
+                    alert( 'エラーが発生しました．\n\n' + error.value )
                 } )
 
                 function profileParser( data ){
-                    var prof = []
-                    console.log( data )
-                    prof.push({
+                    var profile = []
+                    profile.push( {
                         name: data.name,
                         created_at: data.created_at,
                         followers_count: data.followers_count,
@@ -48,21 +47,24 @@
                         statuses_count: data.statuses_count,
                         profile_image_url: data.profile_image_url
 
-                    })
-                    bind.binding( 'tweet', prof )
+                    } )
+                    bind.binding( 'tweet', profile )
                 }
-                
+
             }
 
+
+
         </script>
+
     </head>
-    
+
     <body>
-        
+
         <div id="application">
-            
+
             <div id="nav">
-                <div id="appName">APP</div>
+                <div id="appName">SPOTLIGHT</div>
                 <a href="/">
                     <div class="menu selected">メインページ</div>
                 </a>
@@ -72,20 +74,17 @@
                 <a href="/list">
                     <div class="menu">ランク/リスト</div>
                 </a>
-                <a href="/update">
-                    <div class="menu">更新</div>
-                </a>
                 <a href="/setting">
                     <div class="menu">設定</div>
                 </a>
             </div>
-            
+
             <div id="article">
                 <div id="header">
-                    <div class="htext">VER 0.1.0</div>
+                    <div class="htext">SPOTLIGHT BETA 0.1.0</div>
                 </div>
                 <div id="padding">
-                    <div class="label">プロフィール</div>
+                    <div class="label">マイデータ</div>
                     <div id="tweet">
                         <div class="tw clearfix">
                             <div class="icon">
@@ -106,9 +105,10 @@
                     </div>
                 </div>
             </div>
-            
+
+
         </div>
-        
+
     </body>
-    
+
 </html>

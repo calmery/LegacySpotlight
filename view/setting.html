@@ -8,6 +8,45 @@
         <meta http-equiv="content-script-type" content="text/javascript">
         <link rel="stylesheet" href="resources/css/base.css">
         <link rel="stylesheet" href="resources/css/layout.css">
+        <script src="resources/js/binding.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+
+            var socketio = io()
+            
+            socketio.on( 'userResetComplate', function( data ){
+                sessionStorage.setItem( 'Message', '再度登録するにはアプリケーションを再起動してください．' )
+                alert( 'ユーザ情報を消去しました．' )
+                window.location.href = '/information'
+            } )
+            
+            socketio.on( 'dataResetComplate', function( data ){
+                alert( '活動情報を消去しました．' )
+                window.location.href = '/'
+            } )
+            
+            socketio.on( 'error', function( error ){
+                alert( 'エラーが発生しました．\n\n' + error.value )
+            } )
+
+            function del( types ){
+
+                var flg = confirm( 'この処理は取り消すことができません．続けますか？' )
+                if( flg )
+                    if( types == 'user' )
+                        socketio.emit( 'userReset', {
+                            value: true
+                        } )
+                    else if( types == 'data' )
+                        socketio.emit( 'dataReset', {
+                            value: true
+                        } )
+                    else
+                        alert( '不正な操作を検知しました．' )
+
+            }
+
+        </script>
     </head>
 
     <body>
@@ -15,7 +54,7 @@
         <div id="application">
 
             <div id="nav">
-                <div id="appName">APP</div>
+                <div id="appName">SPOTLIGHT</div>
                 <a href="/">
                     <div class="menu">メインページ</div>
                 </a>
@@ -24,9 +63,6 @@
                 </a>
                 <a href="/list">
                     <div class="menu">ランク/リスト</div>
-                </a>
-                <a href="/update">
-                    <div class="menu">更新</div>
                 </a>
                 <a href="/setting">
                     <div class="menu selected">設定</div>
@@ -37,6 +73,19 @@
                 <div id="header">
                     <div class="htext">
                         SETTING
+                    </div>
+                </div>
+                <div id="padding">
+                    <div class="label">システム</div>
+                    <div id="tweet">
+                        <div class="tw clearfix" onclick="del('user')">
+                            <b>ユーザ情報を消去する</b><br><br>
+                            このアプリケーションに登録されているユーザ情報を消去します．これはユーザ情報を消去するだけで再度ユーザ登録を行えば今までの活動内容を引き継ぐことが可能です．
+                        </div>
+                        <div class="tw clearfix" onclick="del('data')">
+                            <b>活動内容を初期化する</b><br><br>
+                            このアプリケーションに保存されている活動に関する情報を消去します．ユーザ情報は消去されません．
+                        </div>
                     </div>
                 </div>
             </div>
