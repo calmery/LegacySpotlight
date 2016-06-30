@@ -34,6 +34,7 @@ package.json のあるディレクトリに移動し以下のコマンドを実�
 
 ### License
 [GPLv2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.ja.html)
+[GPLv2 JP](https://www.gnu.org/licenses/old-licenses/gpl-2.0-translations.html)
 
 ### Author
 patchworks
