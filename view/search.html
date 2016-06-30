@@ -11,71 +11,42 @@
         <script src="resources/js/binding.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script>
-            
+
             var socketio = io()
+            
+            var fstWrite     = false,
+                dataObject   = [],
+                resultObject = [],    // Shaping data
+                loaded       = []     // Added tweets
+            
+            // Search result from Twitter.
+            socketio.on( 'searchResult', function( data ){
+                
+                var tweets = data.value
+                
+                dataObject.push( JSON.stringify( tweets ) )
 
-            socketio.on( 'connect', function(){ console.log( 'connected' ) } )
-            socketio.on( 'disconnect', function(){ console.log( 'disconnected' ) } )
-
-            socketio.on( 'result', function( data ){
-                if( data.type == 'searchResult' ) parseSearch( data.value )
-                else if( data.type == 'postedResult' ){
-                    
-                    if( data.value.flg == true ){
-                        alert( '保存しました．\n' + data.value.value.data + '\n' + data.value.value.raw )
-                        document.getElementById('savedblock').style.display = 'block'
-                        document.getElementById('saved').style.display = 'block'
-                    }else{
-                        alert( '保存時にエラーが発生しました．' )
-                    }
-                    
-                }else if( data.type == 'error' ) alert( 'エラーが発生しました．' + data.value )
-            } )
-            
-            var fstWrite = false
-            var dataObject = []
-            var resultObject = []
-            var loaded = []
-            
-            function searchQuery(){
-                
-                var word = document.getElementById( 'searchWord' ).value
-                var count = document.getElementById( 'searchCount' ).value
-                if( !word ){
-                    alert( '検索ワードが指定されていません' )
-                    return false
-                }
-                
-                socketio.emit( 'search', {
-                    value: word,
-                    count: count
-                } )
-                
-                return true
-                
-            }
-            
-            function parseSearch( tweets ){
-                
-                dataObject.push( JSON.stringify(tweets) )
-                
                 var meta   = tweets.search_metadata,
                     tweets = tweets.statuses
-                
+
                 var data = [], now, time
                 
+                console.log(tweets)
+
                 for( var i=0; i<tweets.length; i++ ){
-                    
+
                     now = tweets[i]
-                    
+
                     time = now.created_at.split( /\s+/ )
-                    time.splice( 4, 1 )
-                    // Wed Jun 22 18:53:22 +0000 2016
-                    
-                    if( loaded.indexOf( now.id ) >= 0 ){
-                        console.log( now.id + ' already loaded' )
-                    } else {
+                    time.splice( 4, 1 ) // Wed Jun 22 18:53:22 +0000 2016
+
+                    // This tweet already loaded
+                    if( loaded.indexOf( now.id ) >= 0 )
+                        console.log( 'exist : ' + now.id )
+                    // New tweet
+                    else {
                         loaded.push( now.id )
+                        // Shaping
                         data.push( {
                             retweet_count: now.retweet_count,
                             created_at: time.join( ' ' ),
@@ -99,17 +70,20 @@
                             }
                         } )
                     }
-                    
+
                 }
                 
-                if( !fstWrite ) bind.binding( 'tweet', data )
-                else bind.binding( 'tweet', data, {
-                    rewrite: false
-                } )
-                bind.view( 'tweet' )
-                
-                fstWrite = true
-                
+                // Max element length is 200.
+                if( !document.getElementById('n200') ){
+                    if( !fstWrite ) bind.binding( 'tweet', data )
+                    else bind.binding( 'tweet', data, {
+                        rewrite: false
+                    } )
+                    bind.view( 'tweet' )
+                    fstWrite = true
+                } else 
+                    alert( 'リストの最大数を超えてしまうため追加できません．一度保存し新しく検索を始めてください．' )
+
                 var element = document.getElementsByClassName( 'tw' )
                 for( var i=0; i<element.length; i++ ){
                     element[i].addEventListener( 'click', function(){
@@ -124,28 +98,54 @@
                         }
                     } )
                 }
+            } )
+            
+            socketio.on( 'postedResult', function( data ){
+                alert( '保存しました．\n' + data.value.value.data + '\n' + data.value.value.raw )
+            } )
+
+            socketio.on( 'error', function( error ){
+                alert( 'エラーが発生しました．\n\n' + error.value )
+            } )
+            
+            // Search on Twitter
+            function searchQuery(){
+
+                var word  = document.getElementById( 'searchWord' ).value,
+                    count = document.getElementById( 'searchCount' ).value
                 
+                if( !word ){
+                    alert( '検索ワードが指定されていません' )
+                    return false
+                }
+
+                socketio.emit( 'searchQuery', {
+                    value: word,
+                    count: count
+                } )
+
+                return true
+
             }
             
+            // Save
             function save(){
-                
                 var error = ''
-                
-                if( !fstWrite ){
+
+                if( !fstWrite )
                     error += '検索結果が存在しないため保存ができません．'
-                }
-                
-                if( !document.getElementById('dataName').value ){
+
+                if( !document.getElementById( 'dataName' ).value )
                     error += '名前を付けづに保存はできません．'
-                }
                 
+                // Not search or haven't name
                 if( error ){
                     alert( '以下のエラーを確認してください．' + error )
                     return false
                 }
-                
+
                 var result = []
-                
+
                 var elem
                 for( var i=1; i<=bind.constant.NOW_INDEX; i++ ){
                     elem = document.getElementById( 'n' + i )
@@ -160,39 +160,37 @@
                         screen_name: elem.getAttribute( 'screen' )
                     } )
                 }
-                
+
                 resultObject.push( result )
-                
+
                 socketio.emit( 'postResult', {
                     name: document.getElementById('dataName').value,
                     data: result,
                     raw: dataObject
                 } )
-                
+
                 return true
-                
             }
-            
-            function resetData(){
 
-                console.log('a')
-                var flg = confirm( '保存していない情報は失われます．保存するには左メニューより名前を入力し保存をクリックします．\n\n終了しますか？' )
-                
-                if( flg ){
-                    
-                    window.location.reload()
-                    
-                }
-
-            }
-            
             window.onload = function(){
-                
+
                 bind.hide( 'tweet' )
                 
+                // Confirm user action.
+                var elems = document.getElementsByClassName( 'ml' )
+                for( var i=0; i<elems.length; i++ )
+                    elems[i].addEventListener( 'click', function( e ){
+                        e.preventDefault()
+                        var flg = confirm( '保存していない情報は失われます．終了しますか？' )
+                        if( flg )
+                            window.location.href = this.parentNode.getAttribute( 'href')
+                    } )
+
             }
-            
+
+
         </script>
+
     </head>
 
     <body>
@@ -200,21 +198,18 @@
         <div id="application">
 
             <div id="nav">
-                <div id="appName">APP</div>
+                <div id="appName">SPOTLIGHT</div>
                 <a href="/">
-                    <div class="menu">メインページ</div>
+                    <div class="menu ml">メインページ</div>
                 </a>
                 <a href="/search">
-                    <div class="menu selected">検索</div>
+                    <div class="menu ml selected">検索</div>
                 </a>
                 <a href="/list">
-                    <div class="menu">ランク/リスト</div>
-                </a>
-                <a href="/update">
-                    <div class="menu">更新</div>
+                    <div class="menu ml">ランク/リスト</div>
                 </a>
                 <a href="/setting">
-                    <div class="menu">設定</div>
+                    <div class="menu ml">設定</div>
                 </a>
                 <div class="not"></div>
                 <div id="dataBox">
@@ -223,12 +218,6 @@
                 <a href="javascript:void(0)" onclick="save()">
                     <div class="menu">保存</div>
                 </a>
-                <div class="not"></div>
-                <a href="javascript:void(0)" onclick="resetData()">
-                    <div class="menu">終了</div>
-                </a>
-                <div class="not" id="savedblock"></div>
-                <div class="menu selected" id="saved">保存済み</div>
             </div>
 
             <div id="article">
@@ -241,9 +230,9 @@
                     </a>
                 </div>
                 <div id="padding">
-                    
+
                     <div class="label">Result</div>
-                    
+
                     <div id="tweet">
                         <div class="tw clearfix" id="n{{INDEX}}" flg="none" userid="{{user.id}}" tweetid="{{id}}" profile="{{user.profile_image_url}}" create="{{created_at}}" username="{{user.name}}" screen="{{user.screen_name}}">
                             <div class="icon">
@@ -262,11 +251,9 @@
                             </div>
                         </div>
                     </div>
-                    
                 </div>
             </div>
-            
-            <a href="#" onclick="window.location.reload()" style="bottom:0;right:0;position:fixed">UNDERDEV</a>
+
 
         </div>
 

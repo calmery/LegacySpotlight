@@ -11,37 +11,37 @@
         <script src="resources/js/binding.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script>
-            
+
             var socketio = io()
-        
+
             socketio.emit( 'getList', {
                 value: true
             } )
-            
-            socketio.on( 'result', function( data ){
-                if( data.type == 'gotList' ){
-                    console.log(data.value)
-                    var obj = []
-                    for( var i=0; i<data.value.length; i++ )
-                        obj.push( { name: data.value[i] } )
-                    bind.binding( 'tweet', obj )
-                } else if( data.type == 'gotListData' ){
-                    sessionStorage.setItem( 'editList', JSON.stringify(data.value) )
-                    window.location.href = '/edit'
-                }
+
+            socketio.on( 'gotList', function( data ){
+                var obj = []
+                for( var i=0; i<data.value.length; i++ )
+                    obj.push( { name: data.value[i] } )
+                bind.binding( 'tweet', obj )
             } )
             
+            socketio.on( 'gotListData', function( data ){
+                sessionStorage.setItem( 'editList', JSON.stringify( data.value ) )
+                window.location.href = '/edit'
+            } )
+
             function getList( val ){
-                
+
                 socketio.emit( 'getListData', {
                     value: val
                 } )
-                
+
                 sessionStorage.setItem( 'editName', val )
-                
+
             }
-            
+
         </script>
+
     </head>
 
     <body>
@@ -49,7 +49,7 @@
         <div id="application">
 
             <div id="nav">
-                <div id="appName">APP</div>
+                <div id="appName">SPOTLIGHT</div>
                 <a href="/">
                     <div class="menu">メインページ</div>
                 </a>
@@ -58,9 +58,6 @@
                 </a>
                 <a href="/list">
                     <div class="menu selected">ランク/リスト</div>
-                </a>
-                <a href="/update">
-                    <div class="menu">更新</div>
                 </a>
                 <a href="/setting">
                     <div class="menu">設定</div>
@@ -73,7 +70,6 @@
                         RANK / LIST        
                     </div>
                 </div>
-                
                 <div id="padding">
                     <div class="label">保存したリスト</div>
                     <div id="tweet">
@@ -82,7 +78,6 @@
                         </a>
                     </div>
                 </div>
-                
             </div>
 
         </div>
