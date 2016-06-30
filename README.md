@@ -36,7 +36,7 @@ package.json のあるディレクトリに移動し以下のコマンドを実�
 [GPLv2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.ja.html)
 
 ### Author
-Patchworks
+patchworks
 
 - [Marei Kikukawa](https://github.com/calmery)
 - [Naoya Sugita](https://github.com/naoyasugita)
