@@ -15,6 +15,7 @@
 現在のバージョンにおいて以下の環境で動作の確認を行っている．この他の環境では正しく動作しない可能性がある．
 
 - Windows 8
+- Windows 10
 - Mac OS X Elcapitan
 
 ### Install
