@@ -41,3 +41,6 @@ patchworks
 - [Marei Kikukawa](https://github.com/calmery)
 - [Naoya Sugita](https://github.com/naoyasugita)
 - [Keisuke Toyota](https://github.com/KeisukeToyota)
+
+### Thanks
+- [Luchesa. Vol. 9 Free | Just UI](https://www.iconfinder.com/icons/669950/electric_energy_idea_lamp_light_icon#size=512)
