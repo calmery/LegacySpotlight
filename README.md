@@ -34,8 +34,9 @@ package.json のあるディレクトリに移動し以下のコマンドを実�
 `$ electron-packager . SpotlightBeta --platform=win32,darwin --arch=x64 --version=1.2.4`
 
 ### License
-[GPLv2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.ja.html)
-[GPLv2 JP](https://www.gnu.org/licenses/old-licenses/gpl-2.0-translations.html)
+Copyright (C) 2016 patchworks
+[GPLv2](https://opensource.org/licenses/GPL-2.0)  
+[GPLv2 JP](https://opensource.org/licenses/GPL-2.0)
 
 ### Author
 patchworks
