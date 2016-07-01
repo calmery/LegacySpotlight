@@ -35,7 +35,9 @@ package.json のあるディレクトリに移動し以下のコマンドを実�
 
 ### License
 Copyright (C) 2016 patchworks  
-[GPLv2](https://opensource.org/licenses/GPL-2.0)  
+[GPL-2.0](https://opensource.org/licenses/GPL-2.0)  
+
+This software is released under the [GPL-2.0](https://opensource.org/licenses/GPL-2.0) License, see https://opensource.org/licenses/GPL-2.0.
 
 ### Author
 patchworks
