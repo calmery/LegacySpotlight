@@ -88,6 +88,8 @@ var bind = {
         if( config.rewrite !== false ){
             element.innerHTML = ''
         }
+        
+        console.log( template ) 
 
         // Extraction of key ({{KEY}} => KEY) and assignment to args
         var args = template.match( /{+[a-zA-Z0-9|.|-|_]+}+/g )

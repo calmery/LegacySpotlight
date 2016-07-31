@@ -1,157 +1,151 @@
-var express = require( 'express' )(),
-    http    = require( 'http' ).Server( express )
+exports.run = function(){
 
-var config         = require( '../config/config' ).config,
-    isExistFile    = config.fn.isExistFile,
-    fixPath        = config.fn.fixPath,
-    checkUserAgent = config.fn.checkUserAgent,
-    port           = config.express.port
+    var express = require( 'express' ),
+        app     = express()
+    
+    var http    = require( 'http' ).Server( app )
 
-// Common addresses
-var commonPath = [
-    {
-        url: /resources\/[a-zA-Z0-9|.|\/|-]+/,
-        fn : function( request, response ){
-            response.sendfile( fixPath( __dirname + '/../view/' + request._parsedUrl.pathname ) )
+    var session = require( 'express-session' )( {
+        secret           : 'secret',
+        resave           : true,
+        saveUninitialized: true
+    } )
+    
+    app.use( session )
+    
+    var fn      = require( './fn' ).fn,
+        isExist = fn.isExist,
+        fixPath = fn.fixPath
+    
+    var root
+    
+    var port = http.listen().address().port
+    console.log( 'Running app on localhost:' + port )
+
+    app.use( express.static( fixPath( __dirname, '../view/resources/' ) ) )
+    
+    var paths = {
+
+        '/': function( request, response ){
+            if( !root && request.headers['user-agent'].indexOf('Electron') != -1 ){
+                root = request.sessionID
+                exports.root = root
+            }
+            
+            // Already send response !
+            // Error: Can't set headers after they are sent.
+            
+            if( !isExist( fixPath( __dirname, '../config/user.js' ) ) )
+                response.redirect( '/setup' )
+            else
+                if( root == request.sessionID )
+                    response.sendFile( fixPath( __dirname, '../view/index.html' ) )
+                else
+                    response.status( 403 ).send( 'Forbidden' )
+        },
+
+        '/search': function( request, response ){
+            if( root == request.sessionID )
+                response.sendFile( fixPath( __dirname, '../view/search.html' ) )
+            else
+                response.status( 403 ).send( 'Forbidden' )
+        },
+
+        '/list': function( request, response ){
+            if( root == request.sessionID )
+                response.sendFile( fixPath( __dirname, '../view/list.html' ) )
+            else
+                response.status( 403 ).send( 'Forbidden' )
+        },
+
+        '/setting': function( request, response ){
+            if( root == request.sessionID )
+                response.sendFile( fixPath( __dirname, '../view/setting.html' ) )
+            else
+                response.status( 403 ).send( 'Forbidden' )
+        },
+
+        '/edit': function( request, response ){
+            if( root == request.sessionID )
+                response.sendFile( fixPath( __dirname, '../view/edit.html' ) )
+            else
+                response.status( 403 ).send( 'Forbidden' )
+        },
+        
+        '/user': function( request, response ){
+            if( root == request.sessionID )
+                response.sendFile( fixPath( __dirname, '../view/user.html' ) )
+            else
+                response.status( 403 ).send( 'Forbidden' )
+        },
+
+        '/vote': function( request, response ){
+            response.sendFile( fixPath( __dirname, '../view/vote.html' ) )
         }
-    }, {
-        url: '/information',
-        fn : function( request, response ){
-            response.sendfile( fixPath( __dirname + '/../view/information.html' ) )
-        }
+
     }
-]
 
-// Include
-var paths = commonPath
+    if( !isExist( fixPath( __dirname, '../config/user.js' ) ) ){
 
-// Checking if the user configuration file exists.
-// If it exists immediately run application.
-// On the other hand if it not exists move page and create new user.  
-if( isExistFile( __dirname + '/../config/user.js' ) ){
-    
-    paths.push( {
-        url: '/',
-        fn : function( request, response ){
-            if( checkUserAgent( request ) )
-                response.sendfile( fixPath( __dirname + '/../view/index.html' ) )
-        }
-    } )
-    paths.push( {
-        url: '/search',
-        fn : function( request, response ){
-            if( checkUserAgent( request ) )
-                response.sendfile( fixPath( __dirname + '/../view/search.html' ) )
-        }
-    } )
-    paths.push( {
-        url: '/list',
-        fn : function( request, response ){
-            if( checkUserAgent( request ) )
-                response.sendfile( fixPath( __dirname + '/../view/list.html' ) )
-        }
-    } )
-    paths.push( {
-        url: '/setting',
-        fn : function( request, response ){
-            if( checkUserAgent( request ) )
-                response.sendfile( fixPath( __dirname + '/../view/setting.html' ) )
-        }
-    } )
-    
-    paths.push( {
-        url: '/edit',
-        fn : function( request, response ){
-            if( checkUserAgent( request ) )
-                response.sendfile( fixPath( __dirname + '/../view/edit.html' ) )
-        }
-    } )
-    
-    // This is public address. Allow connections from outside.
-    paths.push( {
-        url: '/vote',
-        fn : function( request, response ){
-            response.sendfile( fixPath( __dirname + '/../view/vote.html' ) )
-        }
-    } )
-    
-} else {
-    
-    // Twitter OAuth
-    // Get your access token and access token secret.
-    var consumer_key    = config.twitter.consumer_key,
-        consumer_secret = config.twitter.consumer_secret
-    
-    var passport        = require( 'passport' ),
-        TwitterStrategy = require( 'passport-twitter' ).Strategy
-    
-    passport.serializeUser( function( user, done ){
-        done( null, user.id )
-    } )
-    passport.deserializeUser( function( obj, done ){
-        done( null, obj )
-    } )
-    
-    passport.use( new TwitterStrategy( {
-        consumerKey   : consumer_key,
-        consumerSecret: consumer_secret,
-        callbackURL   : "http://127.0.0.1:3000/callback"
-    }, function( token, tokenSecret, profile, done ){
-        console.log( token, tokenSecret )
-        profile.twitter_token        = token
-        profile.twitter_token_secret = tokenSecret
-        exports.profile              = profile
-        process.nextTick( function(){
-            return done( null, profile )
+        var config = require( '../config/config' ).config
+
+        var consumer_key    = config.twitter.consumer_key,
+            consumer_secret = config.twitter.consumer_secret
+
+        var passport        = require( 'passport' ),
+            TwitterStrategy = require( 'passport-twitter' ).Strategy
+
+        passport.serializeUser( function( user, done ){
+            done( null, user.id )
         } )
-    } ) )
-    
-    express.use( passport.initialize() ) 
-    express.use( passport.session() )
-    express.use( require( 'express-session' )( {
-        secret: 'secret'
-    } ) )
-    
-    // Open
-    paths.push( {
-        url: '/twitter',
-        fn : passport.authenticate( 'twitter' )
-    } )
-    
-    // Add callback address
-    paths.push( {
-        url: '/callback',
-        fn : passport.authenticate( 'twitter', { 
-            successRedirect: '/newUser',
-            failureRedirect: '/' 
+        passport.deserializeUser( function( obj, done ){
+            done( null, obj )
         } )
-    } )
-    
-    // Setup
-    paths.push( {
-        url: '/',
-        fn : function( request, response ){
-            response.sendfile( fixPath( __dirname + '/../view/setup.html' ) )
+
+        paths['/twitter']  = passport.authenticate( 'twitter' )
+        paths['/callback'] = passport.authenticate( 'twitter', { 
+            successRedirect: '/signup',
+            failureRedirect: '/setup' 
+        } )
+        paths['/setup']    = function( request, response ){
+            if( root == request.sessionID )
+                response.sendFile( fixPath( __dirname, '../view/setup.html' ) )
+            else
+                response.status( 403 ).send( 'Forbidden' )
         }
-    } )
-    
-    paths.push( {
-        url: '/newUser',
-        fn : function( request, response ){
-            response.sendfile( fixPath( __dirname + '/../view/newUser.html' ) )
+        paths['/signup']   = function( request, response ){
+            if( root == request.sessionID )
+                response.sendFile( fixPath( __dirname, '../view/signup.html' ) )
+            else
+                response.status( 403 ).send( 'Forbidden' )
         }
-    } )
+
+        passport.use( new TwitterStrategy( {
+            consumerKey   : consumer_key,
+            consumerSecret: consumer_secret,
+            callbackURL   : 'http://127.0.0.1:' + port + '/callback'
+        }, function( token, tokenSecret, profile, done ){
+            exports.access_token        = token
+            exports.access_token_secret = tokenSecret
+            exports.profile             = profile
+            process.nextTick( function(){
+                return done( null, profile )
+            } )
+        } ) )
+
+        app.use( passport.initialize() ) 
+        app.use( passport.session() )
+        app.use( session )
+
+    }
     
+    for( var path in paths )
+        app.get( path, paths[path] )
+
+    return {
+        http   : http,
+        port   : port,
+        session: session
+    }
+
 }
-
-// Set addresses
-for( var i=0; i<paths.length; i++ ){
-    express.get( paths[i].url, paths[i].fn )
-}
-
-http.listen( 3000 )
-
-/* ----- Exports ----- */
-
-exports.express = express
-exports.http    = http

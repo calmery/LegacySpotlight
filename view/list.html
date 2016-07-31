@@ -6,9 +6,9 @@
         <meta http-equiv="cache-control" content="no-cache">
         <meta http-equiv="content-style-type" content="text/css">
         <meta http-equiv="content-script-type" content="text/javascript">
-        <link rel="stylesheet" href="resources/css/base.css">
-        <link rel="stylesheet" href="resources/css/layout.css">
-        <script src="resources/js/binding.js"></script>
+        <link rel="stylesheet" href="css/base.css">
+        <link rel="stylesheet" href="css/layout.css">
+        <script src="js/binding.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script>
 
@@ -17,7 +17,20 @@
             socketio.emit( 'getList', {
                 value: true
             } )
+            
+            socketio.on( 'processError', function( error ){
+                alert( 'エラーが発生しました．\n\n' + error.value )
+            } )
 
+            socketio.on( 'complate', function( res ){
+                alert( '共有が完了しました．' )
+            } )
+
+            socketio.on( 'gotSharedList', function( data ){
+                sessionStorage.setItem( 'editList', data.value )
+                window.location.href = '/user'
+            } )
+            
             socketio.on( 'gotList', function( data ){
                 var obj = []
                 for( var i=0; i<data.value.length; i++ )
@@ -26,7 +39,7 @@
             } )
             
             socketio.on( 'gotListData', function( data ){
-                sessionStorage.setItem( 'editList', JSON.stringify( data.value ) )
+                sessionStorage.setItem( 'editList', data.value )
                 window.location.href = '/edit'
             } )
 
@@ -38,6 +51,20 @@
 
                 sessionStorage.setItem( 'editName', val )
 
+            }
+            
+            function share( name ){
+                
+                if( !confirm('この結果をシェアしますか？') )
+                    return false
+                
+                socketio.emit( 'share', name )
+                
+            }
+            
+            function getShared( num ){
+                socketio.emit( 'pullSharedList', num )
+                sessionStorage.setItem( 'editName', num )
             }
 
         </script>
@@ -73,9 +100,59 @@
                 <div id="padding">
                     <div class="label">保存したリスト</div>
                     <div id="tweet">
-                        <a href="javascript:void(0)" onclick="getList('{{name}}')">
-                            <div class="tw">{{name}}</div>
-                        </a>
+                        <div class="tw2" class="clearfix" onclick="getList('{{name}}')">
+                            <div class="clearfix">
+                                <div class="postName"><b>{{name}}</b></div>
+                                <div style="width:50px;float:left">
+                                    <div class="postBtn" onclick="share( '{{name}}' )">共有</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="label">共有ユーザリスト（Beta）</div>
+                    <div id="tweet2">
+                        <div class="tw2" class="clearfix" onclick="getShared(1)">
+                            <div class="clearfix">
+                                <div class="postName"><b>Rank 1</b></div>
+                                <div style="width:50px;float:left">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tw2" class="clearfix" onclick="getShared(2)">
+                            <div class="clearfix">
+                                <div class="postName"><b>Rank 2</b></div>
+                                <div style="width:50px;float:left">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tw2" class="clearfix" onclick="getShared(3)">
+                            <div class="clearfix">
+                                <div class="postName"><b>Rank 3</b></div>
+                                <div style="width:50px;float:left">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tw2" class="clearfix" onclick="getShared(4)">
+                            <div class="clearfix">
+                                <div class="postName"><b>Rank 4</b></div>
+                                <div style="width:50px;float:left">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tw2" class="clearfix" onclick="getShared(5)">
+                            <div class="clearfix">
+                                <div class="postName"><b>Rank 5</b></div>
+                                <div style="width:50px;float:left">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tw2" class="clearfix" onclick="getShared(6)">
+                            <div class="clearfix">
+                                <div class="postName"><b>Others</b></div>
+                                <div style="width:50px;float:left">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

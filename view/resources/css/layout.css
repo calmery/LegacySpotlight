@@ -141,7 +141,34 @@ body::-webkit-scrollbar{
     border-bottom: 5px solid rgba(0,119,178,1);
 }
 
+.advancedLavel {
+    font-size: 12px;
+    padding-left: 5px;
+    font-weight: bold;
+    font-family: sans-serif;
+    margin-bottom: 5px;
+    border-left: 5px solid rgba(0,119,178,1);
+}
+
+#advanced textarea {
+    width: 100%;
+    border: 0;
+    background: rgba( 240,240,240,1 );
+    margin-bottom: 5px;
+    padding: 5px;
+    height: 30px;
+}
+
 .tw {
+    background: rgba( 245,245,245,1 );
+    border-left: 5px solid rgba( 2, 159, 218, 1 );
+    margin: 0 25px;
+    width: 505px;
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.tw2 {
     background: rgba( 245,245,245,1 );
     border-left: 5px solid rgba( 2, 159, 218, 1 );
     margin: 0 25px;
@@ -157,7 +184,7 @@ textarea.form {
     padding: 15px 25px;
 }
 
-#tweet {
+#tweet, #tweet2 {
     margin-bottom: 20px;
 }
 
@@ -175,6 +202,14 @@ textarea.form {
 .tw .data {
     width: 430px;
     float: left;
+}
+
+.openvote {
+    background: rgba( 2, 159, 218, 1 );
+    margin: 0 25px;
+    width: 510px;
+    padding: 5px 20px;
+    color: white
 }
 
 .userid {
@@ -209,7 +244,7 @@ textarea#searchCount {
     border-radius: 3px;
     padding: 10px 10px;
 }
-#searchBtn {
+#searchBtn, #advancedSearchBtn {
     width: 50px;
     height: 35px;
     background: rgba( 2, 159, 218, 1 );
@@ -221,9 +256,72 @@ textarea#searchCount {
     border-radius: 3px;
     line-height: 28pt;
 }
-#searchBtn:hover {
+#searchBtn:hover, #advancedSearchBtn:hover {
     -webkit-transition: ease 0.5s;
     background: rgba( 0, 119, 178, 1 )
+}
+
+#advancedSearchBtn {
+    width: 110px;
+    left: 175px;
+}
+
+#advancedQuery, #advancedClose {
+    width: 100%;
+    padding: 10px 0;
+    background: rgba( 2, 159, 218, 1 );
+    text-align: center;
+    color: rgba(255,255,255,1);
+    margin-bottom: 10px;
+}
+
+#advanced input, #advanced select {
+    margin-bottom: 10px;
+}
+
+#advancedBackground {
+    z-index: 9999999999;
+    width: 800px;
+    height: 600px;
+    background: rgba( 0,0,0,.5 );
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: fixed;
+    display: none;
+}
+#advanced {
+    background: #fff;
+    width: 450px;
+    height: 400px;
+    padding: 25px;
+    top: 50%;
+    left: 50%;
+    position: fixed;
+    margin: -225px 0 0 -225px;
+}
+
+.postBtn {
+    width: 50px;
+    height: 35px;
+    background: rgba( 2, 159, 218, 1 );
+    text-align: center;
+    color: rgba(255,255,255,1);
+    border-radius: 3px;
+    line-height: 28pt;
+    float: left;
+}
+
+.postBtn:hover {
+    -webkit-transition: ease 0.5s;
+    background: rgba( 0, 119, 178, 1 )
+}
+
+.postName {
+    width:455px;
+    float:left;
+    line-height: 28pt;
 }
 
 #dataBox {
