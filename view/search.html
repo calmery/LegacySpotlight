@@ -6,75 +6,132 @@
         <meta http-equiv="cache-control" content="no-cache">
         <meta http-equiv="content-style-type" content="text/css">
         <meta http-equiv="content-script-type" content="text/javascript">
-        <link rel="stylesheet" href="resources/css/base.css">
-        <link rel="stylesheet" href="resources/css/layout.css">
-        <script src="resources/js/binding.js"></script>
+        <link rel="stylesheet" href="css/base.css">
+        <link rel="stylesheet" href="css/layout.css">
+        <script src="js/binding.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script>
-
+            
+            bind.constant.NOW_INDEX = 0
+            
             var socketio = io()
+            
+            socketio.on( 'postedResult', function( data ){
+                alert( '保存しました．\n' + data.value.value.data + '\n' + data.value.value.raw )
+            } )
+            socketio.on( 'processError', function( error ){
+                alert( 'エラーが発生しました．\n\n' + error.value )
+            } )
+            
+            var historys = []
             
             var fstWrite     = false,
                 dataObject   = [],
                 resultObject = [],    // Shaping data
                 loaded       = []     // Added tweets
             
-            // Search result from Twitter.
+            function advancedOpen(){
+                document.getElementById( 'advancedBackground' ).style.display = 'block'
+            }
+            function advancedClose(){
+                document.getElementById( 'advancedBackground' ).style.display = 'none'
+            }
+            
+            function advancedQuery(){
+                
+                document.getElementById( 'advancedBackground' ).style.display = 'none'
+                
+                var $ = function( e ){
+                    return document.getElementById( e )
+                }
+                
+                var and      = $( 'and' ).value.split( /\s+/ ),
+                    or       = $( 'or' ).value.split( /\s+/ ),
+                    not      = $( 'not' ).value.split( /\s+/ ),
+                    from     = $( 'from' ).value,
+                    to       = $( 'to' ).value,
+                    think    = $( 'think' ).value
+                
+                if( and.length == 1 ) and = []
+                if( or.length == 1 )  or  = []
+                if( not.length == 1 ) not = []
+                
+                socketio.emit( 'advancedSearch', {
+                    and  : and,
+                    or   : or,
+                    not  : not,
+                    from : from,
+                    to   : to,
+                    think: think
+                } )
+                
+            }
+            
+            function searchQuery(){
+                
+                var count = document.getElementById( 'searchCount' ).value,
+                    word  = document.getElementById( 'searchWord' ).value
+                
+                if( !word ){
+                    alert( '検索ワードが指定されていません' )
+                    return false
+                }
+                
+                socketio.emit( 'searchQuery', {
+                    value: word,
+                    count: count
+                } )
+                
+            }
+            
             socketio.on( 'searchResult', function( data ){
+                historys.push( data.value )
                 
                 var tweets = data.value
                 
-                dataObject.push( JSON.stringify( tweets ) )
-
                 var meta   = tweets.search_metadata,
                     tweets = tweets.statuses
-
                 var data = [], now, time
-                
+
                 console.log(tweets)
-
                 for( var i=0; i<tweets.length; i++ ){
-
                     now = tweets[i]
-
                     time = now.created_at.split( /\s+/ )
                     time.splice( 4, 1 ) // Wed Jun 22 18:53:22 +0000 2016
-
                     // This tweet already loaded
                     if( loaded.indexOf( now.id ) >= 0 )
                         console.log( 'exist : ' + now.id )
-                    // New tweet
-                    else {
-                        loaded.push( now.id )
-                        // Shaping
-                        data.push( {
-                            retweet_count: now.retweet_count,
-                            created_at: time.join( ' ' ),
-                            id: now.id_str,
-                            in_reply_to_screen_name: now.in_reply_to_screen_name,
-                            in_reply_to_status_id: now.in_reply_to_status_id_str,
-                            in_reply_to_user_id: now.in_reply_to_user_id_str,
-                            text: now.text,
-                            id: now.id,
-                            user: {
-                                name: now.user.name,
-                                created_at: now.user.created_at,
-                                description: now.user.description,
-                                followers_count: now.user.followers_count,
-                                friends_count: now.user.friends_count,
-                                id: now.user.id_str,
-                                lang: now.user.lang,
-                                screen_name: now.user.screen_name,
-                                statuses_count: now.user.statuses_count,
-                                profile_image_url: now.user.profile_image_url
-                            }
-                        } )
-                    }
-
+                        // New tweet
+                        else {
+                            loaded.push( now.id )
+                            // Shaping
+                            data.push( {
+                                retweet_count: now.retweet_count,
+                                created_at: time.join( ' ' ),
+                                id: now.id_str,
+                                in_reply_to_screen_name: now.in_reply_to_screen_name,
+                                in_reply_to_status_id: now.in_reply_to_status_id_str,
+                                in_reply_to_user_id: now.in_reply_to_user_id_str,
+                                text: now.text,
+                                id: now.id,
+                                user: {
+                                    name: now.user.name,
+                                    created_at: now.user.created_at,
+                                    description: now.user.description,
+                                    followers_count: now.user.followers_count,
+                                    friends_count: now.user.friends_count,
+                                    id: now.user.id_str,
+                                    lang: now.user.lang,
+                                    screen_name: now.user.screen_name,
+                                    statuses_count: now.user.statuses_count,
+                                    profile_image_url: now.user.profile_image_url
+                                }
+                            } )
+                        }
                 }
-                
-                // Max element length is 200.
-                if( !document.getElementById('n200') ){
+
+                // Max element length is 150.
+                if( bind.constant.NOW_INDEX <= 150 ){
                     if( !fstWrite ) bind.binding( 'tweet', data )
                     else bind.binding( 'tweet', data, {
                         rewrite: false
@@ -83,7 +140,6 @@
                     fstWrite = true
                 } else 
                     alert( 'リストの最大数を超えてしまうため追加できません．一度保存し新しく検索を始めてください．' )
-
                 var element = document.getElementsByClassName( 'tw' )
                 for( var i=0; i<element.length; i++ ){
                     element[i].addEventListener( 'click', function(){
@@ -98,84 +154,12 @@
                         }
                     } )
                 }
-            } )
-            
-            socketio.on( 'postedResult', function( data ){
-                alert( '保存しました．\n' + data.value.value.data + '\n' + data.value.value.raw )
-            } )
-
-            socketio.on( 'error', function( error ){
-                alert( 'エラーが発生しました．\n\n' + error.value )
-            } )
-            
-            // Search on Twitter
-            function searchQuery(){
-
-                var word  = document.getElementById( 'searchWord' ).value,
-                    count = document.getElementById( 'searchCount' ).value
                 
-                if( !word ){
-                    alert( '検索ワードが指定されていません' )
-                    return false
-                }
-
-                socketio.emit( 'searchQuery', {
-                    value: word,
-                    count: count
-                } )
-
-                return true
-
-            }
+            } )
             
-            // Save
-            function save(){
-                var error = ''
-
-                if( !fstWrite )
-                    error += '検索結果が存在しないため保存ができません．'
-
-                if( !document.getElementById( 'dataName' ).value )
-                    error += '名前を付けづに保存はできません．'
-                
-                // Not search or haven't name
-                if( error ){
-                    alert( '以下のエラーを確認してください．' + error )
-                    return false
-                }
-
-                var result = []
-
-                var elem
-                for( var i=1; i<=bind.constant.NOW_INDEX; i++ ){
-                    elem = document.getElementById( 'n' + i )
-                    result.push( {
-                        flg: elem.getAttribute( 'flg' ),
-                        userid: elem.getAttribute( 'userid' ),
-                        text: document.getElementById( 'text' + i ).innerHTML,
-                        id: elem.getAttribute( 'tweetid' ),
-                        profile_image_url:elem.getAttribute('profile'),
-                        created_at:elem.getAttribute('create'),
-                        name:elem.getAttribute('username'),
-                        screen_name: elem.getAttribute( 'screen' )
-                    } )
-                }
-
-                resultObject.push( result )
-
-                socketio.emit( 'postResult', {
-                    name: document.getElementById('dataName').value,
-                    data: result,
-                    raw: dataObject
-                } )
-
-                return true
-            }
-
             window.onload = function(){
-
                 bind.hide( 'tweet' )
-                
+
                 // Confirm user action.
                 var elems = document.getElementsByClassName( 'ml' )
                 for( var i=0; i<elems.length; i++ )
@@ -185,10 +169,64 @@
                         if( flg )
                             window.location.href = this.parentNode.getAttribute( 'href')
                     } )
-
             }
+            
+            var vote = {}
+            
+            function openVote( id ){
+                alert( id + 'を公開しました' )
+                vote.id = id
+                vote.text = document.getElementById( 'text' + id ).innerHTML
+                socketio.emit('openVote', vote)
+            }
+            
+            function save(){
+                
+                var error = ''
+                if( !fstWrite )
+                    error += '検索結果が存在しないため保存ができません．'
+                
+                if( !document.getElementById( 'dataName' ).value )
+                    error += '名前を付けづに保存はできません．'
 
-
+                // Not search or haven't name
+                if( error ){
+                    alert( '以下のエラーを確認してください．' + error )
+                    return false
+                }
+                
+                var tweets = []
+                for( var i=0; i<historys.length; i++ ){
+                    for( var j=0; j<historys[i].statuses.length; j++ )
+                        tweets.push( historys[i].statuses[j] )
+                }
+                
+                var elem
+                for( var i=0; i<tweets.length; i++ ){
+                    elem = document.getElementById( 'n' + tweets[i].id )
+                    tweets[i].flg = elem.getAttribute( 'flg' )
+                }
+                
+                console.log( tweets )
+                
+                var meta = []
+                
+                for( var i=0; i<historys.length; i++ ){
+                    meta.push( historys[i].search_metadata )
+                }
+                
+                socketio.emit( 'postResult', {
+                    name: document.getElementById('dataName').value,
+                    data: {
+                        search_metadata: meta,
+                        statuses: tweets
+                    },
+                    raw: historys
+                } )
+                return true
+                
+            }
+            
         </script>
 
     </head>
@@ -222,19 +260,20 @@
 
             <div id="article">
                 <div id="header">
-                    <div class="htext float_l">SEARCH</div>
+                    
+                    <div id="advancedSearchBtn" onclick="advancedOpen()">高度な検索</div>
+                    
                     <textarea id="searchWord" placeholder="キーワード"></textarea>
                     <textarea id="searchCount" placeholder="個数"></textarea>
-                    <a href="javascript: void(0)" onclick="searchQuery()">
-                        <div id="searchBtn">検索</div>
-                    </a>
+                    <div id="searchBtn" onclick="searchQuery()">検索</div>
+                    
                 </div>
                 <div id="padding">
 
                     <div class="label">Result</div>
 
                     <div id="tweet">
-                        <div class="tw clearfix" id="n{{INDEX}}" flg="none" userid="{{user.id}}" tweetid="{{id}}" profile="{{user.profile_image_url}}" create="{{created_at}}" username="{{user.name}}" screen="{{user.screen_name}}">
+                        <div class="tw clearfix" id="n{{id}}" flg="none" userid="{{user.id}}" tweetid="{{id}}" profile="{{user.profile_image_url}}" create="{{created_at}}" username="{{user.name}}" screen="{{user.screen_name}}">
                             <div class="icon">
                                 <img src="{{user.profile_image_url}}">
                             </div>
@@ -245,15 +284,49 @@
                                 <span class="userscreenname">@{{user.screen_name}}</span>
                                 ( Friends : {{user.friends_count}} / Followsers : {{user.followers_count}} )
                                 <br><br>
-                                <span id="text{{INDEX}}">{{text}}</span>
+                                <span id="text{{id}}">{{text}}</span>
                                 <br><br>
                                 <span class="created_at">{{created_at}}</span>
                             </div>
                         </div>
+                        <!--
+                        <div id="open{{id}}" onclick="openVote('{{id}}')" good="0" bad="0" class="openvote">公開する</div>
+                        -->
                     </div>
+                    
+                </div>
+            </div>
+            
+            <div id="advancedBackground">
+                <div id="advanced">
+                    <div class="advancedLavel">And</div>
+                    <textarea id="and"></textarea>
+                    <div class="advancedLavel">Or</div>
+                    <textarea id="or"></textarea>
+                    <div class="advancedLavel">Not</div>
+                    <textarea id="not"></textarea>
+                    <div class="advancedLavel">From</div>
+                    <textarea id="from"></textarea>
+                    <div class="advancedLavel">To</div>
+                    <textarea id="to"></textarea>
+                    <div class="advancedLavel">Think</div>
+                    <select id="think">
+                        <option>-</option>
+                        <option>ポジティブ</option>
+                        <option>ネガティブ</option>
+                    </select>
+                    <br>
+                    <div id="advancedQuery" onclick="advancedQuery()">検索</div>
+                    <div id="advancedClose" onclick="advancedClose()">閉じる</div>
                 </div>
             </div>
 
+            <div id="voteBackground">
+                <div id="vote">
+                    <div id="ip"></div>
+                    <div id="votetext"></div>
+                </div>
+            </div>
 
         </div>
 

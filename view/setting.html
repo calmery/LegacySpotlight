@@ -6,9 +6,9 @@
         <meta http-equiv="cache-control" content="no-cache">
         <meta http-equiv="content-style-type" content="text/css">
         <meta http-equiv="content-script-type" content="text/javascript">
-        <link rel="stylesheet" href="resources/css/base.css">
-        <link rel="stylesheet" href="resources/css/layout.css">
-        <script src="resources/js/binding.js"></script>
+        <link rel="stylesheet" href="css/base.css">
+        <link rel="stylesheet" href="css/layout.css">
+        <script src="js/binding.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script>
 
@@ -17,7 +17,7 @@
             socketio.on( 'userResetComplate', function( data ){
                 sessionStorage.setItem( 'Message', '再度登録するにはアプリケーションを再起動してください．' )
                 alert( 'ユーザ情報を消去しました．' )
-                window.location.href = '/information'
+                window.location.href = '/setup'
             } )
             
             socketio.on( 'dataResetComplate', function( data ){
