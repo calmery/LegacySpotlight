@@ -53,6 +53,7 @@ var fn = {
         },
 
         userProfile: function( condition ){
+            
             var option = {}
             if( typeof( condition ) === 'number' )
                 option.user_id = condition
@@ -87,6 +88,7 @@ var fn = {
     // question Bool   : Question.
     // links    Bool   : Include links. ( Image and Url )
     search : function( options ){
+        console.log( options )
         if( !options ) return false
         var query = ''
         for( var option in options )
@@ -104,7 +106,8 @@ var fn = {
                 case 'to'      :
                 case 'since'   :
                 case 'until'   :
-                    query += statements[option] + options[option] + ' '
+                    if( options[option] )
+                        query += statements[option] + options[option] + ' '
                     break
                 case 'think'   :
                     if( options[option] === 'positive' || options[option] === 'negative' )
@@ -115,6 +118,7 @@ var fn = {
                     query += statements[option] + ' '
             }
         this.history.push( query )
+        console.log( 'Advanced search query : ' + query )
         // Execute resolve function when search is successful.
         // Execute reject function when search is failed.
         return new Promise( function( resolve, reject ){
@@ -126,7 +130,6 @@ var fn = {
                 else resolve( tweets )
              } )
         } )
-        return true
     }
 
 }

@@ -29,7 +29,9 @@
                     profileParser( data.value )
                 } )
                 
-                socketio.on( 'error', function( error ){
+                socketio.on( 'processError', function( error ){
+                    if( typeof error.value == 'object' )
+                        error.value = JSON.stringify( error.value )
                     alert( 'エラーが発生しました．\n\n' + error.value )
                 } )
 
@@ -95,9 +97,9 @@
                                 <br>
                                 <span class="username">{{name}}</span>
                                 <span class="userscreenname">@{{screen_name}}</span>
-                                ( Friends : {{friends_count}} / Followsers : {{followers_count}} )
+                                ( Friends : {{friends_count}} / Followers : {{followers_count}} )
                                 <br><br>
-                                <span class="created_at">{{description}}</span>
+                                <span class="description">{{description}}</span>
                                 <br><br>
                                 <span class="created_at">{{created_at}}</span>
                             </div>

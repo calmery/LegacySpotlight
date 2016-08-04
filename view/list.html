@@ -13,16 +13,20 @@
         <script>
 
             var socketio = io()
+            
+            var sharedFlg = false
 
             socketio.emit( 'getList', {
                 value: true
             } )
             
             socketio.on( 'processError', function( error ){
+                sharedFlg = false
                 alert( 'エラーが発生しました．\n\n' + error.value )
             } )
 
-            socketio.on( 'complate', function( res ){
+            socketio.on( 'complateShare', function( response ){
+                window.location.href = '/edit'
                 alert( '共有が完了しました．' )
             } )
 
@@ -40,17 +44,16 @@
             
             socketio.on( 'gotListData', function( data ){
                 sessionStorage.setItem( 'editList', data.value )
-                window.location.href = '/edit'
+                if( !sharedFlg )
+                    window.location.href = '/edit'
             } )
 
             function getList( val ){
-
                 socketio.emit( 'getListData', {
                     value: val
                 } )
 
                 sessionStorage.setItem( 'editName', val )
-
             }
             
             function share( name ){
@@ -60,6 +63,7 @@
                 
                 socketio.emit( 'share', name )
                 
+                sharedFlg = true
             }
             
             function getShared( num ){

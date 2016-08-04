@@ -9,49 +9,47 @@
         <link rel="stylesheet" href="css/base.css">
         <link rel="stylesheet" href="css/layout.css">
         <title>Spotlight</title>
-        
+
         <script src="/socket.io/socket.io.js"></script>
         <script>
-            
+
             var socketio = io()
-            
+
             /* ----- IO events ----- */
-            
+
             socketio.on( 'userCreated', function( data ){
                 alert( '登録が完了しました．' )
                 window.location.href = '/'
             } )
-            
+
             socketio.on( 'processError', function( error ){
                 alert( 'エラーが発生しました．\n' + error.value )
             } )
-            
+
             /* ----- Functions ----- */
-            
+
             function signup(){
-                
+
                 var flg = true
-                
+
                 var name         = document.getElementById( 'fname' ).value,
                     organization = document.getElementById( 'foriga' ).value
-                
-                name = name.replace( /\s+/g, '' )
-                
+
                 if( !name || !organization )
                     flg = false
-                    
+
                 if( flg )
                     socketio.emit( 'createUser', {
-                        name: name,
+                        name        : name,
                         organization: organization
                     } )
                 else 
                     alert( '入力が不正です．確認してください．' )
-                
+
             }
-            
+
         </script>
-        
+
     </head>
 
     <body>
@@ -61,7 +59,7 @@
             <div id="nav">
                 <div id="appName">SPOTLIGHT</div>
             </div>
-            
+
             <div id="article">
                 <div id="header">
                     <div class="htext">WELCOME TO SPOTLIGHT</div>

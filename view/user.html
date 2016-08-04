@@ -25,34 +25,46 @@
 
                 bind.binding( 'tweet', data.response )
                 
-                
                 bind.view( 'tweet' )
+                
+                document.getElementById( 'profileClose' ).addEventListener( 'click', function(){
+                    document.getElementById( 'profileBackground' ).style.display = 'none'
+                } )
 
             }
             
-            /*
-            function getUserProfile( id ){
-                socketio.emit( 'getUserProfile', id )
-            }
-            */
-            
             socketio.on( 'processError', function( error ){
+                if( typeof error.value == 'object' )
+                    error.value = JSON.stringify( error.value )
                 alert( 'エラーが発生しました．\n\n' + error.value )
             } )
             
-            /*
-            socketio.on( 'gotUserProfile', function(data){
+            function getUserProfile( user ){
+                console.log( user )
+                socketio.emit( 'getUserProfile', {
+                    value: user
+                } )
+            }
+            
+            var $ = function( e ){
+                return document.getElementById( e )
+            }
+            
+            socketio.on( 'gotUserProfile', function( profile ){
                 
-                console.log( data.value.tweets )
-                console.log( data.value.profile.screen_name )
-                console.log( document.getElementById( 'bind' + data.value.profile.screen_name ) )
+                profile = profile.value
                 
-                document.getElementById( 'bind' + data.value.profile.screen_name ).style.display = 'block'
-                bind.binding( 'bind' + data.value.profile.screen_name, data.value.tweets )
-                
+                console.log( profile )
+                $( 'profileBackground' ).style.display = 'block'
+                $( 'profileImage' ).src = profile.profile_image_url
+                $( 'profileName' ).innerHTML = profile.name
+                $( 'profileScreenName' ).innerHTML = '@' + profile.screen_name
+                $( 'profileId' ).innerHTML = profile.id
+                $( 'profileDescription' ).innerHTML = profile.description
+                $( 'profileFriends' ).innerHTML = 'Friends : ' + profile.friends_count + ' / Followers : ' + profile.followers_count
+                $( 'profileCreatedAt' ).innerHTML = profile.created_at
                 
             } )
-            */
 
         </script>
     </head>
@@ -91,19 +103,23 @@
                                 <br>
                                 <span class="username">{{name}}</span>
                                 <span class="userscreenname">@{{screen_name}}</span>
-                                <!--
-                                <div id="bind{{screen_name}}" style="display:none">
-                                    <div class="tw clearfix">
-                                            <span id="text{{INDEX}}">{{text}}</span>
-                                            <br><br>
-                                            <span class="created_at">{{created_at}}</span>
-                                    </div>
-                                </div>
-                                -->
                             </div>
                         </div>
                     </div>
 
+                </div>
+            </div>
+            
+            <div id="profileBackground">
+                <div id="profileClose">閉じる</div>
+                <div id="profileField">
+                    <div id="profileId"></div><br><br>
+                    <img src="" id="profileImage"><br><br>
+                    <div id="profileName"></div>
+                    <div id="profileScreenName"></div><br><br>
+                    <div id="profileFriends"></div><br><br>
+                    <div id="profileDescription"></div><br><br>
+                    <div id="profileCreatedAt"></div>
                 </div>
             </div>
 

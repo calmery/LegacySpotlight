@@ -24,7 +24,8 @@ exports.config = {
     },
 
     server: {
-        uri: 'localhost:3000',
+        uri: '202.16.132.30',
+        port: 80,
         secure: false
     }
 

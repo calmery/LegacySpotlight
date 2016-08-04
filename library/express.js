@@ -5,23 +5,31 @@ exports.run = function(){
     
     var http    = require( 'http' ).Server( app )
 
+    // Create a new session.
     var session = require( 'express-session' )( {
         secret           : 'secret',
         resave           : true,
         saveUninitialized: true
     } )
     
+    // Express is using session from express-session module.
     app.use( session )
     
+    // To expand the function.
     var fn      = require( './fn' ).fn,
         isExist = fn.isExist,
         fixPath = fn.fixPath
     
+    // Admin
     var root
     
+    // Application is using random port. So get a port number.
     var port = http.listen().address().port
     console.log( 'Running app on localhost:' + port )
 
+    /***** Routing *****/
+    
+    // Resources
     app.use( express.static( fixPath( __dirname, '../view/resources/' ) ) )
     
     var paths = {
@@ -32,8 +40,8 @@ exports.run = function(){
                 exports.root = root
             }
             
-            // Already send response !
             // Error: Can't set headers after they are sent.
+            // Cauntion : Response was already sent.
             
             if( !isExist( fixPath( __dirname, '../config/user.js' ) ) )
                 response.redirect( '/setup' )
@@ -85,13 +93,16 @@ exports.run = function(){
 
     }
 
+    // Check __dirname/config/user.js
     if( !isExist( fixPath( __dirname, '../config/user.js' ) ) ){
 
+        // Import application setting.
         var config = require( '../config/config' ).config
 
         var consumer_key    = config.twitter.consumer_key,
             consumer_secret = config.twitter.consumer_secret
 
+        // Import passport module.
         var passport        = require( 'passport' ),
             TwitterStrategy = require( 'passport-twitter' ).Strategy
 
@@ -125,6 +136,7 @@ exports.run = function(){
             consumerSecret: consumer_secret,
             callbackURL   : 'http://127.0.0.1:' + port + '/callback'
         }, function( token, tokenSecret, profile, done ){
+            // Export to index.js
             exports.access_token        = token
             exports.access_token_secret = tokenSecret
             exports.profile             = profile
@@ -139,9 +151,11 @@ exports.run = function(){
 
     }
     
+    // Attach paths.
     for( var path in paths )
         app.get( path, paths[path] )
 
+    // Export
     return {
         http   : http,
         port   : port,

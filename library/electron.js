@@ -7,7 +7,7 @@ exports.run = function( port ){
 
     var config = require( '../config/config' ).config
 
-    /* ----- Application events ----- */
+    /***** Application events *****/
 
     app.on( 'ready', function(){
 
@@ -28,11 +28,10 @@ exports.run = function( port ){
             main = null
         } )
 
-        /* ----- App events ----- */
+        /***** App events *****/
 
         app.on( 'window-all-closed', function(){
-            if( process.platform != 'darwin' )
-                app.quit()
+            app.quit()
         } )
 
         // Ready
