@@ -244,7 +244,7 @@ textarea#searchCount {
     border-radius: 3px;
     padding: 10px 10px;
 }
-#searchBtn, #advancedSearchBtn {
+#searchBtn, #advancedSearchBtn, #profileClose, #voteClose, #advancedSavedBtn {
     width: 50px;
     height: 35px;
     background: rgba( 2, 159, 218, 1 );
@@ -256,9 +256,49 @@ textarea#searchCount {
     border-radius: 3px;
     line-height: 28pt;
 }
-#searchBtn:hover, #advancedSearchBtn:hover {
+#searchBtn:hover, #advancedSearchBtn:hover, #profileClose:hover, #voteClose:hover, #advancedSavedBtn:hover {
     -webkit-transition: ease 0.5s;
     background: rgba( 0, 119, 178, 1 )
+}
+
+#queryArea {
+    display: none;
+}
+
+#advancedSavedBtn {
+    width: 120px;
+    left: 300px;
+}
+
+#profileField, #vote {
+    width: 550px;
+    height: 350px;
+    padding: 25px;
+    background: #fff;
+    top: 100px;
+    left: 100px;
+    position: fixed;
+    border-radius: 3px;
+    text-align: center;
+    font-size: 15px;
+}
+
+#vote #ip {
+    font-weight: bold;
+}
+
+#voteResult {
+    display: none;
+}
+
+#profileId {
+    font-weight: bold;
+}
+
+#profileImage {
+    width: 55px;
+    height: 55px;
+    border-radius: 100%;
 }
 
 #advancedSearchBtn {
@@ -266,7 +306,7 @@ textarea#searchCount {
     left: 175px;
 }
 
-#advancedQuery, #advancedClose {
+#advancedQuery, #advancedClose, #advancedSave, .queryBtn {
     width: 100%;
     padding: 10px 0;
     background: rgba( 2, 159, 218, 1 );
@@ -275,11 +315,27 @@ textarea#searchCount {
     margin-bottom: 10px;
 }
 
+.queryBtn {
+    width: 450px;
+    margin: 0;
+    margin-bottom: 10px;
+    float: right;
+}
+
+.deleteBtn {
+    width: 100px;
+    float: right;
+    padding: 10px 0;
+    background: rgba( 22, 179, 238, 1 );
+    text-align: center;
+    color: rgba(255,255,255,1);
+}
+
 #advanced input, #advanced select {
     margin-bottom: 10px;
 }
 
-#advancedBackground {
+#advancedBackground, #profileBackground, #voteBackground {
     z-index: 9999999999;
     width: 800px;
     height: 600px;
@@ -291,15 +347,16 @@ textarea#searchCount {
     position: fixed;
     display: none;
 }
+
 #advanced {
     background: #fff;
     width: 450px;
-    height: 400px;
+    height: 475px;
     padding: 25px;
     top: 50%;
     left: 50%;
     position: fixed;
-    margin: -225px 0 0 -225px;
+    margin: -265px 0 0 -225px;
 }
 
 .postBtn {
@@ -358,4 +415,19 @@ textarea#searchCount {
     font-size: 12px;
     color: #fff;
     font-weight: 600;
+}
+
+#voteEnd {
+    width: 100%;
+    height: 35px;
+    background: rgba( 2, 159, 218, 1 );
+    text-align: center;
+    color: rgba(255,255,255,1);
+    margin: 10px 0;
+    border-radius: 3px;
+    line-height: 28pt;
+}
+
+#voteClose {
+    display: none;
 }

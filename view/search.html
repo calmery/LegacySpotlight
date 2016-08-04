@@ -20,7 +20,29 @@
                 alert( '保存しました．\n' + data.value.value.data + '\n' + data.value.value.raw )
             } )
             socketio.on( 'processError', function( error ){
+                if( typeof error.value == 'object' )
+                    error.value = JSON.stringify( error.value )
                 alert( 'エラーが発生しました．\n\n' + error.value )
+            } )
+            
+            socketio.on( 'openedVote', function( value ){
+                console.log( value )
+                document.getElementById( 'voteClose' ).style.display = 'none'
+                document.getElementById( 'voteBackground' ).style.display = 'block'
+                document.getElementById( 'votetext' ).innerHTML = vote.text
+                document.getElementById( 'ip' ).innerHTML = value.value.address
+                alert( value.value.value )
+            } )
+            
+            socketio.on( 'closedVote', function( value ){
+                value = value.value
+                console.log( value )
+                document.getElementById( 'voteEnd' ).style.display = 'none'
+                document.getElementById( 'voteResult' ).style.display = 'block'
+                document.getElementById( 'votegood' ).innerHTML = value.good
+                document.getElementById( 'votebad' ).innerHTML = value.bad
+                alert( value.id + 'の公開を終了しました．' )
+                document.getElementById( 'voteClose' ).style.display = 'block'
             } )
             
             var historys = []
@@ -52,9 +74,9 @@
                     to       = $( 'to' ).value,
                     think    = $( 'think' ).value
                 
-                if( and.length == 1 ) and = []
-                if( or.length == 1 )  or  = []
-                if( not.length == 1 ) not = []
+                if( and[0] == '' ) and = []
+                if( or[0] == '' )  or  = []
+                if( not[0] == '' ) not = []
                 
                 socketio.emit( 'advancedSearch', {
                     and  : and,
@@ -88,6 +110,8 @@
                 historys.push( data.value )
                 
                 var tweets = data.value
+                
+                alert( tweets.statuses.length + '件のツイートが見つかりました．' )
                 
                 var meta   = tweets.search_metadata,
                     tweets = tweets.statuses
@@ -169,15 +193,28 @@
                         if( flg )
                             window.location.href = this.parentNode.getAttribute( 'href')
                     } )
+                
+                document.getElementById( 'voteClose' ).addEventListener( 'click', function( e ){
+                    document.getElementById( 'voteBackground' ).style.display = 'none'
+                } )
+                
+                document.getElementById( 'voteEnd' ).addEventListener( 'click', function( e ){
+                    socketio.emit( 'closeVote', {
+                        value: true
+                    } )
+                } )
             }
             
             var vote = {}
             
             function openVote( id ){
-                alert( id + 'を公開しました' )
                 vote.id = id
                 vote.text = document.getElementById( 'text' + id ).innerHTML
-                socketio.emit('openVote', vote)
+                socketio.emit( 'openVote', vote )
+                document.getElementById( 'voteEnd' ).style.display = 'block'
+                document.getElementById( 'voteResult' ).style.display = 'none'
+                document.getElementById( 'votegood' ).innerHTML = 0
+                document.getElementById( 'votebad' ).innerHTML = 0
             }
             
             function save(){
@@ -227,6 +264,100 @@
                 
             }
             
+            function advancedSave(){
+                var name = document.getElementById( 'advancedName' ).value.replace( /\n/g, '' )
+                if( !name ){
+                    alert( '有効な名前ではありません．' )
+                    return
+                }
+                
+                var $ = function( e ){
+                    return document.getElementById( e )
+                }
+
+                var and      = $( 'and' ).value.split( /\s+/ ),
+                    or       = $( 'or' ).value.split( /\s+/ ),
+                    not      = $( 'not' ).value.split( /\s+/ ),
+                    from     = $( 'from' ).value,
+                    to       = $( 'to' ).value,
+                    think    = $( 'think' ).value
+
+                if( and[0] == '' ) and = []
+                if( or[0] == '' )  or  = []
+                if( not[0] == '' ) not = []
+
+                socketio.emit( 'advancedSave', {
+                    advancedName: name,
+                    and  : and,
+                    or   : or,
+                    not  : not,
+                    from : from,
+                    to   : to,
+                    think: think
+                } )
+                
+                
+                
+            }
+            
+            socketio.on( 'advancedSaved', function(){
+                alert( '条件の保存が完了しました．' )
+                advancedOpenSaved()
+            } )
+            
+            function advancedOpenSaved(){
+                socketio.emit( 'pullQuery', {
+                    value : true
+                } )
+            }
+            
+            var querys
+            
+            socketio.on( 'returnQuery', function( data ){
+                
+                document.getElementById( 'querys' ).innerHTML = ''
+                
+                var query = data.value
+                querys = query
+                if( !query ){
+                    alert( '条件が保存されていません．' )
+                    return
+                }
+                document.getElementById( 'queryArea' ).style.display = 'block'
+                for( var i in query )
+                    document.getElementById( 'querys' ).innerHTML += '<div class="clearfix" style="width:550px;margin: 0 auto;"><div class="deleteBtn" onclick="deleteQuery(\'' + i + '\')">消去</div><div class="queryBtn" onclick="openQuery(\'' + i + '\')">' + i + '</div></div>'
+            } )
+            
+            function openQuery( key ){
+                
+                document.getElementById( 'advancedName' ).value = key
+                
+                alert( '高度な検索に' + key + 'の条件を読み込みました．')
+                
+                var $ = function( e ){
+                    return document.getElementById( e )
+                }
+
+                $( 'and' ).value = querys[key].and.join( ' ' )
+                $( 'or' ).value = querys[key]['or'].join( ' ' )
+                $( 'not' ).value = querys[key].not.join( ' ' )
+                $( 'from' ).value = querys[key].from
+                $( 'to' ).value = querys[key].to
+                $( 'think' ).value = querys[key].think                
+                
+            }
+            
+            function deleteQuery( key ){
+                socketio.emit( 'deleteQuery', {
+                    value: key
+                } )
+            }
+            
+            socketio.on( 'deletedQuery', function(){
+                alert( '条件を消去しました．' )
+                advancedOpenSaved()
+            } )
+            
         </script>
 
     </head>
@@ -262,6 +393,7 @@
                 <div id="header">
                     
                     <div id="advancedSearchBtn" onclick="advancedOpen()">高度な検索</div>
+                    <div id="advancedSavedBtn" onclick="advancedOpenSaved()">保存した条件</div>
                     
                     <textarea id="searchWord" placeholder="キーワード"></textarea>
                     <textarea id="searchCount" placeholder="個数"></textarea>
@@ -269,6 +401,11 @@
                     
                 </div>
                 <div id="padding">
+                    
+                    <div id="queryArea">
+                        <div class="label">Query</div>
+                        <div id="querys"></div>
+                    </div>
 
                     <div class="label">Result</div>
 
@@ -289,9 +426,7 @@
                                 <span class="created_at">{{created_at}}</span>
                             </div>
                         </div>
-                        <!--
                         <div id="open{{id}}" onclick="openVote('{{id}}')" good="0" bad="0" class="openvote">公開する</div>
-                        -->
                     </div>
                     
                 </div>
@@ -317,14 +452,24 @@
                     </select>
                     <br>
                     <div id="advancedQuery" onclick="advancedQuery()">検索</div>
+                    <textarea id="advancedName" placeholder="検索条件に名前をつける"></textarea>
+                    <div id="advancedSave" onclick="advancedSave()">検索条件を保存する</div>
                     <div id="advancedClose" onclick="advancedClose()">閉じる</div>
                 </div>
             </div>
 
             <div id="voteBackground">
+                <div id="voteClose">閉じる</div>
                 <div id="vote">
-                    <div id="ip"></div>
-                    <div id="votetext"></div>
+                    同一ネットワーク上の他の端末で以下のアドレスにアクセスしてください．<br><br>
+                    <div id="ip"></div><br><br>
+                    <div id="votetext"></div><br><br>
+                    <div id="voteResult">
+                        結果<br><br>
+                        Safe<div id="votegood"></div><br>
+                        UnSafe<div id="votebad"></div>
+                    </div>
+                    <div id="voteEnd">公開を終了する</div>
                 </div>
             </div>
 
