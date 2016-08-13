@@ -1,0 +1,50 @@
+.text-css {
+  display: inline-block;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  position: relative;
+  cursor: pointer;
+  top: 10;
+  margin: 0 15% 0 4%;
+  padding: 0 22px;
+  border: 4px solid rgba(0,150,255,0.91);
+  font: normal normal bold 20px/50px Arial, Helvetica, sans-serif;
+  color: #6bbdf8;
+  text-align: center;
+  text-transform: uppercase;
+  -o-text-overflow: clip;
+  text-overflow: clip;
+  background: #ffffff;
+}
+
+.text-css:hover {
+  border: 4px solid rgba(0,150,255,0.91);
+  color: #ffffff;
+  background: #6bbdf8;
+}
+
+.text2-css {
+  display: inline-block;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  position: relative;
+  cursor: pointer;
+  top: 10;
+  margin: 0 0% 0 1%;
+  padding: 0 22px;
+  border: 4px solid rgba(237,18,18,1);
+  font: normal normal bold 20px/50px Arial, Helvetica, sans-serif;
+  color: #FF6060;
+  text-align: center;
+  text-transform: uppercase;
+  -o-text-overflow: clip;
+  text-overflow: clip;
+  background: #ffffff;
+}
+
+.text2-css:hover {
+  color: #ffffff;
+  background: #FF6060;
+}
