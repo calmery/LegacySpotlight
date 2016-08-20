@@ -18,12 +18,18 @@
 [Release](https://github.com/calmery/spotlight/releases) からダウンロードし，ファイルの書き込みが許可されているディレクトリ（デスクトップなど）に展開する．フォルダを開き Spotlight.exe また Spotlight.app を実行する．
 
 ### Development
-[NodeJS v4.4.7 LTS](https://nodejs.org/en/) をインストール後 [npm](https://www.npmjs.com) を使いモジュールをインポートする．  
+[NodeJS v4.4.7 LTS](https://nodejs.org/en/) をインストール後 [npm](https://www.npmjs.com) を使いモジュールをインポートする． 
+
 `$ npm install -g electron-prebuilt`  
 package.json のあるディレクトリに移動し以下のコマンドを実行する．  
 `$ npm install`  
 その後以下のコマンドでアプリケーションを実行する．  
 `$ electron .`
+
+以下の方法でも実行可能．
+`$ cd requirements`  
+`$ sh install.sh`  
+`$ sh run.sh`
 
 electron-packager を使いアプリケーションとして書き出すことができる．  
 `$ npm install -g electron-packager`  
