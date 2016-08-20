@@ -87,11 +87,10 @@ io.sockets.on( 'connection', function( socket ){
                 for( var i=0; i<files.length; i++ )
                     fs.unlink( __dirname + '/data/result/' + files[i], function( err ){
                         if( err ) emitError( err )
-                        else
-                            emitResult( 'complateDataReset', {
-                                value: true
-                            } )
                     } )
+                emitResult( 'complateDataReset', {
+                    value: true
+                } )
             } )
         } )
         
