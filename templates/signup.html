@@ -9,47 +9,9 @@
         <link rel="stylesheet" href="css/base.css">
         <link rel="stylesheet" href="css/layout.css">
         <title>Spotlight</title>
-
         <script src="/socket.io/socket.io.js"></script>
-        <script>
-
-            var socketio = io()
-
-            /* ----- IO events ----- */
-
-            socketio.on( 'userCreated', function( data ){
-                alert( '登録が完了しました．' )
-                window.location.href = '/'
-            } )
-
-            socketio.on( 'processError', function( error ){
-                alert( 'エラーが発生しました．\n' + error.value )
-            } )
-
-            /* ----- Functions ----- */
-
-            function signup(){
-
-                var flg = true
-
-                var name         = document.getElementById( 'fname' ).value,
-                    organization = document.getElementById( 'foriga' ).value
-
-                if( !name || !organization )
-                    flg = false
-
-                if( flg )
-                    socketio.emit( 'createUser', {
-                        name        : name,
-                        organization: organization
-                    } )
-                else 
-                    alert( '入力が不正です．確認してください．' )
-
-            }
-
-        </script>
-
+        <script src="preload.js"></script>
+        <script src="js/signup.js"></script>
     </head>
 
     <body>
@@ -67,19 +29,23 @@
                 <div id="padding">
                     <div class="label">ユーザ登録</div>
                     <div id="tweet">
-                        <div class="tw clearfix">
+                        <div class="elem box clearfix">
                             ユーザを作成します．<br><br>
                             利用者の名前，そして学校名などの所属先を入力してください．入力された情報はユーザの識別にのみ利用されます．
                         </div>
-                        <div class="tw clearfix">
+                        <div class="elem box clearfix">
                             <textarea id="fname" placeholder="名前" class="form"></textarea><br><br>
                             <textarea id="foriga" placeholder="所属（学校名など）" class="form"></textarea>
                         </div>
-                        <div class="tw clearfix">
-                            <div class="menu" onclick="signup()">登録する</div>
+                        <div class="elem box on clearfix" onclick="signup()">
+                            <div class="menu">登録する</div>
+                        </div>
+                        <div class="elem box on clearfix" onclick="skip()">
+                            <div class="menu">登録をスキップする</div>
                         </div>
                     </div>
                 </div>
+                
             </div>
 
 

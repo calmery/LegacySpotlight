@@ -10,33 +10,8 @@
         <link rel="stylesheet" href="css/layout.css">
         <script src="js/binding.js"></script>
         <script src="/socket.io/socket.io.js"></script>
-        <script>
-
-            var socketio = io()
-            
-            socketio.on( 'dataResetComplate', function( data ){
-                alert( '活動情報を消去しました．' )
-                window.location.href = '/'
-            } )
-            
-            socketio.on( 'processError', function( error ){
-                alert( 'エラーが発生しました．\n\n' + error.value )
-            } )
-
-            function del( types ){
-
-                var flg = confirm( 'この処理は取り消すことができません．続けますか？' )
-                if( flg )
-                    if( types == 'data' )
-                        socketio.emit( 'dataReset', {
-                            value: true
-                        } )
-                    else
-                        alert( '不正な操作を検知しました．' )
-
-            }
-
-        </script>
+        <script src="preload.js"></script>
+        <script src="js/setting.js"></script>
     </head>
 
     <body>
@@ -62,17 +37,32 @@
             <div id="article">
                 <div id="header">
                     <div class="htext">
-                        SETTING
+                        Setting
                     </div>
                 </div>
                 <div id="padding">
                     <div class="label">システム</div>
-                    <div id="tweet">
-                        <div class="tw clearfix" onclick="del('data')">
+                    <div class="elem box on">
+                        <div onclick="del('data')">
                             <b>活動内容を初期化する</b><br><br>
                             このアプリケーションに保存されている活動に関する情報を消去します．ユーザ情報は消去されません．
                         </div>
                     </div>
+                    <div class="hideTarget">
+                        <div class="label">連携機能を使用する</div>
+                        <a href="/resetup">
+                            <div class="elem box on">
+                                <b>アカウントを登録</b><br><br>
+                                アカウントの情報をサーバへ登録します．情報の共有機能が使用できるようになります．
+                            </div>
+                        </a>
+                    </div>
+                    <div class="label">Credit</div>
+                    <a href="/credit">
+                        <div class="elem box on">
+                            <b>Using Node modules</b>
+                        </div>
+                    </a>
                 </div>
             </div>
 

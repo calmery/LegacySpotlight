@@ -10,55 +10,8 @@
         <link rel="stylesheet" href="css/layout.css">
         <script src="js/binding.js"></script>
         <script src="/socket.io/socket.io.js"></script>
-        <script>
-
-            var socketio = io()
-
-            window.onload = function(){
-
-                if( !sessionStorage.getItem( 'myprofile' ) )
-                    socketio.emit( 'getMyProfile', {
-                        value: true
-                    } )
-                else
-                    profileParser( JSON.parse( unescape( sessionStorage.getItem( 'myprofile' ) ) ) )
-                
-                // Return my profile on Twitter.
-                socketio.on( 'gotMyProfile', function( data ){
-                    sessionStorage.setItem( 'myprofile', escape( JSON.stringify( data.value ) ) )
-                    profileParser( data.value )
-                } )
-                
-                socketio.on( 'processError', function( error ){
-                    if( typeof error.value == 'object' )
-                        error.value = JSON.stringify( error.value )
-                    alert( 'エラーが発生しました．\n\n' + error.value )
-                } )
-
-                function profileParser( data ){
-                    var profile = []
-                    profile.push( {
-                        name: data.name,
-                        created_at: data.created_at,
-                        followers_count: data.followers_count,
-                        friends_count: data.friends_count,
-                        id: data.id_str,
-                        lang: data.lang,
-                        description: data.description,
-                        screen_name: data.screen_name,
-                        statuses_count: data.statuses_count,
-                        profile_image_url: data.profile_image_url
-
-                    } )
-                    bind.binding( 'tweet', profile )
-                }
-
-            }
-
-
-
-        </script>
-
+        <script src="preload.js"></script>
+        <script src="js/index.js"></script>
     </head>
 
     <body>
@@ -83,12 +36,12 @@
 
             <div id="article">
                 <div id="header">
-                    <div class="htext">SPOTLIGHT BETA 0.2.1</div>
+                    <div class="htext">Spotlight Beta 0.3.2</div>
                 </div>
                 <div id="padding">
                     <div class="label">マイデータ</div>
-                    <div id="tweet">
-                        <div class="tw clearfix">
+                    <div id="profiles" class="box">
+                        <div class="elem clearfix">
                             <div class="icon">
                                 <img src="{{profile_image_url}}">
                             </div>
@@ -107,7 +60,6 @@
                     </div>
                 </div>
             </div>
-
 
         </div>
 
