@@ -26,10 +26,10 @@ package.json のあるディレクトリに移動し以下のコマンドを実�
 その後以下のコマンドでアプリケーションを実行する．  
 `$ electron .`
 
-以下の方法でも実行可能．
-`$ cd requirements`  
-`$ sh install.sh`  
-`$ sh run.sh`
+以下の方法でも実行可能．  
+`$ cd requirements`    
+`$ sh install.sh`    
+`$ sh run.sh`  
 
 electron-packager を使いアプリケーションとして書き出すことができる．  
 `$ npm install -g electron-packager`  
