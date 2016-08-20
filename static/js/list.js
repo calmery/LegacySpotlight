@@ -13,8 +13,11 @@ socketio.on( 'gotList', function( data ){
     var obj = []
     for( var i=0; i<data.value.length; i++ )
         obj.push( { name: data.value[i] } )
-    bind.binding( 'tweet', obj )
-    bind.view( 'tweet' )
+    console.log( obj )
+    if( obj.length > 0 ){
+        bind.binding( 'tweet', obj )
+        bind.view( 'tweet' )
+    }
 } )
 
 socketio.on( 'gotListData', function( data ){
