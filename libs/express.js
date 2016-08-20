@@ -2,7 +2,7 @@ exports.run = function(){
 
     var express = require( 'express' ),
         app     = express()
-    
+
     var http    = require( 'http' ).Server( app )
 
     // Create a new session.
@@ -11,27 +11,27 @@ exports.run = function(){
         resave           : true,
         saveUninitialized: true
     } )
-    
+
     // Express is using session from express-session module.
     app.use( session )
-    
+
     // To expand the function.
     var fn      = require( './fn' ).fn,
         isExist = fn.isExist,
         fixPath = fn.fixPath
-    
+
     // Admin
     var root
-    
+
     // Application is using random port. So get a port number.
     var port = http.listen().address().port
     console.log( 'Running app on localhost:' + port )
 
     /***** Routing *****/
-    
+
     // Resources
-    app.use( express.static( fixPath( __dirname, '../view/resources/' ) ) )
-    
+    app.use( express.static( fixPath( __dirname, '../static/' ) ) )
+
     var paths = {
 
         '/': function( request, response ){
@@ -39,65 +39,79 @@ exports.run = function(){
                 root = request.sessionID
                 exports.root = root
             }
-            
+
             // Error: Can't set headers after they are sent.
             // Cauntion : Response was already sent.
-            
-            if( !isExist( fixPath( __dirname, '../config/user.js' ) ) )
+
+            if( !isExist( fixPath( __dirname, '../core/user.js' ) ) )
                 response.redirect( '/setup' )
             else
-                if( root == request.sessionID )
-                    response.sendFile( fixPath( __dirname, '../view/index.html' ) )
+                if( root === request.sessionID )
+                    response.sendFile( fixPath( __dirname, '../templates/index.html' ) )
                 else
                     response.status( 403 ).send( 'Forbidden' )
         },
 
         '/search': function( request, response ){
-            if( root == request.sessionID )
-                response.sendFile( fixPath( __dirname, '../view/search.html' ) )
+            if( root === request.sessionID )
+                response.sendFile( fixPath( __dirname, '../templates/search.html' ) )
             else
                 response.status( 403 ).send( 'Forbidden' )
         },
 
         '/list': function( request, response ){
-            if( root == request.sessionID )
-                response.sendFile( fixPath( __dirname, '../view/list.html' ) )
+            if( root === request.sessionID )
+                response.sendFile( fixPath( __dirname, '../templates/list.html' ) )
             else
                 response.status( 403 ).send( 'Forbidden' )
         },
 
         '/setting': function( request, response ){
-            if( root == request.sessionID )
-                response.sendFile( fixPath( __dirname, '../view/setting.html' ) )
+            if( root === request.sessionID )
+                response.sendFile( fixPath( __dirname, '../templates/setting.html' ) )
             else
                 response.status( 403 ).send( 'Forbidden' )
         },
 
         '/edit': function( request, response ){
-            if( root == request.sessionID )
-                response.sendFile( fixPath( __dirname, '../view/edit.html' ) )
+            if( root === request.sessionID )
+                response.sendFile( fixPath( __dirname, '../templates/edit.html' ) )
+            else
+                response.status( 403 ).send( 'Forbidden' )
+        },
+
+        '/user': function( request, response ){
+            if( root === request.sessionID )
+                response.sendFile( fixPath( __dirname, '../templates/user.html' ) )
             else
                 response.status( 403 ).send( 'Forbidden' )
         },
         
-        '/user': function( request, response ){
-            if( root == request.sessionID )
-                response.sendFile( fixPath( __dirname, '../view/user.html' ) )
+        '/credit': function( request, response ){
+            if( root === request.sessionID )
+                response.sendFile( fixPath( __dirname, '../templates/credit.html' ) )
+            else
+                response.status( 403 ).send( 'Forbidden' )
+        },
+        
+        '/resetup': function( request, response ){
+            if( root === request.sessionID )
+                response.sendFile( fixPath( __dirname, '../templates/resetup.html' ) )
             else
                 response.status( 403 ).send( 'Forbidden' )
         },
 
         '/vote': function( request, response ){
-            response.sendFile( fixPath( __dirname, '../view/vote.html' ) )
+            response.sendFile( fixPath( __dirname, '../templates/vote.html' ) )
         }
 
     }
 
-    // Check __dirname/config/user.js
-    if( !isExist( fixPath( __dirname, '../config/user.js' ) ) ){
+    // Check __dirname/core/user.js
+    if( !isExist( fixPath( __dirname, '../core/user.js' ) ) ){
 
         // Import application setting.
-        var config = require( '../config/config' ).config
+        var config = require( '../core/config' ).config
 
         var consumer_key    = config.twitter.consumer_key,
             consumer_secret = config.twitter.consumer_secret
@@ -119,14 +133,14 @@ exports.run = function(){
             failureRedirect: '/setup' 
         } )
         paths['/setup']    = function( request, response ){
-            if( root == request.sessionID )
-                response.sendFile( fixPath( __dirname, '../view/setup.html' ) )
+            if( root === request.sessionID )
+                response.sendFile( fixPath( __dirname, '../templates/setup.html' ) )
             else
                 response.status( 403 ).send( 'Forbidden' )
         }
         paths['/signup']   = function( request, response ){
-            if( root == request.sessionID )
-                response.sendFile( fixPath( __dirname, '../view/signup.html' ) )
+            if( root === request.sessionID )
+                response.sendFile( fixPath( __dirname, '../templates/signup.html' ) )
             else
                 response.status( 403 ).send( 'Forbidden' )
         }
@@ -150,7 +164,7 @@ exports.run = function(){
         app.use( session )
 
     }
-    
+
     // Attach paths.
     for( var path in paths )
         app.get( path, paths[path] )

@@ -1,11 +1,11 @@
 exports.run = function( port ){
-    
-    var electron = require( 'electron' ),
-    app      = electron.app,
-    window   = electron.BrowserWindow,
-    main
 
-    var config = require( '../config/config' ).config
+    var electron = require( 'electron' ),
+        app      = electron.app,
+        window   = electron.BrowserWindow,
+        main
+
+    var config = require( '../core/config' ).config
 
     /***** Application events *****/
 
@@ -38,5 +38,5 @@ exports.run = function( port ){
         main.show()
 
     } )
-    
+
 }
