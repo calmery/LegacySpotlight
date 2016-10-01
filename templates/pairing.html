@@ -1,0 +1,37 @@
+<script src="/socket.io/socket.io.js"></script>
+<script src="preload.js"></script>
+<script>
+    
+    function pairingRequest(){
+        
+        var pairingDeviceName = document.getElementById( 'pairingDeviceName' ).value
+        
+        socketio.emit( 'pairingRequest', {
+            name: pairingDeviceName
+        } )
+        
+    }
+    
+    var pairingCode = function(){
+
+        socketio.emit( 'inputMyPairingCode',{
+            code: document.getElementById( 'pairingCode' ).value
+        } )
+
+    }
+    
+    socketio.on( 'inputYourPairingCode', function(){
+        
+        document.getElementById( 'hide' ).style.display = 'block'
+        
+    } )
+    
+</script>
+
+<textarea id="pairingDeviceName"></textarea>
+<a href="javascript: void( 0 )" onclick="pairingRequest()">Send</a>
+
+<div id="hide" style="display: none">
+    <textarea id="pairingCode"></textarea>
+    <a href="javascript: void( 0 )" onclick="pairingCode()">Send</a>
+</div>

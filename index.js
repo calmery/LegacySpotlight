@@ -13,6 +13,21 @@ io.use( sharedsession( server.session ) )
 // Root user's session id.
 var root 
 
+var pairingDevices = {
+    
+    allowed: [],
+    
+    denied : [],
+    
+    during: [],
+    duringObject: {},
+    
+    code: {}
+    
+}
+
+var Pairing = require( './libs/pairing' )
+
 /***** Global variables *****/
 
 var config = require( './core/config' ).config
@@ -57,8 +72,8 @@ io.sockets.on( 'connection', function( socket ){
 
     /***** Global Functions *****/
 
-    function emitResult( type, data ){
-        socket.emit( type, {
+    function emitResult( type, data, id ){
+        io.sockets.to( id ? id : socket.id ).emit( type, {
             value: data
         } )
     }
@@ -500,7 +515,42 @@ io.sockets.on( 'connection', function( socket ){
             
         } )
 
+        
+        socket.on( 'getPairingRequestList', function(){
+            console.log( 'Send pairing request.' )
+            emitResult( 'pairingRequestList', pairingDevices )
+        } )
+        
+        socket.on( 'permitPairing', function( device ){
+            if( pairingDevices.during.indexOf( device.device ) !== -1 ){
+                console.log( 'Permit pairing device : ' + device.device )
+                pairingDevices.code[device.device] = pairingDevices.duringObject[device.device].getPairingCode()
+                emitResult( 'pairingCode', pairingDevices.code[device.device] )
+                approvePairing( pairingDevices.duringObject[device.device].getId() )
+            } else {
+                console.log( 'Device not found (' + device.device + ')' )
+                emitError( 'Pairing Code not found' )
+            }
+        } )
+
+
+
     }
+    
+    function approvePairing( id ){
+        emitResult( 'inputYourPairingCode', {}, id )
+    }
+    
+    socket.on( 'inputMyPairingCode', function( code ){
+        if( pairingDevices.during.indexOf( socket.handshake.sessionID ) !== -1 && pairingDevices.duringObject[socket.handshake.sessionID].comparePairingCode( Number( code.code ) ) ){
+            console.log( 'Welcome ! New device is ' + pairingDevices.duringObject[socket.handshake.sessionID].getName() )
+            pairingDevices.allowed.push( socket.handshake.sessionID )
+            pairingDevices.during.splice( pairingDevices.during.indexOf( socket.handshake.sessionID ), 1 )
+            delete pairingDevices.duringObject[socket.handshake.sessionID]
+            delete pairingDevices.code[socket.handshake.sessionID]
+            console.log( pairingDevices )
+        } 
+    } )
     
     socket.on( 'pullVote', function(){
         emitResult( 'voteData', voteStatus )
@@ -512,6 +562,12 @@ io.sockets.on( 'connection', function( socket ){
             else
                 voteStatus.bad += 1
                 console.log( voteStatus )
+    } )
+
+    socket.on( 'pairingRequest', function( data ){
+        console.log( 'New pairing request from "' + data.name + ' (' + socket.handshake.sessionID + ')"'  )
+        pairingDevices.during.push( socket.handshake.sessionID )
+        pairingDevices.duringObject[socket.handshake.sessionID] = new Pairing( data.name, socket.handshake.sessionID, socket.id )
     } )
 
 } )
