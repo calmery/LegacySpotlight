@@ -22,7 +22,7 @@ exports.run = function( port ){
         main.loadURL( 'http://127.0.0.1:' + port )
 
         // development option.
-        // main.webContents.openDevTools()
+        main.webContents.openDevTools()
 
         main.on( 'closed', function(){
             main = null

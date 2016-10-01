@@ -1,0 +1,26 @@
+<script src="/socket.io/socket.io.js"></script>
+<script src="preload.js"></script>
+<script>
+
+    socketio.emit( 'getPairingRequestList', {} )
+    
+    socketio.on( 'pairingRequestList', function( list ){
+        list = list.value
+        console.log( list )
+    } )
+    
+    function permitPairing( device ){
+        socketio.emit( 'permitPairing', {
+            device: device
+        } )
+    }
+    
+    socketio.on( 'pairingCode', function( pairing ){
+        console.log( pairing.value )
+    } )
+    
+    socketio.on( 'processError', function( e ){
+        console.log( e.error )
+    } )
+    
+</script>

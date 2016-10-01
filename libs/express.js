@@ -24,7 +24,7 @@ exports.run = function(){
     var root
 
     // Application is using random port. So get a port number.
-    var port = http.listen().address().port
+    var port = http.listen( 3000 ).address().port
     console.log( 'Running app on localhost:' + port )
 
     /***** Routing *****/
@@ -100,9 +100,20 @@ exports.run = function(){
             else
                 response.status( 403 ).send( 'Forbidden' )
         },
+        
+        '/device': function( request, response ){
+            if( root === request.sessionID )
+                response.sendFile( fixPath( __dirname, '../templates/device.html' ) )
+            else
+                response.status( 403 ).send( 'Forbidden' )
+        },
 
         '/vote': function( request, response ){
             response.sendFile( fixPath( __dirname, '../templates/vote.html' ) )
+        },
+        
+        '/pairing': function( request, response ){
+            response.sendFile( fixPath( __dirname, '../templates/pairing.html' ) )
         }
 
     }
