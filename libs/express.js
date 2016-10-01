@@ -24,7 +24,7 @@ exports.run = function(){
     var root
 
     // Application is using random port. So get a port number.
-    var port = http.listen( 3000 ).address().port
+    var port = http.listen().address().port
     console.log( 'Running app on localhost:' + port )
 
     /***** Routing *****/
