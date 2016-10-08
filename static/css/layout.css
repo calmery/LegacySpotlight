@@ -15,6 +15,15 @@ body::-webkit-scrollbar{
     display: none
 }
 
+.borderLine {
+    width: 100%;
+    padding: 10px 0;
+    text-align: center;
+    color: #fff;
+    background: rgba( 2, 159, 218, 1 );
+    margin: 20px 0;
+}
+
 /* Nav */
 
 #nav {
