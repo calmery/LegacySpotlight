@@ -135,6 +135,7 @@ socketio.on( 'searchResult', function( data ){
 
     // Max element length is 150.
     if( bind.constant.COUNTER <= 150 ){
+        if( bind.constant.COUNTER > 0 ) document.getElementById( 'tweet' ).innerHTML += '<div class="borderLine">' + meta.query + '</div>'
         if( !fstWrite ) bind.binding( 'tweet', data )
         else bind.binding( 'tweet', data, {
             rewrite: false
