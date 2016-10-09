@@ -187,7 +187,7 @@ textarea#searchCount {
     border-radius: 3px;
     padding: 10px 10px;
 }
-#dataName {
+#dataName, #highlight {
     width: 100%;
     height: 45px;
     border: 0;
@@ -197,12 +197,16 @@ textarea#searchCount {
     color: #fff;
     background: rgba(0,0,0,0)
 }
-#dataName::-webkit-input-placeholder {
+#dataName::-webkit-input-placeholder, #highlight::-webkit-input-placeholder {
     color: rgba(255,255,255,.5)
 }
-#dataName:focus {
+#dataName:focus, #highlight:focus {
     -webkit-transition: ease 0.5s;
     background: rgba( 0, 119, 178, 1 )
+}
+
+.highlightText {
+    background: rgba( 42, 189, 248, 1 );
 }
 
 .advancedLavel {

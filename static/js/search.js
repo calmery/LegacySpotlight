@@ -335,3 +335,31 @@ socketio.on( 'deletedQuery', function(){
     alert( '条件を消去しました．' )
     advancedOpenSaved()
 } )
+
+var data = []
+
+function highlight(){
+
+    if( document.getElementById( 'highlight' ).value ){
+        
+        var text = document.getElementById( 'highlight' ).value
+        var target
+        
+        for( var i=0; i<document.querySelectorAll( '.box' ).length; i++ ){
+
+            
+            if( !data[i] ) {
+                data.push(document.querySelectorAll( '.box' )[i].children[0].children[1].children[6].innerHTML)
+                
+            }
+            
+            target = data[i]
+            
+            document.querySelectorAll( '.box' )[i].children[0].children[1].children[6].innerHTML = target.replace( RegExp( text, 'g' ), '<span class="highlightText">' + text + '</span>' )
+            
+            
+        }
+        
+    }
+    
+}
