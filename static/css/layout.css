@@ -421,3 +421,7 @@ textarea.form {
     border: 0;
     padding: 15px 25px;
 }
+
+.remove {
+    background: rgba( 255, 96, 96, 1 )
+}

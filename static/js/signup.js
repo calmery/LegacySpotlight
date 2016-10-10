@@ -17,7 +17,7 @@ function signup(){
             organization: organization
         } )
     else 
-        alert( '入力が不正です．確認してください．' )
+        alert( '入力が不正，または未入力の項目があります．' )
 }
 
 function skip(){

@@ -26,4 +26,12 @@ onload = function(){
         }] )
     }
     
+    socketio.emit( 'isPairing', {} )
+    
+    socketio.on( 'hidePairing', function( value ){
+        if( !value.value )
+            document.getElementById( 'pairingBtn' ).style.display = 'none' 
+            console.log(value)
+    } )
+    
 }
