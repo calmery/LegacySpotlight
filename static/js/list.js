@@ -49,7 +49,7 @@ function getShared( num ){
 
 socketio.on( 'onInit', function( config ){
     console.log( config )
-    if( config.name === 'guest' ){
+    if( config.value.name === 'guest' ){
         var elements = document.getElementsByClassName( 'hideTarget' )
         for( var i=0; i<elements.length; i++ )
             elements[i].style.display = 'none'
@@ -62,4 +62,12 @@ window.onload = function(){
         value: true
     } )
     socketio.emit( 'init', {} )
+    
+    socketio.emit( 'isPairing', {} )
+
+    socketio.on( 'hidePairing', function( value ){
+        if( !value.value )
+            document.getElementById( 'pairingBtn' ).style.display = 'none' 
+            console.log(value)
+    } )
 }

@@ -1,31 +1,37 @@
-exports.config = {
+const fs   = require( 'fs' ),
+      path = require( 'path' )
+
+// Additional modules
+const JsYaml = require( 'js-yaml' )
+
+// Utility
+const Util = require( '../libs/utility' )
+
+// yamlParser :: String -> Object
+const yamlParser = ( path ) => JsYaml.safeLoad( fs.readFileSync( Util.fixPath( __dirname, path ), 'utf8' ) )
+
+var config
+
+const update = function(){
+    config = {}
     
-    electron: {
-        app: {
-            width: 800,
-            height: 600,
-            center: true,
-            fullscreen: false,
-            fullscreenenable: false,
-            show: false,
-            title: 'Spotlight Beta'
-        },
-        maxListeners: 10
-    },
-    
-    twitter: {
-        name: 'SpotlightBeta-Patchworks',
-        app: '12368503',
-        consumer_key: '2aZzmhzrNsXqjQcDv0z3eB8cQ',
-        consumer_secret: 'qBHKHCoaHOsfrzkTB5AchtWgpB1wCIuQBc6ZMQlylod5QdAdkk',
-        defaultSearchResultCount: 15
-    },
-    
-    server: {
-        // Yoshilab
-        uri: '202.16.132.30',
-        port: 80,
-        secure: false
+    config = {
+        default : yamlParser( 'config/default.yaml' ),
+        electron: yamlParser( 'config/electron.yaml' ),
+        twitter : yamlParser( 'config/twitter.yaml' ),
+        server  : yamlParser( 'config/server.yaml' )
     }
     
+    console.log( Util.isExist( Util.fixPath( __dirname, 'config', 'user.yaml' ) ) )
+
+    if( Util.isExist( Util.fixPath( __dirname, 'config', 'user.yaml' ) ) )
+        config['user'] = yamlParser( 'config/user.yaml' )
+    
+    module.exports.config = config
+    
+    return config
 }
+
+update()
+
+module.exports.update = update

@@ -1,24 +1,24 @@
-exports.run = function( port ){
+const Electron = require( 'electron' )
+const Config   = require( '../core/config' ).config
 
-    var electron = require( 'electron' ),
-        app      = electron.app,
-        window   = electron.BrowserWindow,
+const run = function( port ){
+
+    var app      = Electron.app,
+        window   = Electron.BrowserWindow,
         main
-
-    var config = require( '../core/config' ).config
 
     /***** Application events *****/
 
     app.on( 'ready', function(){
 
-        var option       = config.electron.app,
-            maxListeners = config.electron.maxListeners
+        const option       = Config.electron.app,
+              maxListeners = Config.electron.maxListeners
 
         main = new window( option )
 
         main.setResizable( false )
         main.setMaxListeners( maxListeners )
-
+        
         main.loadURL( 'http://127.0.0.1:' + port )
 
         // development option.
@@ -40,3 +40,5 @@ exports.run = function( port ){
     } )
 
 }
+
+module.exports.run = run

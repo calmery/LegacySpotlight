@@ -10,6 +10,14 @@ window.onload = function(){
     document.getElementById( 'profileClose' ).addEventListener( 'click', function(){
         document.getElementById( 'profileBackground' ).style.display = 'none'
     } )
+    
+    socketio.emit( 'isPairing', {} )
+
+    socketio.on( 'hidePairing', function( value ){
+        if( !value.value )
+            document.getElementById( 'pairingBtn' ).style.display = 'none' 
+            console.log(value)
+    } )
 }
 
 function getUserProfile( user ){

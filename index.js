@@ -1,77 +1,55 @@
-var express = require( './libs/express' ),
-    server  = express.run()
+const fs = require( 'fs' ),
+      os = require( 'os' )
 
-var sharedsession = require( 'express-socket.io-session' ),
-    io            = require( 'socket.io' )( server.http )
+const request       = require( 'request' ),
+      sharedsession = require( 'express-socket.io-session' ),
+      JsYaml        = require( 'js-yaml' )
 
-var request = require( 'request' ),
-    fs      = require( 'fs' ),
-    os      = require( 'os' )
+var Express  = require( './libs/express' )
 
-io.use( sharedsession( server.session ) )
+const Electron = require( './libs/electron' ),
+      Util     = require( './libs/utility' ),
+      Pairing  = require( './libs/pairing' )
 
-// Root user's session id.
-var root 
+var Twitter
+
+if( Util.isExist( Util.fixPath( __dirname, 'core', 'config', 'user.yaml' ) ) )
+    Twitter  = require( './libs/twitter' )
+
+const _Config  = require( './core/config' )
+const Config   = _Config.config
+
+/* ***** ***** ***** */
+
+// Execute express
+const runtime = Express.run()
+
+const io = require( 'socket.io' )( runtime.http )
+io.use( sharedsession( runtime.session ) )
+
+// Root user's session id
+var root
 
 var pairingDevices = {
-    
     allowed: [],
-    
     denied : [],
-    
     during: [],
     duringObject: {},
-    
     code: {}
-    
-}
-
-var Pairing = require( './libs/pairing' )
-
-/***** Global variables *****/
-
-var config = require( './core/config' ).config
-
-var serverAddress = 'http' + ( config.server.secure ? 's' : '' ) + '://' + config.server.uri + ':' + config.server.port
-console.log( 'Server address : ' + serverAddress )
-
-var fn      = require( './libs/fn' ).fn,
-    fixPath = fn.fixPath,
-    isExist = fn.isExist
-
-var userConfig
-var twitter
-var client
-var clientFn
-
-if( isExist( fixPath( __dirname, 'core', 'user.js' ) ) ){
-    userConfig = require( './core/user' ).config
-    twitter    = require( './libs/twitter' )
-    client     = twitter.client
-    clientFn   = twitter.fn
 }
 
 var voteStatus = {},
     isVote     = false
 
+var userConfig = Config.user ? Config.user : undefined
+
+const serverAddress = 'http' + ( Config.server.secure ? 's' : '' ) + '://' + Config.server.uri + ':' + Config.server.port
+console.log( 'Server address : ' + serverAddress )
+
+
+
 io.sockets.on( 'connection', function( socket ){
-
-    if( !root && express.root === socket.handshake.sessionID ){
-
-        root = express.root
-        console.log( 'Root user\'s session id of application is ' + root )
-
-        console.log( '----- ----- ----- ----- -----' )
-
-    }
     
-    // Check user name and user organization
-    socket.on( 'init', function(){
-        socket.emit( 'onInit', userConfig )
-    } )
-
-    /***** Global Functions *****/
-
     function emitResult( type, data, id ){
         io.sockets.to( id ? id : socket.id ).emit( type, {
             value: data
@@ -83,20 +61,36 @@ io.sockets.on( 'connection', function( socket ){
             value: data
         } )
     }
+    
+    if( !root && Express.root === socket.handshake.sessionID ){
 
-    if( root && root === socket.handshake.sessionID ){
+        root = Express.root
+        console.log( 'Root user\'s session id of application is ' + root + '\n----- ----- ----- ----- -----' )
+
+    }
+    
+    if( root === socket.handshake.sessionID || pairingDevices.allowed.indexOf( socket.handshake.sessionID ) != -1 ){
+    
+        // Check user name and user organization
+        socket.on( 'init', function(){
+            emitResult( 'onInit', _Config.update().user )
+        } )
         
-        // index.html : getMyProfile => returnMyProfile
+        socket.on( 'isPairing', function(){
+            emitResult( 'hidePairing', Config.default.pairing )
+        } )
+        
+        // getMyProfile => returnMyProfile
         socket.on( 'getMyProfile', function( data ){
-            clientFn.get.user.profile( Number( userConfig.id ) ).then( function( profile ){
+            console.log( userConfig )
+            Twitter.getUserProfile( Number( userConfig.id ) ).then( function( profile ){
                 emitResult( 'returnMyProfile', profile )
             }, function( error ){
-                // Dump
                 emitError( error )
             } )
         } )
         
-        // setting.html : dataReset => complateDataReset
+        // dataReset => complateDataReset
         socket.on( 'dataReset', function( data ){
             fs.readdir( __dirname + '/data/result/', function( err, files ){
                 for( var i=0; i<files.length; i++ )
@@ -115,22 +109,23 @@ io.sockets.on( 'connection', function( socket ){
             var name = data.advancedName
             delete data.advancedName
 
-            var history = fs.readFileSync( fixPath( __dirname, 'data',  'querys.json' ), 'utf-8' )
+            var history = fs.readFileSync( Util.fixPath( __dirname, 'data',  'querys.json' ), 'utf-8' )
             try {
                 history = JSON.parse( history )
                 history[name] = data
+                
+                console.log( Util.fixPath( __dirname, 'data',  'querys.json' ) )
 
-                fs.writeFileSync( fixPath( __dirname, 'data',  'querys.json' ), JSON.stringify( history ) )
+                fs.writeFileSync( Util.fixPath( __dirname, 'data',  'querys.json' ), JSON.stringify( history ) )
 
                 emitResult( 'advancedSaved', true )
-
             } catch( e ){
                 emitError( e )
             }
         } )
 
         socket.on( 'pullQuery', function(){
-            var history = fs.readFileSync( fixPath( __dirname, 'data',  'querys.json' ), 'utf-8' )
+            var history = fs.readFileSync( Util.fixPath( __dirname, 'data',  'querys.json' ), 'utf-8' )
             try {
                 history = JSON.parse( history )
                 emitResult( 'returnQuery', history )
@@ -142,39 +137,34 @@ io.sockets.on( 'connection', function( socket ){
         socket.on( 'deleteQuery', function( data ){
             var name = data.value
 
-            var history = fs.readFileSync( fixPath( __dirname, 'data',  'querys.json' ), 'utf-8' )
+            var history = fs.readFileSync( Util.fixPath( __dirname, 'data',  'querys.json' ), 'utf-8' )
             try {
                 history = JSON.parse( history )
                 delete history[name]
 
-                fs.writeFileSync( fixPath( __dirname, 'data',  'querys.json' ), JSON.stringify( history ) )
+                fs.writeFileSync( Util.fixPath( __dirname, 'data',  'querys.json' ), JSON.stringify( history ) )
 
                 emitResult( 'deletedQuery', true )
-
             } catch( e ){
                 emitError( e )
             }
         } )
 
         socket.on( 'advancedSearch', function( data ){
-
             if( data.think == '-' ) delete data.think
-            clientFn.get.search.advanced( data ).then( function( tweets ){
+            Twitter.searchAdvanced( data ).then( function( tweets ){
                 emitResult( 'searchResult', tweets )
             }, function( error ){
                 emitError( error )
             } )
-
         } )
 
         socket.on( 'searchQuery', function( data ){
-            client.get( 'search/tweets', { 
-                q: data.value,
-                count: data.count ? data.count : 20
-            }, function( error, tweets, response ){
-                if( error ) emitError( error )
-                else emitResult( 'searchResult', tweets )
-                    } )
+            Twitter.search( data.value, data.count ? data.count : Config.twitter.defaultSearchResultCount ).then( function( tweets ){
+                emitResult( 'searchResult', tweets )
+            }, function( error ){
+                emitError( error ) 
+            } )
         } )
 
         socket.on( 'postResult', function( data ){
@@ -200,7 +190,7 @@ io.sockets.on( 'connection', function( socket ){
                 isVote = true
                 emitResult( 'openedVote', { 
                     value: vote.id + 'を公開しました．',
-                    address: fn.getLocalAddress()['ipv4'][0]['address'] + ':' + server.port + '/vote' 
+                    address: Util.getLocalAddressIpv4() + ':' + runtime.port + '/vote' 
                 } )
             } else
                 emitError( '既に公開しているツイートがあります．' )
@@ -261,22 +251,13 @@ io.sockets.on( 'connection', function( socket ){
 
         } )
 
-        socket.on( 'getUserProfile', function( condition ){
-            console.log( 'Request @' + condition.value + '\'s profile' )
-            clientFn.get.userProfile( condition.value ).then( function( profile ){
-                emitResult( 'gotUserProfile', profile )
-            }, function( error ){
-                emitError( error )
-            } )
-        } )
-
         socket.on( 'getListData', function( data ){
-            emitResult( 'gotListData', fs.readFileSync( fixPath( __dirname, 'data', 'result', data.value + '.json' ), 'utf-8' ) )
+            emitResult( 'gotListData', fs.readFileSync( Util.fixPath( __dirname, 'data', 'result', data.value + '.json' ), 'utf-8' ) )
         } )
 
         socket.on( 'share', function( name ){
 
-            var result = JSON.parse( fs.readFileSync( fixPath( __dirname, 'data', 'result', name + '.json' ), 'utf-8' ) )
+            var result = JSON.parse( fs.readFileSync( Util.fixPath( __dirname, 'data', 'result', name + '.json' ), 'utf-8' ) )
 
             require( 'getmac' ).getMac( function( error, macAddress ){
                 if( error ) emitError( 'コンピュータを識別できませんした．' )
@@ -304,7 +285,8 @@ io.sockets.on( 'connection', function( socket ){
                     else {
 
                         console.log( 'Uploaded' )
-
+console.log( body )
+                        
                         if( body )
                             emitError( JSON.parse( body ).error )
                         else {
@@ -318,9 +300,10 @@ io.sockets.on( 'connection', function( socket ){
             } )
 
         } )
+
         
         /***** Sign up *****/
-
+        
         socket.on( 'createUser', function( data ){
 
             console.log( 'Sign up process' )
@@ -336,94 +319,77 @@ io.sockets.on( 'connection', function( socket ){
             data.organization = data.organization.replace( /\'/g, "\'" )
 
             if( data.name !== 'guest' && data.organization !== 'guest' ){
-            
+
                 request.get( {
                     uri: serverAddress + '/user?name=' + data.name
                 }, function( error, response, body ){
 
                     if( error )
                         emitError( 'サーバに接続できませんでした．接続状態を確認してください．' )
-                        else {
+                    else {
+                        
+                        body = JSON.parse( body )
 
-                            console.log( 'Exist user : ' + body )
+                        if( body.response.exist ){
+                            console.log( 'Exist : ' + data.name )
+                            emitError( '既にユーザが存在しています．別の名前をお使いください．' )
+                        } else {
 
-                            body = JSON.parse( body )
+                            data.id                 = Express.profile.id
+                            data.screen_name        = Express.profile.username
+                            data.twitter = {
+                                access_token       : Express.access_token,
+                                access_token_secret: Express.access_token_secret
+                            }
 
-                            if( body.response.exist )
-                                emitError( '既にユーザが存在しています．別の名前をお使いください．' )
-                                else {
+                            // Server
+                            data.accesstoken        = Express.access_token
+                            data.accesstoken_secret = Express.access_token_secret
 
-                                    data.id                 = express.profile.id
-                                    data.screen_name        = express.profile.username
-                                    data.twitter = {
-                                        access_token       : express.access_token,
-                                        access_token_secret: express.access_token_secret
-                                    }
-
-                                    // Server
-                                    data.accesstoken        = express.access_token
-                                    data.accesstoken_secret = express.access_token_secret
-
-                                    request.post( {
-                                        uri: serverAddress + '/user',
-                                        form: JSON.stringify( data ),
-                                        json: false
-                                    }, function( error, response, body ){
-
-                                        console.log( 'Sign up : ' + body )
-
-                                        body = JSON.parse( body )
-
-                                        if( body.response.result ){
-                                            delete data.accesstoken
-                                            delete data.accesstoken_secret
-
-                                            output = 'exports.config = '
-                                            output += JSON.stringify( data )
-
-                                            fs.writeFile( fixPath( __dirname, 'core', 'user.js' ), output, function( error ){
-                                                if( error ) emitError( error )
-                                                else {
-                                                    emitResult( 'userCreated', true )
-                                                    userConfig = require( './core/user' ).config
-                                                    twitter    = require( './libs/twitter' )
-                                                    client     = twitter.client
-                                                    clientFn   = twitter.fn
-                                                    console.log( 'Welcome to Spotlight-Beta !' )
-                                                }
-                                            } )
-
+                            request.post( {
+                                uri: serverAddress + '/user',
+                                form: JSON.stringify( data ),
+                                json: false
+                            }, function( error, response, body ){
+                                console.log( 'Sign up : ' + body )
+                                body = JSON.parse( body )
+                                if( body.response.result ){
+                                    delete data.accesstoken
+                                    delete data.accesstoken_secret
+                                    fs.writeFile( Util.fixPath( __dirname, 'core', 'config', 'user.yaml' ), JsYaml.safeDump( data ), function( error ){
+                                        if( error ) emitError( error )
+                                        else {
+                                            emitResult( 'userCreated', true )
+                                            userConfig = _Config.update().user
+                                            Twitter  = require( './libs/twitter' )
+                                            console.log( 'Welcome to Spotlight-Beta !' )
                                         }
-
                                     } )
-
                                 }
-
+                            } )
                         }
+                        
+                    }
 
                 } )
-                
+
             } else {
-                
+
                 data.name = 'guest'
                 data.organization = 'guest'
-                data.id                 = express.profile.id
-                data.screen_name        = express.profile.username
+                data.id                 = Express.profile.id
+                data.screen_name        = Express.profile.username
                 data.twitter = {
-                    access_token       : express.access_token,
-                    access_token_secret: express.access_token_secret
+                    access_token       : Express.access_token,
+                    access_token_secret: Express.access_token_secret
                 }
-                
-                output = 'exports.config = '
-                output += JSON.stringify( data )
-                fs.writeFile( fixPath( __dirname, 'core', 'user.js' ), output, function( error ){
+
+                fs.writeFile( Util.fixPath( __dirname, 'core', 'config', 'user.yaml' ), JsYaml.safeDump( data ), function( error ){
                     if( error ) emitError( error )
                     else {
                         emitResult( 'userCreated', true )
-                        userConfig = require( './core/user' ).config
-                        twitter    = require( './libs/twitter' )
-                        client     = twitter.client
-                        clientFn   = twitter.fn
+                        userConfig = _Config.update().user
+                        Twitter  = require( './libs/twitter' )
                         console.log( 'Welcome to Spotlight-Beta !' )
                     }
                 } )
@@ -431,10 +397,8 @@ io.sockets.on( 'connection', function( socket ){
 
         } )
         
-        
-        
         socket.on( 'recreateUser', function( data ){
-            
+
             console.log( 'Re-Sign up process' )
 
             var output
@@ -454,14 +418,13 @@ io.sockets.on( 'connection', function( socket ){
                 if( error )
                     emitError( 'サーバに接続できませんでした．接続状態を確認してください．' )
                 else {
-
-                    console.log( 'Exist user : ' + body )
-
+                    
                     body = JSON.parse( body )
 
-                    if( body.response.exist )
+                    if( body.response.exist ){
                         emitError( '既にユーザが存在しています．別の名前をお使いください．' )
-                    else {
+                        console.log( 'Exist : ' + body )
+                    } else {
 
                         data.id                 = userConfig.id
                         data.screen_name        = userConfig.screen_name
@@ -475,29 +438,24 @@ io.sockets.on( 'connection', function( socket ){
                         data.accesstoken_secret = data.twitter.access_token_secret
 
                         console.log( data )
-                        
+
                         request.post( {
                             uri: serverAddress + '/user',
-                            form: JSON.stringify( data ),
-                            json: false
+                            form: JSON.stringify( data ),                                json: false
                         }, function( error, response, body ){
 
                             console.log( 'Sign up : ' + body )
-
                             body = JSON.parse( body )
 
                             if( body.response.result ){
                                 delete data.accesstoken
                                 delete data.accesstoken_secret
 
-                                output = 'exports.config = '
-                                output += JSON.stringify( data )
-
-                                fs.writeFile( fixPath( __dirname, 'core', 'user.js' ), output, function( error ){
+                                fs.writeFile( Util.fixPath( __dirname, 'core', 'config', 'user.yaml' ), JsYaml.safeDump( data ), function( error ){
                                     if( error ) emitError( error )
                                     else {
                                         emitResult( 'userCreated', true )
-                                        userConfig = data
+                                        userConfig = _Config.update().user
                                         console.log( 'Welcome to Spotlight-Beta !' )
                                     }
                                 } )
@@ -512,15 +470,16 @@ io.sockets.on( 'connection', function( socket ){
 
             } )
 
-            
-        } )
 
+        } )
+        
+        /* Pairing */
         
         socket.on( 'getPairingRequestList', function(){
             console.log( 'Send pairing request.' )
             emitResult( 'pairingRequestList', pairingDevices )
         } )
-        
+
         socket.on( 'permitPairing', function( device ){
             if( pairingDevices.during.indexOf( device.device ) !== -1 ){
                 console.log( 'Permit pairing device : ' + device.device )
@@ -533,24 +492,20 @@ io.sockets.on( 'connection', function( socket ){
             }
         } )
 
+        socket.on( 'removePairing', function( device ){
+            var index = pairingDevices.allowed.indexOf( device.device )
+            if( index != -1 )
+                pairingDevices.allowed.splice( index, 1 )
+            var index2 = Express.semiRootUsers.indexOf( device.device )
+            if( index2 != -1 )
+                Express.semiRootUsers.splice( index2, 1 )
+            emitResult( 'updateDevicePage', {} )
+        } )  
 
-
+    
     }
     
-    function approvePairing( id ){
-        emitResult( 'inputYourPairingCode', {}, id )
-    }
-    
-    socket.on( 'inputMyPairingCode', function( code ){
-        if( pairingDevices.during.indexOf( socket.handshake.sessionID ) !== -1 && pairingDevices.duringObject[socket.handshake.sessionID].comparePairingCode( Number( code.code ) ) ){
-            console.log( 'Welcome ! New device is ' + pairingDevices.duringObject[socket.handshake.sessionID].getName() )
-            pairingDevices.allowed.push( socket.handshake.sessionID )
-            pairingDevices.during.splice( pairingDevices.during.indexOf( socket.handshake.sessionID ), 1 )
-            delete pairingDevices.duringObject[socket.handshake.sessionID]
-            delete pairingDevices.code[socket.handshake.sessionID]
-            console.log( pairingDevices )
-        } 
-    } )
+    // Non root access
     
     socket.on( 'pullVote', function(){
         emitResult( 'voteData', voteStatus )
@@ -559,17 +514,39 @@ io.sockets.on( 'connection', function( socket ){
     socket.on( 'vote', function( opinion ){
         if( opinion.value == 1 )
             voteStatus.good += 1
-            else
-                voteStatus.bad += 1
-                console.log( voteStatus )
+        else
+            voteStatus.bad += 1
+        console.log( voteStatus )
+    } )
+    
+    function approvePairing( id ){
+        emitResult( 'inputYourPairingCode', {}, id )
+    }
+
+    socket.on( 'inputMyPairingCode', function( code ){
+        if( pairingDevices.during.indexOf( socket.handshake.sessionID ) !== -1 && pairingDevices.duringObject[socket.handshake.sessionID].comparePairingCode( Number( code.code ) ) ){
+            console.log( 'Welcome ! New device is ' + pairingDevices.duringObject[socket.handshake.sessionID].getName() )
+            pairingDevices.allowed.push( socket.handshake.sessionID )
+            pairingDevices.during.splice( pairingDevices.during.indexOf( socket.handshake.sessionID ), 1 )
+            delete pairingDevices.duringObject[socket.handshake.sessionID]
+            delete pairingDevices.code[socket.handshake.sessionID]
+            console.log( pairingDevices )
+            Express.semiRootUsers.push( socket.handshake.sessionID )
+        }
     } )
 
     socket.on( 'pairingRequest', function( data ){
         console.log( 'New pairing request from "' + data.name + ' (' + socket.handshake.sessionID + ')"'  )
         pairingDevices.during.push( socket.handshake.sessionID )
         pairingDevices.duringObject[socket.handshake.sessionID] = new Pairing( data.name, socket.handshake.sessionID, socket.id )
+        console.log( pairingDevices )
     } )
-
+    
 } )
 
-require( './libs/electron' ).run( server.port )
+
+
+// Execute electron
+Electron.run( runtime.port )
+
+/* ***** ***** ***** */
