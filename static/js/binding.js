@@ -9,7 +9,6 @@ var bind = {
         },
         
         INDEX_ALIGN: function( element, objects, config, index, args ){
-            this.COUNTER++
             var numCount   = objects.length.toString().length,
                 indexCount = ( index + 1 ).toString().length
             index = index + 1

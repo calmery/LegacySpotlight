@@ -1,26 +1,77 @@
-<script src="/socket.io/socket.io.js"></script>
-<script src="preload.js"></script>
-<script>
+<html lang="ja">
 
-    socketio.emit( 'getPairingRequestList', {} )
-    
-    socketio.on( 'pairingRequestList', function( list ){
-        list = list.value
-        console.log( list )
-    } )
-    
-    function permitPairing( device ){
-        socketio.emit( 'permitPairing', {
-            device: device
-        } )
-    }
-    
-    socketio.on( 'pairingCode', function( pairing ){
-        console.log( pairing.value )
-    } )
-    
-    socketio.on( 'processError', function( e ){
-        console.log( e.error )
-    } )
-    
-</script>
+    <head>
+        <meta http-equiv="content-type" content="text/html;charset=utf-8">
+        <meta http-equiv="pragma" content="no-cache">
+        <meta http-equiv="cache-control" content="no-cache">
+        <meta http-equiv="content-style-type" content="text/css">
+        <meta http-equiv="content-script-type" content="text/javascript">
+        <link rel="stylesheet" href="css/base.css">
+        <link rel="stylesheet" href="css/layout.css">
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="preload.js"></script>
+        <script src="js/binding.js"></script>
+        <script src="js/device.js"></script>
+    </head>
+
+    <body>
+
+        <div id="application">
+
+            <div id="nav">
+                <div id="appName">SPOTLIGHT</div>
+                <a href="/">
+                    <div class="menu">メインページ</div>
+                </a>
+                <a href="/search">
+                    <div class="menu">検索</div>
+                </a>
+                <a href="/list">
+                    <div class="menu">ランク/リスト</div>
+                </a>
+                <a href="/setting">
+                    <div class="menu">設定</div>
+                </a>
+                <div class="not"></div>
+                <a href="/device">
+                    <div class="menu selected">デバイス</div>
+                </a>
+            </div>
+
+            <div id="article">
+                <div id="header">
+                    <div class="htext">
+                        Device
+                    </div>
+                </div>
+                <div id="padding">
+                    <div class="label">デバイス</div>
+                    <div id="allowedDevice">
+                        <div class="elem box">
+                            <div class="clearfix">
+                                <div class="postName"><b>{{name}}</b></div>
+                                <div style="width:50px;float:left">
+                                    <div class="postBtn hideTarget remove" onclick="removePairing( '{{name}}' )">切断</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="label">リクエスト</div>
+                    <div id="duringDevice">
+                        <div class="elem box">
+                            <div class="clearfix">
+                                <div class="postName"><b>{{name}}</b></div>
+                                <div style="width:50px;float:left">
+                                    <div class="postBtn hideTarget" id="{{name}}" onclick="permitPairing( '{{name}}' )">許可</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </body>
+
+</html>

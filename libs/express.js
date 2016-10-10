@@ -1,12 +1,19 @@
-exports.run = function(){
+const Express = require( 'express' )
+const Http    = require( 'http' )
 
-    var express = require( 'express' ),
-        app     = express()
+const _Config = require( '../core/config' )
+const Config = _Config.config
+const Util   = require( './utility' )
 
-    var http    = require( 'http' ).Server( app )
+var semiRoots = []
+
+const run = function(){
+
+    var app  = Express(),
+        http = Http.Server( app )
 
     // Create a new session.
-    var session = require( 'express-session' )( {
+    const session = require( 'express-session' )( {
         secret           : 'secret',
         resave           : true,
         saveUninitialized: true
@@ -15,121 +22,78 @@ exports.run = function(){
     // Express is using session from express-session module.
     app.use( session )
 
-    // To expand the function.
-    var fn      = require( './fn' ).fn,
-        isExist = fn.isExist,
-        fixPath = fn.fixPath
-
     // Admin
     var root
 
     // Application is using random port. So get a port number.
-    var port = http.listen().address().port
+    const port = http.listen().address().port
     console.log( 'Running app on localhost:' + port )
 
     /***** Routing *****/
 
     // Resources
-    app.use( express.static( fixPath( __dirname, '../static/' ) ) )
+    app.use( Express.static( Util.fixPath( __dirname, '../static/' ) ) )
+    
+    const sendResponse = function( request, response, staticTemplatePath ){
+        if( root === request.sessionID || semiRoots.indexOf( request.sessionID ) != -1 ) 
+            response.sendFile( 
+                Util.fixPath( __dirname, '..', 'templates', 
+                    ( typeof staticTemplatePath === 'string' ? staticTemplatePath : ( request._parsedOriginalUrl.href + '.html' ) )
+                ) 
+            )
+        else 
+            response.status( 403 ).send( 'Forbidden' )
+    }
 
-    var paths = {
+    const paths = {
 
-        '/': function( request, response ){
-            if( !root && request.headers['user-agent'].indexOf('Electron') != -1 ){
+        '/'      : function( request, response ){
+            if( !root && request.headers['user-agent'].indexOf('Electron') !== -1 ){
                 root = request.sessionID
-                exports.root = root
+                // Export root for socket.io
+                module.exports.root = root
             }
 
             // Error: Can't set headers after they are sent.
             // Cauntion : Response was already sent.
-
-            if( !isExist( fixPath( __dirname, '../core/user.js' ) ) )
+            if( _Config.update().user === undefined )
                 response.redirect( '/setup' )
             else
-                if( root === request.sessionID )
-                    response.sendFile( fixPath( __dirname, '../templates/index.html' ) )
-                else
-                    response.status( 403 ).send( 'Forbidden' )
+                sendResponse( request, response, 'index.html' )
         },
 
-        '/search': function( request, response ){
-            if( root === request.sessionID )
-                response.sendFile( fixPath( __dirname, '../templates/search.html' ) )
-            else
-                response.status( 403 ).send( 'Forbidden' )
-        },
-
-        '/list': function( request, response ){
-            if( root === request.sessionID )
-                response.sendFile( fixPath( __dirname, '../templates/list.html' ) )
-            else
-                response.status( 403 ).send( 'Forbidden' )
-        },
-
-        '/setting': function( request, response ){
-            if( root === request.sessionID )
-                response.sendFile( fixPath( __dirname, '../templates/setting.html' ) )
-            else
-                response.status( 403 ).send( 'Forbidden' )
-        },
-
-        '/edit': function( request, response ){
-            if( root === request.sessionID )
-                response.sendFile( fixPath( __dirname, '../templates/edit.html' ) )
-            else
-                response.status( 403 ).send( 'Forbidden' )
-        },
-
-        '/user': function( request, response ){
-            if( root === request.sessionID )
-                response.sendFile( fixPath( __dirname, '../templates/user.html' ) )
-            else
-                response.status( 403 ).send( 'Forbidden' )
+        '/search' : sendResponse,
+        
+        '/list'   : sendResponse,
+        '/edit'   : sendResponse,
+        
+        '/setting': sendResponse,
+        '/user'   : sendResponse,
+        '/credit' : sendResponse,
+        
+        '/device' : sendResponse,
+        
+        '/vote'   : function( request, response ){
+            response.sendFile( Util.fixPath( __dirname, '../templates/vote.html' ) )
         },
         
-        '/credit': function( request, response ){
-            if( root === request.sessionID )
-                response.sendFile( fixPath( __dirname, '../templates/credit.html' ) )
-            else
-                response.status( 403 ).send( 'Forbidden' )
+        '/pairing'   : function( request, response ){
+            response.sendFile( Util.fixPath( __dirname, '../templates/pairing.html' ) )
         },
         
-        '/resetup': function( request, response ){
-            if( root === request.sessionID )
-                response.sendFile( fixPath( __dirname, '../templates/resetup.html' ) )
-            else
-                response.status( 403 ).send( 'Forbidden' )
-        },
-        
-        '/device': function( request, response ){
-            if( root === request.sessionID )
-                response.sendFile( fixPath( __dirname, '../templates/device.html' ) )
-            else
-                response.status( 403 ).send( 'Forbidden' )
-        },
-
-        '/vote': function( request, response ){
-            response.sendFile( fixPath( __dirname, '../templates/vote.html' ) )
-        },
-        
-        '/pairing': function( request, response ){
-            response.sendFile( fixPath( __dirname, '../templates/pairing.html' ) )
-        }
+        '/resetup': sendResponse
 
     }
 
     // Check __dirname/core/user.js
-    if( !isExist( fixPath( __dirname, '../core/user.js' ) ) ){
+    if( Config.user === undefined ){
 
-        // Import application setting.
-        var config = require( '../core/config' ).config
-
-        var consumer_key    = config.twitter.consumer_key,
-            consumer_secret = config.twitter.consumer_secret
+        const consumer_key    = Config.twitter.consumer_key
+        const consumer_secret = Config.twitter.consumer_secret
 
         // Import passport module.
-        var passport        = require( 'passport' ),
-            TwitterStrategy = require( 'passport-twitter' ).Strategy
+        const passport        = require( 'passport' )
+        const TwitterStrategy = require( 'passport-twitter' ).Strategy
 
         passport.serializeUser( function( user, done ){
             done( null, user.id )
@@ -143,19 +107,9 @@ exports.run = function(){
             successRedirect: '/signup',
             failureRedirect: '/setup' 
         } )
-        paths['/setup']    = function( request, response ){
-            if( root === request.sessionID )
-                response.sendFile( fixPath( __dirname, '../templates/setup.html' ) )
-            else
-                response.status( 403 ).send( 'Forbidden' )
-        }
-        paths['/signup']   = function( request, response ){
-            if( root === request.sessionID )
-                response.sendFile( fixPath( __dirname, '../templates/signup.html' ) )
-            else
-                response.status( 403 ).send( 'Forbidden' )
-        }
-
+        paths['/setup']    = sendResponse
+        paths['/signup']   = sendResponse
+        
         passport.use( new TwitterStrategy( {
             consumerKey   : consumer_key,
             consumerSecret: consumer_secret,
@@ -175,7 +129,7 @@ exports.run = function(){
         app.use( session )
 
     }
-
+    
     // Attach paths.
     for( var path in paths )
         app.get( path, paths[path] )
@@ -188,3 +142,6 @@ exports.run = function(){
     }
 
 }
+
+module.exports.run = run
+module.exports.semiRootUsers = semiRoots

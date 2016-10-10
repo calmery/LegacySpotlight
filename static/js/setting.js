@@ -15,15 +15,19 @@ function del( types ){
 }
 
 socketio.on( 'onInit', function( config ){
-    
-    if( config.name === 'guest' )
+    if( config.value.name === 'guest' )
         document.getElementsByClassName( 'hideTarget' )[0].style.display = 'block'
     
 } )
 
 window.onload = function(){
-    
     document.getElementsByClassName( 'hideTarget' )[0].style.display = 'none'
-    
     socketio.emit( 'init', {} )
+    socketio.emit( 'isPairing', {} )
+
+    socketio.on( 'hidePairing', function( value ){
+        if( !value.value )
+            document.getElementById( 'pairingBtn' ).style.display = 'none' 
+            console.log(value)
+    } )
 }
