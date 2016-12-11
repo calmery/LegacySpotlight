@@ -1,39 +1,37 @@
-# Spotlight Beta
-====
+# Spotlight
 
 ### Description
-サイバーボランティアの活動の一環として開発した．Twitterの匿名性を利用した不正な利用を素早く見つけ出し報告、監視を目的としたアプリケーションの開発を行う．
-
-### Future
-機能の追加を短い期間で行う．ある一定以上の機能が追加されたとき、不具合の修正を行い安定版を公開する．安定版は不具合が確認されたり安定していない機能は全て除外され実装されない．
+サイバーボランティアの活動の一環として開発した．これはTwitterの匿名性を利用した不正な利用を素早く見つけ出し報告，監視することを目的としたアプリケーションである．
 
 ### Requirement
-現在のバージョンにおいて以下の環境で動作の確認を行っている．この他の環境では正しく動作しない可能性がある．
-
 - Windows 8
 - Windows 10
-- Mac OS X El Capitan
+- Mac OS X 10.11.6
 
-### Install
-[Release](https://github.com/calmery/spotlight/releases) からダウンロードし，ファイルの書き込みが許可されているディレクトリ（デスクトップなど）に展開する．フォルダを開き Spotlight.exe また Spotlight.app を実行する．
+### How to use
+[Release](https://github.com/calmery/spotlight/releases) からダウンロードし，ファイルの書き込みが許可されているディレクトリに展開する．フォルダを開き Spotlight.exe また Spotlight.app を実行する．
 
 ### Development
-[NodeJS v4.4.7 LTS](https://nodejs.org/en/) をインストール後 [npm](https://www.npmjs.com) を使いモジュールをインポートする． 
+- [NodeJS v4.4.7 LTS](https://nodejs.org/en/) 
+- [npm](https://www.npmjs.com)
 
-`$ npm install -g electron-prebuilt`  
-package.json のあるディレクトリに移動し以下のコマンドを実行する．  
-`$ npm install`  
-その後以下のコマンドでアプリケーションを実行する．  
-`$ electron .`
+```
+$ git clone https://github.com/calmery/Spotlight.git
+$ cd spotlight
+$ npm install -g electron-prebuilt  
+$ npm install
+$ electron .```
+OR
+```
+$ git clone https://github.com/calmery/Spotlight.git
+$ cd spotlight/requirements 
+$ sh install.sh   
+$ sh run.sh```
 
-以下の方法でも実行可能．  
-`$ cd requirements`    
-`$ sh install.sh`    
-`$ sh run.sh`  
-
-electron-packager を使いアプリケーションとして書き出すことができる．  
-`$ npm install -g electron-packager`  
-`$ electron-packager . SpotlightBeta --platform=win32,darwin --arch=x64 --version=1.2.4`
+## Packaging
+```
+$ npm install -g electron-packager
+$ electron-packager . SpotlightBeta --platform=win32,darwin --arch=x64 --version=1.2.4```
 
 ### License
 This software is released under the [GPL-2.0](https://opensource.org/licenses/GPL-2.0) License, see LICENSE.
