@@ -20,18 +20,21 @@ $ git clone https://github.com/calmery/Spotlight.git
 $ cd spotlight
 $ npm install -g electron-prebuilt  
 $ npm install
-$ electron .```
+$ electron .
+```
 OR
 ```
 $ git clone https://github.com/calmery/Spotlight.git
 $ cd spotlight/requirements 
 $ sh install.sh   
-$ sh run.sh```
+$ sh run.sh
+```
 
 ## Packaging
 ```
 $ npm install -g electron-packager
-$ electron-packager . SpotlightBeta --platform=win32,darwin --arch=x64 --version=1.2.4```
+$ electron-packager . SpotlightBeta --platform=win32,darwin --arch=x64 --version=1.2.4
+```
 
 ### License
 This software is released under the [GPL-2.0](https://opensource.org/licenses/GPL-2.0) License, see LICENSE.
