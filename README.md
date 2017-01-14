@@ -12,7 +12,7 @@
 [Release](https://github.com/calmery/spotlight/releases) からダウンロードし，ファイルの書き込みが許可されているディレクトリに展開する．フォルダを開き Spotlight.exe また Spotlight.app を実行する．
 
 ## Development
-- [NodeJS v4.4.7 LTS](https://nodejs.org/en/) 
+- [NodeJS v4.4.7 LTS OR v7.1.0](https://nodejs.org/en/) 
 - [npm](https://www.npmjs.com)
 
 ```
