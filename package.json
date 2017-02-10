@@ -8,5 +8,8 @@
     "type": "git"
   },
   "author": "Marei Kikukawa",
-  "license": "GPL-2.0"
+  "license": "GPL-2.0",
+  "dependencies": {
+    "yacona": "^17.2.11"
+  }
 }
