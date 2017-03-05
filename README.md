@@ -15,21 +15,6 @@
 - [NodeJS v7.1.0](https://nodejs.org/en/) 
 - [npm](https://www.npmjs.com)
 
-```
-$ git clone https://github.com/calmery/Spotlight.git
-$ cd spotlight
-$ npm install -g electron-prebuilt  
-$ npm install
-$ electron .
-```
-OR
-```
-$ git clone https://github.com/calmery/Spotlight.git
-$ cd spotlight/requirements 
-$ sh install.sh   
-$ sh run.sh
-```
-
 ## Packaging
 ```
 $ npm install -g electron-packager
