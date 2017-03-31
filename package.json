@@ -1,0 +1,11 @@
+{
+  "name": "spotlight",
+  "version": "0.5.4",
+  "main": "index",
+  "repository": {
+    "url": "https://github.com/calmery/Spotlight.git",
+    "type": "git"
+  },
+  "author": "calmery <contact@calmery.me>",
+  "license": "GPL-2.0"
+}

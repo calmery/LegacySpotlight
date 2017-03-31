@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+    
+    <head>
+        
+        <meta charset="utf-8">
+        <title>Spotlight</title>
+        
+        <link rel="stylesheet" href="/yacona/base">
+        
+    </head>
+    
+    <body>
+        
+        <a href="javascript: void(0)" class="startup" identifier="search">Seach</a>
+        <a href="javascript: void(0)" class="startup" identifier="a">a</a>
+        
+    </body>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/yacona/preload"></script>
+    <script>
+        
+        let startup = document.getElementsByClassName( 'startup' )
+        let startupProcess = false
+        
+        socket.on( 'startupComplete', () => startupProcess = false )
+        
+        for( let i=0; i<startup.length; i++ ){
+            startup[i].addEventListener( 'click', e => {
+                e.preventDefault()
+                if( startupProcess === false ){
+                    socket.emit( 'startup', e.target.getAttribute( 'identifier' ) )
+                    startupProcess = true
+                }
+            } )
+        }
+        
+    </script>
+    
+</html>
