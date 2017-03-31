@@ -5,6 +5,14 @@ module.exports = yacona => {
     yacona.addRoute( './public' )
     yacona.createWindow( { setMenu: null, setResizable: false, openDevTools: true } )
     
+    yacona.setSocket( 'connection', ( socket, value ) => {
+        let auth = yacona.config.load( 'auth', 'user.yaml' )
+        if( auth.status === false ){
+            yacona.localAppLoader( utility.fixPath( __dirname, '..', 'auth' ) )
+            yacona.kill( 'controller' )
+        }
+    } )
+    
     yacona.setSocket( 'startup', ( socket, value ) => {
         yacona.localAppLoader( utility.fixPath( __dirname, '..', value ) )
         socket.emit( 'startupComplete', true )
