@@ -10,10 +10,10 @@ module.exports = yacona => {
     } )
     
     yacona.setSocket( 'connection', ( socket, value ) => {
-        let auth = yacona.config.load( 'auth', 'user.yaml' )
+        let auth = yacona.config.load( 'oauth', 'twitter/authorization.yaml' )
         if( auth.status === false ){
-            yacona.localAppLoader( utility.fixPath( __dirname, '..', 'auth' ) )
-            yacona.kill( 'controller' )
+            yacona.localAppLoader( utility.fixPath( __dirname, '..', 'oauth' ) )
+            yacona.kill( yacona.getName() )
         } else {
             window.show()
         }
