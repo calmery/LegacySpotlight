@@ -7,13 +7,119 @@
         <title>Spotlight</title>
         
         <link rel="stylesheet" href="/yacona/base">
+        <style>
+            
+            nav {
+                width: 149px;
+                height: 100%;
+                background: rgba( 255, 255, 255, 1 );
+                border-right: 1px solid rgba( 2, 159, 218, 1 );
+                top: 0;
+                left: 0;
+                position: fixed;
+            }
+            
+            nav .menu {
+                height: 39px;
+                border-bottom: 1px solid rgba( 255, 255, 255, 1 );
+                line-height: 30pt;
+                font-size: 12px;
+                color: rgba( 255, 255, 255, 1 );
+                padding-left: 25px;
+                background: rgba( 2, 159, 218, 1 );
+                font-family: Quicksand, sans-serif;
+                font-weight: 500;
+            }
+            
+            nav .menu .left {
+                width: 95px;
+                float: left;
+            }
+            
+            nav .menu .right {
+                width: 29px;
+                float: right;
+            }
+            
+            nav .menu.selected .right:before {
+                content: '●'
+            }
+            
+            nav .menu:first-child {
+                border-bottom: 1px solid rgba( 2, 159, 218, 1 );
+                color: rgba( 2, 159, 218, 1 );
+                background: rgba( 255, 255, 255, 1 );
+            }
+            
+            #main {
+                width: 600px;
+                margin: 0 25px;
+                padding: 25px 0;
+                top: 0;
+                left: 150px;
+                position: absolute;
+                background: rgba( 255, 255, 255, 1 );
+                border-left: 1px solid rgba( 2, 159, 218, 1 );
+                border-right: 1px solid rgba( 2, 159, 218, 1 );
+            }
+            
+            #main .title {
+                margin-top: 25px;
+                margin-left: 25px;
+                font-weight: bold;
+                padding-left: 20px;
+                border-left: 5px solid rgba( 2, 159, 218, 1 );
+            }
+            
+            #main .content {
+                width: calc(100% - 106px);
+                margin: 10px 25px;
+                padding: 25px 25px 25px 20px;
+                background: rgba( 245, 245, 245, 1 );
+                border-left: 5px solid rgba( 2, 159, 218, 1 );
+                border-radius: 0 5px 5px 0;
+            }
+            
+            #main .space {
+                width: calc(100% - 101px);
+                margin: 10px 25px;
+                padding: 0px 25px;
+            }
+            
+        </style>
         
     </head>
     
     <body>
+       
+        <section id="application">
+            
+            <nav>
+                <div class="menu">Spotlight v0.5.4</div>
+                <div class="menu selected">
+                    <div class="left">メイン</div>
+                    <div class="right"></div>
+                </div>
+                <div class="menu">
+                    <div class="left">設定</div>
+                    <div class="right"></div>
+                </div>
+            </nav>
+            
+            <div id="main">
+               
+                <div class="space">aa</div>
+                <div class="title">aa</div>
+                <div class="content">aa</div>
+                
+            </div>
+            
+        </section>
         
         <a href="javascript: void(0)" class="startup" identifier="search">Seach</a>
         <a href="javascript: void(0)" class="startup" identifier="a">a</a>
+        
+        <a href="#" onclick="window.location.reload()">Reload</a>
         
     </body>
     

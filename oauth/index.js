@@ -41,6 +41,6 @@ module.exports = yacona => {
         yacona.kill( yacona.getName() )
     } ) )
     
-    yacona.createWindow( server.url )
+    yacona.createWindow( server.url, { setMenu: null, setResizable: false } )
     
 }
