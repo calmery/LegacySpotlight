@@ -7,82 +7,7 @@
         <title>Spotlight</title>
         
         <link rel="stylesheet" href="/yacona/base">
-        <style>
-            
-            nav {
-                width: 200px;
-                background: rgba( 255, 255, 255, 1 );
-                border-right: 1px solid rgba( 2, 159, 218, 1 );
-                top: 0;
-                left: 0;
-                position: absolute;
-                padding-bottom: 180px;
-                min-height: calc( 100% - 180px );
-            }
-            
-            nav .menu {
-                height: 39px;
-                border-bottom: 1px solid rgba( 255, 255, 255, 1 );
-                line-height: 30pt;
-                font-size: 12px;
-                color: rgba( 255, 255, 255, 1 );
-                padding-left: 25px;
-                background: rgba( 2, 159, 218, 1 );
-                font-family: Quicksand, sans-serif;
-                font-weight: 500;
-            }
-            
-            nav .menu .left {
-                width: 145px;
-                float: left;
-            }
-            
-            nav .menu .right {
-                width: 29px;
-                float: right;
-            }
-            
-            nav .menu.selected .right:before {
-                content: '●'
-            }
-            
-            nav .menu.white {
-                border-bottom: 1px solid rgba( 2, 159, 218, 1 );
-                color: rgba( 2, 159, 218, 1 );
-                background: rgba( 255, 255, 255, 1 );
-            }
-            
-            #myProfile {
-                width: 200px;
-                border-top: 1px solid rgba( 255, 255, 255, 1 );
-                height: 100px;
-                padding: 40px 0;
-                text-align: center;
-                bottom: 0;
-                left: 0;
-                position: fixed;
-                background: rgba( 2, 159, 218, 1 );
-                color: rgba( 255, 255, 255, 1 );
-                font-family: Quicksand, sans-serif
-            }
-            
-            #myProfile #icon {
-                width: 50px;
-                border-radius: 100%;
-                border: 2px solid rgba( 255, 255, 255, 1 );
-                margin-bottom: 15px;
-            }
-            
-            #myProfile #screen_name {
-                font-size: 10px;
-            }
-            
-            #load {
-                display: none;
-            }
-            
-           
-        </style>
+        <link rel="stylesheet" href="layout.css">
         
     </head>
     
@@ -129,30 +54,6 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="/yacona/preload"></script>
     <script src="/yacona/bind"></script>
-    <script>
-        
-        let startupProcess = false
-        
-        socket.on( 'startupComplete', () => startupProcess = false )
-        
-        function startup( value ){
-            if( startupProcess === false ){
-                startupProcess = true
-                socket.emit( 'startup', value )
-            }
-        }
-        
-        socket.on( 'ready', () => {
-            socket.emit( 'getMyProfile' )
-        } )
-        
-        socket.on( 'myProfile', profile => {
-            document.getElementById( 'icon' ).src = profile.icon
-            document.getElementById( 'screen_name' ).innerHTML += profile.screen_name
-            document.getElementById( 'name' ).innerHTML = profile.name
-            document.getElementById( 'load' ).style.display = 'block'
-        } )
-        
-    </script>
+    <script src="main.js"></script>
     
 </html>

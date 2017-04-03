@@ -35,4 +35,16 @@ module.exports = yacona => {
         } )
     } )
     
+    yacona.on( 'search', query => {
+        return new Promise( function( resolve, reject ){
+            client.get( 'search/tweets', {
+                q: query.query,
+                count: query.count
+            }, function( error, tweet, response ){
+                if( error === null ) resolve( tweet )
+                else reject( error )
+            } )
+        } )
+    } )
+    
 }
