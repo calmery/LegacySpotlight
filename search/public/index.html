@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+    <head>
+
+        <meta charset="utf-8">
+        <title>Search</title>
+
+        <link rel="stylesheet" href="/yacona/base">
+        <style>
+
+            #main {
+                width: 600px;
+                margin: 0 25px;
+                padding: 25px 0;
+                top: 0;
+                left: 150px;
+                position: absolute;
+                background: rgba( 255, 255, 255, 1 );
+                border-left: 1px solid rgba( 2, 159, 218, 1 );
+                border-right: 1px solid rgba( 2, 159, 218, 1 );
+            }
+
+            #main .title {
+                margin-top: 25px;
+                margin-left: 25px;
+                font-weight: bold;
+                padding-left: 20px;
+                border-left: 5px solid rgba( 2, 159, 218, 1 );
+            }
+
+            #main .content {
+                width: calc(100% - 106px);
+                margin: 10px 25px;
+                padding: 25px 25px 25px 20px;
+                background: rgba( 245, 245, 245, 1 );
+                border-left: 5px solid rgba( 2, 159, 218, 1 );
+                border-radius: 0 5px 5px 0;
+            }
+
+            #main .space {
+                width: calc(100% - 101px);
+                margin: 10px 25px;
+                padding: 0px 25px;
+            }
+
+            #myProfile {
+                width: 150px;
+                height: 100px;
+                padding: 40px 0;
+                text-align: center;
+                bottom: 0;
+                left: 0;
+                position: fixed;
+                background: rgba( 2, 159, 218, 1 );
+                color: rgba( 255, 255, 255, 1 );
+                font-family: Quicksand, sans-serif
+            }
+
+            #myProfile #icon {
+                width: 50px;
+                border-radius: 100%;
+                border: 2px solid rgba( 255, 255, 255, 1 );
+                margin-bottom: 15px;
+            }
+
+            #myProfile #screen_name {
+                font-size: 10px;
+            }
+
+            .content textarea {
+                width: calc(100% - 50px);
+                height: 12px;
+                border-radius: 3px;
+                border-color: rgba( 2, 159, 218, 1 );
+                padding: 10px 25px;
+            }
+            .btn {
+                width: 75px;
+                text-align: center;
+                padding: 5px 0;
+                background: rgba( 2, 159, 218, 1 );
+                color: rgba( 255, 255, 255, 1 );
+                border-radius: 3px;
+                line-height: 15pt;
+            }
+
+            .del_btn {
+                background: rgba( 255, 96, 96, 1 )
+            }
+
+            .server {
+                line-height: 22pt;
+            }
+            
+            #result {
+                display: none
+            }
+            
+            #archive .content .left {
+                width: 50px;
+            }
+            
+            #archive .content .left img {
+                width: 46px;
+                border: 2px solid rgba( 255, 255, 255, 1 );
+                border-radius: 100%;
+            }
+            
+            #archive .content .right {
+                width: 424px;
+            }
+            
+            #archive .content .right .name {
+                font-weight: bold
+            }
+            
+            #archive .content .right .screen_name {
+                font-size: 10px;
+            }
+            
+            #archive .content .right .text {
+                margin-top: 10px
+            }
+            
+            .danger {
+                background: red
+            }
+        </style>
+
+    </head>
+
+    <body>
+
+        <section id="application">
+
+            <nav>
+               
+                <div class="menu white">Spotlight v0.5.4</div>
+                <div class="menu selected">
+                    <div class="left">検索</div>
+                    <div class="right"></div>
+                </div>
+                <div class="menu">
+                    <div class="left">高度な検索</div>
+                    <div class="right"></div>
+                </div>
+                <div class="menu">
+                    <div class="left">設定</div>
+                    <div class="right"></div>
+                </div>
+                
+                <div class="menu white">Menu</div>
+                <div class="menu" onclick="saveToggle()" id="toggle">
+                    <div class="left">保存</div>
+                    <div class="right"></div>
+                </div>
+                
+                <a href="#" onclick="window.location.reload()">Reload</a>
+
+            </nav>
+            
+            <div id="myProfile">
+                <div id="load">
+                    <img src="" id="icon">
+                    <div id="name"></div>
+                    <div id="screen_name">@</div>
+                </div>
+            </div>
+
+            <div id="main">
+                
+                <div class="content clearfix" id="save_field" style="display: none">
+                    <textarea id="list_name" placeholder="リスト名"></textarea>
+                    <div class="btn float_r" onclick="save()" style="width: 150px;">検索結果を保存</div>
+                </div>
+
+                <div class="content clearfix" id="search_field">
+                    <textarea id="word" placeholder="キーワード検索"></textarea>
+                    <div class="btn float_r" onclick="search()">検索</div>
+                </div>
+                
+                <div id="result">
+                    <div id="archive"></div>
+                </div>
+
+            </div>
+       
+        </section>
+
+        <a href="javascript: void(0)" class="startup" identifier="search">Seach</a>
+        <a href="javascript: void(0)" class="startup" identifier="a">a</a>
+
+
+
+    </body>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/yacona/preload"></script>
+    <script src="/yacona/bind"></script>
+    <script>
+
+        let startup = document.getElementsByClassName( 'startup' )
+        let startupProcess = false
+
+        socket.on( 'startupComplete', () => startupProcess = false )
+
+        for( let i=0; i<startup.length; i++ ){
+            startup[i].addEventListener( 'click', e => {
+                e.preventDefault()
+                if( startupProcess === false ){
+                    socket.emit( 'startup', e.target.getAttribute( 'identifier' ) )
+                    startupProcess = true
+                }
+            } )
+        }
+
+        socket.emit( 'getMyProfile' )
+
+        socket.on( 'myProfile', profile => {
+            document.getElementById( 'icon' ).src = profile.icon
+            document.getElementById( 'screen_name' ).innerHTML += profile.screen_name
+            document.getElementById( 'name' ).innerHTML = profile.name
+            document.getElementById( 'load' ).style.display = 'block'
+        } )
+        
+        function search(){
+            let word = document.getElementById( 'word' ).value
+            console.log( word )
+            if( word === '' ) return false
+            
+            socket.emit( 'search', word )
+        }
+        
+        let raw = []
+        let meta = []
+        let statuses = []
+        let flag = []
+        
+        let archive = document.getElementById( 'archive' )
+        let count = -1
+        
+        socket.on( 'result', ( result ) => {
+            raw.push( result )
+            document.getElementById( 'result' ).style.display = 'block'
+            
+            let isOverlap
+            
+            meta.push( result.search_metadata )
+            for( let i=0; i<result.statuses.length; i++ ){
+                isOverlap = false
+                for( let j=0; j<statuses.length; j++ ){
+                    if( result.statuses[i].id === statuses[j].id ){
+                        isOverlap = true
+                        meta[meta.length-1].count--
+                    }
+                }
+                if( isOverlap ) continue
+                count++
+                flag.push( 'danger' )
+                statuses.push( result.statuses[i] )
+                archive.innerHTML = '<div class="content clearfix" id="n' + count + '" onclick="change( ' + count + ', ' + result.statuses[i].id + ' )" flag="danger"><div class="left float_l"><img src="' + result.statuses[i].user.profile_image_url + '"></div><div class="right float_r"><div class="name">' + result.statuses[i].user.name + '</div><div class="screen_name">@' + result.statuses[i].user.screen_name+'</div><div class="text">' + result.statuses[i].text + '</div></div></div>' + archive.innerHTML
+            }
+            archive.innerHTML = '<div class="title">' + decodeURIComponent( result.search_metadata.query ) + '</div>' + archive.innerHTML
+        } )
+        
+        function saveToggle(){
+            let e = document.getElementById( 'save_field' )
+            let s = document.getElementById( 'search_field' )
+            let m = document.getElementById( 'toggle' )
+            console.log( e.style.display )
+            if( e.style.display === 'block' ){
+                m.className = 'menu'
+                e.style.display = 'none'
+                s.style.display = 'block'
+            } else if( e.style.display === 'none' ){
+                m.className = 'menu selected'
+                e.style.display = 'block'
+                s.style.display = 'none'
+            }
+        }
+        
+        function save(){
+            console.log( 'Call save method' )
+        }
+        
+        function change( num, id ){
+            let e = document.getElementById( 'n' + num )
+            let f = e.getAttribute( 'flag' )
+            if( f === 'clean' ){
+                flag[num] = 'danger'
+                e.style.borderColor = 'rgba( 2, 159, 218, 1 )'
+                e.setAttribute( 'flag', 'danger' )
+            } else if( f === 'danger' ){
+                flag[num] = 'clean'
+                e.style.borderColor = 'rgba( 126, 211, 33, 1 )'
+                e.setAttribute( 'flag', 'clean' )
+            }
+        }
+
+    </script>
+
+</html>

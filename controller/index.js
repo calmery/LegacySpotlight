@@ -46,4 +46,6 @@ module.exports = yacona => {
         socket.emit( 'startupComplete', true )
     } )
     
+    yacona.on( 'myProfile', () => myProfile )
+    
 }
