@@ -36,7 +36,12 @@ module.exports = yacona => {
         consumerSecret: 'hEesWDwCN6HTbkQ0YdIvgdHsgIhzEqcGwgKKtrerLbIz87BhS9',
         callbackURL   : server.url + 'callback'
     }, function( token, tokenSecret, profile, done ){
-        yacona.config.save( 'twitter/authorization.yaml', yaml.dump( { access_token: token, access_token_secret: tokenSecret } ) )
+        yacona.config.save( 'twitter/authorization.yaml', yaml.dump( { 
+            access_token: token, 
+            access_token_secret: tokenSecret, 
+            id: profile.id,
+            screen_name: profile.username
+        } ) )
         yacona.localAppLoader( 'controller' )
         yacona.kill( yacona.getName() )
     } ) )
