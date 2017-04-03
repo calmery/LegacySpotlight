@@ -30,7 +30,6 @@ module.exports = yacona => {
                         icon: profile.profile_image_url
                     }
                     if( myProfile.icon.indexOf( '_normal' ) !== -1 ) myProfile.icon = myProfile.icon.replace( /_normal/, '' )
-                    console.log( myProfile )
                     socket.emit( 'ready' )
                 } )
                 isStartup = true

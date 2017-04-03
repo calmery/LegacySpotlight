@@ -91,24 +91,23 @@
         <section id="application">
             
             <nav>
+               
                 <div class="menu white">Launcher</div>
-                <div class="menu selected">
-                    <div class="left">検索</div>
-                    <div class="right"></div>
-                </div>
-                <div class="menu selected">
-                    <div class="left">管理</div>
-                    <div class="right"></div>
-                </div>
-                <div class="menu selected">
-                    <div class="left">共有</div>
-                    <div class="right"></div>
-                </div>
-                
-                <div class="menu white">Add-ons</div>
-                <a href="javascript: void( 0 )" onclick="window.location.reload()">
-                    <div class="menu">
-                        <div class="left">Reload</div>
+                <a href="javascript: void(0)" onclick="startup('search')">
+                    <div class="menu selected">
+                        <div class="left">検索</div>
+                        <div class="right"></div>
+                    </div>
+                </a>
+                <a href="javascript: void(0)" onclick="startup('manage')">
+                    <div class="menu selected">
+                        <div class="left">管理</div>
+                        <div class="right"></div>
+                    </div>
+                </a>
+                <a href="javascript: void(0)" onclick="startup('share')">
+                    <div class="menu selected">
+                        <div class="left">共有</div>
                         <div class="right"></div>
                     </div>
                 </a>
@@ -132,19 +131,15 @@
     <script src="/yacona/bind"></script>
     <script>
         
-        let startup = document.getElementsByClassName( 'startup' )
         let startupProcess = false
         
         socket.on( 'startupComplete', () => startupProcess = false )
         
-        for( let i=0; i<startup.length; i++ ){
-            startup[i].addEventListener( 'click', e => {
-                e.preventDefault()
-                if( startupProcess === false ){
-                    socket.emit( 'startup', e.target.getAttribute( 'identifier' ) )
-                    startupProcess = true
-                }
-            } )
+        function startup( value ){
+            if( startupProcess === false ){
+                startupProcess = true
+                socket.emit( 'startup', value )
+            }
         }
         
         socket.on( 'ready', () => {
