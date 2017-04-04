@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+    <head>
+
+        <meta charset="utf-8">
+        <title>Add-ons</title>
+
+        <link rel="stylesheet" href="/yacona/base">
+        <style>
+            .server {
+                float: left;
+                line-height: 22pt;
+            }
+        </style>
+   
+    </head>
+
+    <body>
+
+        <section id="application">
+
+            <nav>
+
+                <div class="menu white">Spotlight v0.5.4</div>
+                <div class="menu selected">
+                    <div class="left">管理</div>
+                    <div class="right"></div>
+                </div>
+
+            </nav>
+
+            <div id="myProfile">
+                <div id="load">
+                    <img src="" id="icon">
+                    <div id="name"></div>
+                    <div id="screen_name">@</div>
+                </div>
+            </div>
+
+            <div id="main">
+               
+                <div class="title" style="margin-top: 0">アドオンの追加</div>
+                
+                <div class="content clearfix" id="search_field">
+                    <textarea id="url" placeholder="/path/to/add-on.zip"></textarea>
+                    <div class="btn float_r" onclick="install()" style="width:110px">インストール</div>
+                </div>
+
+                <div id="result">
+                    <div class="title">アドオンの管理</div>
+                    <div id="archive"></div>
+                </div>
+
+                <div id="loading" style="display: none"></div>
+
+            </div>
+
+        </section>
+
+    </body>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/yacona/preload"></script>
+    <script src="/yacona/common"></script>
+    <script>
+        
+        socket.on( 'uninstalled', () => { alert( 'Uninstalled' ); window.location.reload() } )
+        function uninstall( appName ){
+            document.getElementById( 'loading' ).style.display = 'block'
+            if( confirm( 'Remove ?' ) ){
+                socket.emit( 'uninstall', appName )
+            }
+        }
+        
+        socket.on( 'installed', () => { alert( 'Installed' ); window.location.reload() } )
+        socket.on( 'reject', () => { alert( 'Rejected' ); window.location.reload() } )
+        function install(){
+            let appName = document.getElementById( 'url' ).value
+            if( appName === '' ) return false
+            socket.emit( 'install', appName )
+        }
+        
+        socket.emit( 'getAddons', true )
+        socket.on( 'addons', function( list ){
+            let archive = document.getElementById( 'archive' )
+            
+            for( let i=0; i<list.length; i++ ){
+                
+                archive.innerHTML += '<div class="content clearfix"><div class="server">' + list[i] + '</div><div class="btn del-btn float_r" style="background:rgba(255,96,96,1)" onclick="uninstall(\'' + list[i] + '\')">削除</div></div>'
+                
+            }
+        } )
+        
+    </script>
+
+</html>

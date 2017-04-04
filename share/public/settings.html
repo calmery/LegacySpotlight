@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+    <head>
+
+        <meta charset="utf-8">
+        <title>Share</title>
+
+        <link rel="stylesheet" href="/yacona/base">
+        <link rel="stylesheet" href="resources/css/common.css">
+
+    </head>
+
+    <body>
+
+        <section id="application">
+
+            <nav>
+
+                <div class="menu white">Spotlight v0.5.4</div>
+                <a href="index.html">
+                    <div class="menu">
+                        <div class="left">共有</div>
+                        <div class="right"></div>
+                    </div>
+                </a>
+                <div class="menu selected">
+                    <div class="left">設定</div>
+                    <div class="right"></div>
+                </div>
+
+            </nav>
+
+            <div id="myProfile">
+                <div id="load">
+                    <img src="" id="icon">
+                    <div id="name"></div>
+                    <div id="screen_name">@</div>
+                </div>
+            </div>
+
+            <div id="main">
+
+                <div class="title" style="margin-top: 0">共有先</div>
+                <div class="content clearfix">
+                    <textarea id="share_target" placeholder="http://example.com:3000"></textarea>
+                    <div class="btn float_r">保存</div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </body>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/yacona/preload"></script>
+    <script src="/yacona/common"></script>
+
+</html>
