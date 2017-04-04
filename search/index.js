@@ -4,7 +4,7 @@ module.exports = yacona => {
     const yaml    = yacona.moduleLoader( 'yaml' )
     
     yacona.addRoute( './public' )
-    yacona.createWindow( { setMenu: null, setResizable: false, openDevTools: true } )
+    yacona.createWindow( { setMenu: null, setResizable: false, openDevTools: false } )
     
     yacona.setSocket( 'getMyProfile', ( socket, value ) => {
         socket.emit( 'myProfile', yacona.emit( { app: 'controller', event: 'myProfile' } ) )

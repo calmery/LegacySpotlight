@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+    <head>
+
+        <meta charset="utf-8">
+        <title>Manage</title>
+
+        <link rel="stylesheet" href="/yacona/base">
+        <link rel="stylesheet" href="resources/css/common.css">
+
+        <style>
+            .server {
+                float: left;
+                line-height: 22pt;
+            }
+        </style>
+
+    </head>
+
+    <body>
+
+        <section id="application">
+
+            <nav>
+
+                <div class="menu white">Spotlight v0.5.4</div>
+                <a href="index.html">
+                    <div class="menu selected">
+                        <div class="left">編集</div>
+                        <div class="right"></div>
+                    </div>
+                </a>
+                
+            </nav>
+
+            <div id="myProfile">
+                <div id="load">
+                    <img src="" id="icon">
+                    <div id="name"></div>
+                    <div id="screen_name">@</div>
+                </div>
+            </div>
+
+            <div id="main">
+
+                <div id="save_field" style="display: block">
+                    <div class="title" id="words_list_tag" style="margin-top: 0">リスト</div>
+                    <div id="lists"></div>
+                </div>
+
+                <div id="search_field" style="display: nonr"></div>
+
+                <div id="result">
+                    <div id="list_edit" class="content clearfix">
+                        <textarea id="list_name" placeholder="リスト名"></textarea>
+                        <div class="btn float_r" onclick="save()">保存</div>
+                    </div>
+                    <div id="archive"></div>
+                </div>
+
+                <div id="loading" style="display: none"></div>
+
+            </div>
+
+        </section>
+
+    </body>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/yacona/preload"></script>
+    <script src="/yacona/common"></script>
+    <script src="resources/js/index.js"></script>
+    <script>
+        
+        function edit( listName ){
+            saveToggle()
+            document.getElementById( 'loading' ).style.display ='block'
+            socket.emit( 'edit', listName )
+        }
+
+        socket.emit( 'getList', true )
+        socket.on( 'list', function( list ){
+            let e = document.getElementById( 'lists' )
+            for( let i=0; i<list.length; i++ )
+                e.innerHTML += '<div class="content clearfix"><div class="server float_l">' + list[i] + '</div><div class="btn float_r" onclick="edit(\'' + list[i] + '\')">編集</div></div>'
+        } )
+        
+        let raw
+        let meta = []
+        let statuses = []
+        let flag
+
+        let archive = document.getElementById( 'archive' )
+        let count = -1
+
+        socket.on( 'edit', ( result ) => {
+            
+            document.getElementById( 'list_name' ).value = result.name
+            raw = result.raw
+            flag = result.flag
+            console.log( flag )
+            
+            document.getElementById( 'result' ).style.display = 'block'
+
+            for( let i=0; i<raw.length; i++ ){
+                
+                meta.push( raw[i].search_metadata )
+                
+                let isOverlap
+                for( let j=0; j<raw[i].statuses.length; j++ ){
+                    isOverlap = false
+                    for( let k=0; k<statuses.length; k++ ){
+                        if( raw[i].statuses[j].id === statuses[k].id ){
+                            isOverlap = true
+                        }
+                    }
+                    if( isOverlap ) continue
+                    count++
+                    statuses.push( raw[i].statuses[j] )
+                    archive.innerHTML = '<div class="content clearfix" style="' + ( flag[count] === 'clean' ? 'border-color: rgba( 126, 211, 33, 1 )' : '' ) + '" id="n' + count + '" onclick="change( ' + count + ', ' + raw[i].statuses[j].id + ' )" flag="' + flag[count] + '"><div class="left float_l"><img src="' + raw[i].statuses[j].user.profile_image_url + '"></div><div class="right float_r"><div class="name">' + raw[i].statuses[j].user.name + '</div><div class="screen_name">@' + raw[i].statuses[j].user.screen_name+'</div><div class="text">' + raw[i].statuses[j].text + '</div></div></div>' + archive.innerHTML
+                }
+                
+                archive.innerHTML = '<div class="title">' + decodeURIComponent( raw[i].search_metadata.query ).replace( /\+/g, ' ' ) + '</div>' + archive.innerHTML
+                   
+            }
+
+            document.getElementById( 'loading' ).style.display = 'none'
+        } )
+
+    </script>
+
+</html>

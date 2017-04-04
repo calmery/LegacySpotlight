@@ -55,10 +55,6 @@ function saveToggle(){
     }
 }
 
-function save(){
-    console.log( 'Call save method' )
-}
-
 function change( num, id ){
     let e = document.getElementById( 'n' + num )
     let f = e.getAttribute( 'flag' )
