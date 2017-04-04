@@ -78,12 +78,23 @@
             document.getElementById( 'loading' ).style.display ='block'
             socket.emit( 'edit', listName )
         }
+        
+        function remove( listName ){
+            if( confirm( 'Remove ?' ) ){
+                socket.emit( 'remove', listName )
+                window.location.reload()
+            } else return false
+        }
+        
+        socket.on( 'removed', function(){
+            alert( 'Removed' )
+        } )
 
         socket.emit( 'getList', true )
         socket.on( 'list', function( list ){
             let e = document.getElementById( 'lists' )
             for( let i=0; i<list.length; i++ )
-                e.innerHTML += '<div class="content clearfix"><div class="server float_l">' + list[i] + '</div><div class="btn float_r" onclick="edit(\'' + list[i] + '\')">編集</div></div>'
+                e.innerHTML += '<div class="content clearfix"><div class="server float_l">' + list[i] + '</div><div class="btn float_r" style="margin-left:10px;background:rgba(255,96,96,1)" onclick="remove(\'' + list[i] + '\')">消去</div><div class="btn float_r" onclick="edit(\'' + list[i] + '\')">編集</div></div>'
         } )
         
         let raw
