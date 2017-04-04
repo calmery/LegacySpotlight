@@ -31,6 +31,13 @@ module.exports = yacona => {
         socket.emit( 'edit', { flag: flag, raw: dump, name: value } )
     } )
     
+    yacona.setSocket( 'remove', ( socket, value ) => {
+        if( yacona.documents.check( 'share', value ) === true ){
+            yacona.documents.share.rmdir( 'share', value )
+        }
+        socket.emit( 'removed', true )
+    } )
+    
     yacona.setSocket( 'save', ( socket, value ) => {
 
         let name     = value.name,
