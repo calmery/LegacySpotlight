@@ -73,17 +73,17 @@ module.exports = yacona => {
             meta     = value.meta,
             statuses = value.statuses
         
-        if( yacona.documents.check( 'share', name ) === true ){
+        if( yacona.documents.check( 'log', name ) === true ){
             socket.emit( 'reject', 'exists' )
             return false
         }
         
         for( let i=0; i<raw.length; i++ ){
-            yacona.documents.share.save( 'share', name + '/dump/d' + i + '.json', JSON.stringify( raw[i] ) )
+            yacona.documents.share.save( 'log', name + '/dump/d' + i + '.json', JSON.stringify( raw[i] ) )
         }
         
-        yacona.documents.share.save( 'share', name + '/flag.json', JSON.stringify( flag ) )
-        yacona.documents.share.save( 'share', name + '/meta.json', JSON.stringify( meta ) )
+        yacona.documents.share.save( 'log', name + '/flag.json', JSON.stringify( flag ) )
+        yacona.documents.share.save( 'log', name + '/meta.json', JSON.stringify( meta ) )
         
         let s = []
         for( let i=0; i<statuses.length; i++ ){
@@ -100,7 +100,7 @@ module.exports = yacona => {
             } )
         }
         
-        yacona.documents.share.save( 'share', name + '/statuses.json', JSON.stringify( s ) )
+        yacona.documents.share.save( 'log', name + '/statuses.json', JSON.stringify( s ) )
         
         socket.emit( 'saved', true )
         

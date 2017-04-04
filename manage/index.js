@@ -8,7 +8,7 @@ module.exports = yacona => {
     
     yacona.setSocket( 'getList', ( socket, value ) => {
         let list = []
-        let l = yacona.documents.list( 'share', './' )
+        let l = yacona.documents.list( 'log', './' )
         for( let i=0; i<l.length; i++ ){
             if( l[i].toLowerCase() !== '.ds_store' && l[i].toLowerCase() !== 'thumbs.db' ){
                 list.push( l[i] )
@@ -22,18 +22,18 @@ module.exports = yacona => {
     } )
     
     yacona.setSocket( 'edit', ( socket, value ) => {
-        let files = yacona.documents.list( 'share', value + '/dump' )
+        let files = yacona.documents.list( 'log', value + '/dump' )
         let dump = []
         for( let i=0; i<files.length; i++ ){
-            if( files[i].match( /d\d+.json/ ) ) dump.push( JSON.parse( yacona.documents.share.load( 'share', value + '/dump/' + files[i] ) ) )
+            if( files[i].match( /d\d+.json/ ) ) dump.push( JSON.parse( yacona.documents.share.load( 'log', value + '/dump/' + files[i] ) ) )
         }
-        let flag = JSON.parse( yacona.documents.share.load( 'share', value + '/flag.json' ) )
+        let flag = JSON.parse( yacona.documents.share.load( 'log', value + '/flag.json' ) )
         socket.emit( 'edit', { flag: flag, raw: dump, name: value } )
     } )
     
     yacona.setSocket( 'remove', ( socket, value ) => {
-        if( yacona.documents.check( 'share', value ) === true ){
-            yacona.documents.share.rmdir( 'share', value )
+        if( yacona.documents.check( 'log', value ) === true ){
+            yacona.documents.share.rmdir( 'log', value )
         }
         socket.emit( 'removed', true )
     } )
@@ -46,16 +46,16 @@ module.exports = yacona => {
             meta     = value.meta,
             statuses = value.statuses
 
-        if( yacona.documents.check( 'share', name ) === true ){
-            yacona.documents.share.rmdir( 'share', name )
+        if( yacona.documents.check( 'log', name ) === true ){
+            yacona.documents.share.rmdir( 'log', name )
         }
 
         for( let i=0; i<raw.length; i++ ){
-            yacona.documents.share.save( 'share', name + '/dump/d' + i + '.json', JSON.stringify( raw[i] ) )
+            yacona.documents.share.save( 'log', name + '/dump/d' + i + '.json', JSON.stringify( raw[i] ) )
         }
 
-        yacona.documents.share.save( 'share', name + '/flag.json', JSON.stringify( flag ) )
-        yacona.documents.share.save( 'share', name + '/meta.json', JSON.stringify( meta ) )
+        yacona.documents.share.save( 'log', name + '/flag.json', JSON.stringify( flag ) )
+        yacona.documents.share.save( 'log', name + '/meta.json', JSON.stringify( meta ) )
 
         let s = []
         for( let i=0; i<statuses.length; i++ ){
@@ -72,7 +72,7 @@ module.exports = yacona => {
             } )
         }
 
-        yacona.documents.share.save( 'share', name + '/statuses.json', JSON.stringify( s ) )
+        yacona.documents.share.save( 'log', name + '/statuses.json', JSON.stringify( s ) )
 
         socket.emit( 'saved', true )
 
