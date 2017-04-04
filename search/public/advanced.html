@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+    <head>
+
+        <meta charset="utf-8">
+        <title>Search</title>
+
+        <link rel="stylesheet" href="/yacona/base">
+        <link rel="stylesheet" href="resources/css/common.css">
+        
+        <style>
+            .server {
+                float: left;
+                line-height: 22pt;
+            }
+        </style>
+   
+    </head>
+
+    <body>
+
+        <section id="application">
+
+            <nav>
+
+                <div class="menu white">Spotlight v0.5.4</div>
+                <a href="index.html">
+                    <div class="menu">
+                        <div class="left">検索</div>
+                        <div class="right"></div>
+                    </div>
+                </a>
+                <div class="menu selected">
+                    <div class="left">高度な検索</div>
+                    <div class="right"></div>
+                </div>
+                <a href="settings.html">
+                    <div class="menu">
+                        <div class="left">設定</div>
+                        <div class="right"></div>
+                    </div>
+                </a>
+
+                <div class="menu white">Menu</div>
+                <div class="menu" onclick="saveToggle()" id="toggle">
+                    <div class="left">機能</div>
+                    <div class="right"></div>
+                </div>
+                
+
+                <a href="#" onclick="window.location.reload()">Reload</a>
+
+            </nav>
+
+            <div id="myProfile">
+                <div id="load">
+                    <img src="" id="icon">
+                    <div id="name"></div>
+                    <div id="screen_name">@</div>
+                </div>
+            </div>
+
+            <div id="main">
+
+                <div id="save_field" style="display: none">
+                    <div class="content clearfix">
+                        <textarea id="list_name" placeholder="リスト名"></textarea>
+                        <div class="btn float_r" onclick="save()" style="width: 150px;">検索結果を保存</div>
+                    </div>
+                    <div class="content clearfix">
+                        <textarea id="word_name" placeholder="条件名"></textarea>
+                        <div class="btn float_r" onclick="saveWord()" style="width: 150px;">検索条件を保存</div>
+                    </div>
+
+                    <div class="title" id="words_list_tag">保存された検索条件</div>
+                    <div id="words_list">
+                        
+                    </div>
+                </div>
+
+                <div id="search_field">
+                    <div class="content clearfix">
+                        <div id="search_and_field">
+                            <textarea class="search_and" placeholder="And"></textarea>
+                        </div>
+                        <div class="btn float_r" onclick="add_and()">追加</div>
+                    </div>
+
+                    <div class="content clearfix">
+                        <div id="search_or_field">
+                            <textarea class="search_or" placeholder="Or"></textarea>
+                        </div>
+                        <div class="btn float_r" onclick="add_or()">追加</div>
+                    </div>
+
+                    <div class="content clearfix">
+                        <div id="search_not_field">
+                            <textarea class="search_not" placeholder="Not"></textarea>
+                        </div>
+                        <div class="btn float_r" onclick="add_not()">追加</div>
+                    </div>
+
+                    <div class="content clearfix">
+                        <textarea id="search_from" placeholder="From"></textarea>
+                        <textarea id="search_to" placeholder="To"></textarea>
+                    </div>
+                    
+                    <div class="content clearfix">
+                        <div class="btn float_r" onclick="advanced_search()">検索</div>
+                    </div>
+                </div>
+
+                <div id="result">
+                    <div id="archive"></div>
+                </div>
+
+                <div id="loading" style="display: none"></div>
+
+            </div>
+
+        </section>
+
+        <a href="javascript: void(0)" class="startup" identifier="search">Seach</a>
+        <a href="javascript: void(0)" class="startup" identifier="a">a</a>
+
+    </body>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/yacona/preload"></script>
+    <script src="/yacona/common"></script>
+    <script src="resources/js/index.js"></script>
+    <script>
+    
+        function add_and( value ){
+            let form = document.createElement( 'textarea' )
+            form.className = 'search_and'
+            form.placeholder = 'And'
+            if( value ) form.value = value
+            document.getElementById( 'search_and_field' ).appendChild( form )
+        }
+        
+        function add_or( value ){
+            let form = document.createElement( 'textarea' )
+            form.className = 'search_or'
+            form.placeholder = 'Or'
+            if( value ) form.value = value
+            document.getElementById( 'search_or_field' ).appendChild( form )
+        }
+        
+        function add_not( value ){
+            let form = document.createElement( 'textarea' )
+            form.className = 'search_not'
+            form.placeholder = 'Not'
+            if( value ) form.value = value
+            document.getElementById( 'search_not_field' ).appendChild( form )
+        }
+
+        function saveWordToggle(){
+            let e = document.getElementById( 'save_field' )
+            let s = document.getElementById( 'search_field' )
+            let m = document.getElementById( 'toggle' )
+            console.log( e.style.display )
+            if( e.style.display === 'block' ){
+                m.className = 'menu'
+                e.style.display = 'none'
+                s.style.display = 'block'
+            } else if( e.style.display === 'none' ){
+                m.className = 'menu selected'
+                e.style.display = 'block'
+                s.style.display = 'none'
+            }
+        }
+        
+        function saveWord(){
+            
+            let name = document.getElementById( 'word_name' ).value
+            if( name === '' ) return false
+            
+            let e_and = document.getElementsByClassName( 'search_and' )
+            let e_or  = document.getElementsByClassName( 'search_or' )
+            let e_not = document.getElementsByClassName( 'search_not' )
+
+            let from = document.getElementById( 'search_from' ).value
+            let to   = document.getElementById( 'search_to' ).value
+
+            let and = [],
+                or  = [],
+                not = []
+
+            for( let i=0; i<e_and.length; i++ ) if( e_and[i].value !== '' ) and.push( e_and[i].value )
+            for( let i=0; i<e_or.length; i++ )  if( e_or[i].value !== '' )  or.push( e_or[i].value )
+            for( let i=0; i<e_not.length; i++ ) if( e_not[i].value !== '' ) not.push( '-' + e_not[i].value )
+            
+            socket.emit( 'saveWord', {
+                from: from, 
+                to: to,
+                and: and,
+                or: or,
+                not: not,
+                name: name
+            } )
+            
+        }
+        
+        socket.emit( 'getWord', true )
+        let wordList
+        socket.on( 'word', function( words ){
+            let e = document.getElementById( 'words_list' )
+            let count = 0
+            for( let i in words ){
+                count++
+                e.innerHTML += '<div class="content clearfix"><div class="server">' + i + '</div><div class="btn float_r" onclick="loadWord(\'' + i + '\')">読み込み</div></div>'
+            }
+            wordList = words
+            if( count === 0 ){
+                document.getElementById( 'words_list_tag' ).style.display = 'none'
+            }
+        } )
+        
+        function loadWord( word ){
+            
+            document.getElementById( 'search_and_field' ).innerHTML = ''
+            document.getElementById( 'search_or_field' ).innerHTML = ''
+            document.getElementById( 'search_not_field' ).innerHTML = ''
+            
+            add_and()
+            add_or()
+            add_not()
+            
+            let list = wordList[word]
+            
+            let and  = list.and,
+                or   = list.or,
+                not  = list.not,
+                from = list.from,
+                to   = list.to
+            
+            for( let i=0; i<and.length; i++ ){
+                if( i === 0 ) document.getElementsByClassName( 'search_and' )[0].value = and[i]
+                else if( i !== 0 ) add_and( and[i] )
+            }
+            
+            for( let i=0; i<or.length; i++ ){
+                if( i === 0 ) document.getElementsByClassName( 'search_or' )[0].value = or[i]
+                else if( i !== 0 ) add_or( or[i] )
+            }
+            
+            for( let i=0; i<not.length; i++ ){
+                if( i === 0 ) document.getElementsByClassName( 'search_not' )[0].value = not[i]
+                else if( i !== 0 ) add_not( not[i] )
+            }
+            
+            if( from ) document.getElementById( 'search_from' ).value = from
+            if( to ) document.getElementById( 'search_to' ).value = to
+            
+        }
+        
+        function advanced_search(){
+            
+            let e_and = document.getElementsByClassName( 'search_and' )
+            let e_or  = document.getElementsByClassName( 'search_or' )
+            let e_not = document.getElementsByClassName( 'search_not' )
+            
+            let from = document.getElementById( 'search_from' ).value
+            let to   = document.getElementById( 'search_to' ).value
+            
+            let and = [],
+                or  = [],
+                not = []
+            
+            for( let i=0; i<e_and.length; i++ ) if( e_and[i].value !== '' ) and.push( e_and[i].value )
+            for( let i=0; i<e_or.length; i++ )  if( e_or[i].value !== '' )  or.push( e_or[i].value )
+            for( let i=0; i<e_not.length; i++ ) if( e_not[i].value !== '' ) not.push( '-' + e_not[i].value )
+            
+            let and_query  = and.join( ' AND ' ),
+                or_query   = or.join( ' OR ' ),
+                not_query  = not.join( ' ' )
+            
+            let from_query = 'from:' + from,
+                to_query   = 'to:' + to
+            
+            let query = and_query + ' ' + or_query + ' ' + not_query
+            if( from !== '' ) query += ' ' + from_query
+            if( to !== '' ) query += ' ' + to_query
+            
+            socket.emit( 'search', query )
+            
+        }
+    
+    </script>
+
+</html>
