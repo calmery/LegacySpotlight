@@ -47,9 +47,6 @@
                     <div class="left">機能</div>
                     <div class="right"></div>
                 </div>
-                
-
-                <a href="#" onclick="window.location.reload()">Reload</a>
 
             </nav>
 
@@ -120,9 +117,6 @@
             </div>
 
         </section>
-
-        <a href="javascript: void(0)" class="startup" identifier="search">Seach</a>
-        <a href="javascript: void(0)" class="startup" identifier="a">a</a>
 
     </body>
 
@@ -254,9 +248,13 @@
             if( from ) document.getElementById( 'search_from' ).value = from
             if( to ) document.getElementById( 'search_to' ).value = to
             
+            alert( 'Loaded' )
+            
         }
         
         function advanced_search(){
+            
+            document.getElementById( 'loading' ).style.display = 'block'
             
             let e_and = document.getElementsByClassName( 'search_and' )
             let e_or  = document.getElementsByClassName( 'search_or' )
