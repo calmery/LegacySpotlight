@@ -71,7 +71,7 @@
         } )
         
         socket.on( 'shared', function(){ document.getElementById( 'loading' ).style.display = 'none' } )
-        socket.on( 'reject', function(){ document.getElementById( 'loading' ).style.display = 'none' } )
+        socket.on( 'reject', function(){ alert( 'Rejected' ); document.getElementById( 'loading' ).style.display = 'none' } )
         function share( logName ){
             if( confirm( 'Share ?' ) ){
                 document.getElementById( 'loading' ).style.display = 'block'
