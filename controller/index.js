@@ -12,7 +12,10 @@ module.exports = yacona => {
     let myProfile
     let isStartup = false
     
+    let sock
+    
     yacona.setSocket( 'connection', ( socket, value ) => {
+        sock = socket
         if( isStartup === false ){
             console.log( 'Welcome to Spotlight Beta !' )
             let auth = yacona.config.load( 'oauth', 'twitter/authorization.yaml' )
@@ -37,6 +40,10 @@ module.exports = yacona => {
         } else socket.emit( 'ready' )
     } )
     
+    yacona.setSocket( 'appLoader', ( socket, value ) => {
+        yacona.appLoader( value )
+    } )
+    
     yacona.setSocket( 'getMyProfile', ( socket, value ) => {
         socket.emit( 'myProfile', myProfile )
     } )
@@ -46,6 +53,11 @@ module.exports = yacona => {
         socket.emit( 'startupComplete', true )
     } )
     
+    yacona.setSocket( 'getAddons', ( socket, value ) => {
+        socket.emit( 'addons', yacona.getInstalledAppList() )
+    } )
+    
+    yacona.on( 'update', () => sock.emit( 'update', true ) )
     yacona.on( 'myProfile', () => myProfile )
     
 }

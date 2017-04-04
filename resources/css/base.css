@@ -83,3 +83,56 @@ nav .menu.white {
 #load {
     display: none;
 }
+
+#main {
+    width: 600px;
+    margin: 0 25px;
+    padding: 25px 0;
+    top: 0;
+    left: 150px;
+    position: absolute;
+    background: rgba( 255, 255, 255, 1 );
+    border-left: 1px solid rgba( 2, 159, 218, 1 );
+    border-right: 1px solid rgba( 2, 159, 218, 1 );
+}
+
+#main .title {
+    margin-top: 25px;
+    margin-left: 25px;
+    font-weight: bold;
+    padding-left: 20px;
+    border-left: 5px solid rgba( 2, 159, 218, 1 );
+}
+
+#main .content {
+    width: calc(100% - 106px);
+    margin: 10px 25px;
+    padding: 25px 25px 25px 20px;
+    background: rgba( 245, 245, 245, 1 );
+    border-left: 5px solid rgba( 2, 159, 218, 1 );
+    border-radius: 0 5px 5px 0;
+}
+
+#main .space {
+    width: calc(100% - 101px);
+    margin: 10px 25px;
+    padding: 0px 25px;
+}
+
+.content textarea {
+    width: calc(100% - 50px);
+    height: 12px;
+    border-radius: 3px;
+    border-color: rgba( 2, 159, 218, 1 );
+    padding: 10px 25px;
+}
+
+.btn {
+    width: 75px;
+    text-align: center;
+    padding: 5px 0;
+    background: rgba( 2, 159, 218, 1 );
+    color: rgba( 255, 255, 255, 1 );
+    border-radius: 3px;
+    line-height: 15pt;
+}

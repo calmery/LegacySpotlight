@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+    <head>
+
+        <meta charset="utf-8">
+        <title>Share</title>
+
+        <link rel="stylesheet" href="/yacona/base">
+        <link rel="stylesheet" href="resources/css/common.css">
+
+    </head>
+
+    <body>
+
+        <section id="application">
+
+            <nav>
+
+                <div class="menu white">Spotlight v0.5.4</div>
+                <div class="menu selected">
+                    <div class="left">共有</div>
+                    <div class="right"></div>
+                </div>
+                <a href="settings.html">
+                    <div class="menu">
+                        <div class="left">設定</div>
+                        <div class="right"></div>
+                    </div>
+                </a>
+
+            </nav>
+
+            <div id="myProfile">
+                <div id="load">
+                    <img src="" id="icon">
+                    <div id="name"></div>
+                    <div id="screen_name">@</div>
+                </div>
+            </div>
+
+            <div id="main">
+
+                <div class="content clearfix" id="save_field" style="display: none">
+                    <textarea id="list_name" placeholder="リスト名"></textarea>
+                    <div class="btn float_r" onclick="save()" style="width: 150px;">検索結果を保存</div>
+                </div>
+
+                <div class="content clearfix" id="search_field">
+                    <textarea id="word" placeholder="キーワード検索"></textarea>
+                    <div class="btn float_r" onclick="search()">検索</div>
+                </div>
+
+                <div id="result">
+                    <div id="archive"></div>
+                </div>
+
+                <div id="loading" style="display: none"></div>
+
+            </div>
+
+        </section>
+
+    </body>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/yacona/preload"></script>
+    <script src="/yacona/common"></script>
+    <script src="resources/js/index.js"></script>
+
+</html>
