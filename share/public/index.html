@@ -7,7 +7,12 @@
         <title>Share</title>
 
         <link rel="stylesheet" href="/yacona/base">
-        <link rel="stylesheet" href="resources/css/common.css">
+        <style>
+            .server {
+                float: left;
+                line-height: 22pt;
+            }
+        </style>
 
     </head>
 
@@ -41,18 +46,8 @@
 
             <div id="main">
 
-                <div class="content clearfix" id="save_field" style="display: none">
-                    <textarea id="list_name" placeholder="リスト名"></textarea>
-                    <div class="btn float_r" onclick="save()" style="width: 150px;">検索結果を保存</div>
-                </div>
-
-                <div class="content clearfix" id="search_field">
-                    <textarea id="word" placeholder="キーワード検索"></textarea>
-                    <div class="btn float_r" onclick="search()">検索</div>
-                </div>
-
                 <div id="result">
-                    <div id="archive"></div>
+                    <div id="lists"></div>
                 </div>
 
                 <div id="loading" style="display: none"></div>
@@ -66,6 +61,24 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="/yacona/preload"></script>
     <script src="/yacona/common"></script>
-    <script src="resources/js/index.js"></script>
+    <script>
+    
+        socket.emit( 'getList', true )
+        socket.on( 'list', function( list ){
+            let e = document.getElementById( 'lists' )
+            for( let i=0; i<list.length; i++ )
+                e.innerHTML += '<div class="content clearfix"><div class="server float_l">' + list[i] + '</div><div class="btn float_r" onclick="share(\'' + list[i] + '\')">共有</div></div>'
+        } )
+        
+        socket.on( 'shared', function(){ document.getElementById( 'loading' ).style.display = 'none' } )
+        socket.on( 'reject', function(){ document.getElementById( 'loading' ).style.display = 'none' } )
+        function share( logName ){
+            if( confirm( 'Share ?' ) ){
+                document.getElementById( 'loading' ).style.display = 'block'
+                socket.emit( 'share', logName )
+            }
+        }
+        
+    </script>
 
 </html>

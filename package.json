@@ -12,6 +12,7 @@
     "express-session": "^1.15.2",
     "passport": "^0.3.2",
     "passport-twitter": "^1.0.4",
+    "request": "^2.81.0",
     "twitter": "^1.7.0"
   }
 }

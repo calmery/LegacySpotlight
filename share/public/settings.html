@@ -7,7 +7,6 @@
         <title>Share</title>
 
         <link rel="stylesheet" href="/yacona/base">
-        <link rel="stylesheet" href="resources/css/common.css">
 
     </head>
 
@@ -44,7 +43,7 @@
                 <div class="title" style="margin-top: 0">共有先</div>
                 <div class="content clearfix">
                     <textarea id="share_target" placeholder="http://example.com:3000"></textarea>
-                    <div class="btn float_r">保存</div>
+                    <div class="btn float_r" onclick="save()">保存</div>
                 </div>
 
             </div>
@@ -56,5 +55,22 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="/yacona/preload"></script>
     <script src="/yacona/common"></script>
+    <script>
+        
+        function save(){
+            let url = document.getElementById( 'share_target' ).value
+            if( url === '' ) return false
+            socket.emit( 'saveUrl', url )
+        }
+        
+        socket.emit( 'getUrl', true )
+        socket.on( 'saved', function(){ alert( 'Saved' ); socket.emit( 'getUrl', true ) } )
+        socket.on( 'reject', function(){ alert( 'Rejected' ) } )
+        
+        socket.on( 'url', function( config ){
+            document.getElementById( 'share_target' ).placeholder = config.server_url
+        } )
+        
+    </script>
 
 </html>
