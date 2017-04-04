@@ -1,9 +1,11 @@
+const request = require( 'request' )
+
 module.exports = yacona => {
     
     const yaml = yacona.moduleLoader( 'yaml' )
     
     yacona.addRoute( './public' )
-    yacona.createWindow( { setMenu: null, isResizable: false, openDevTools: true } )
+    yacona.createWindow( { setMenu: null, isResizable: false } )
     
     yacona.setSocket( 'getMyProfile', ( socket, value ) => {
         socket.emit( 'myProfile', yacona.emit( { app: 'controller', event: 'myProfile' } ) )
@@ -39,8 +41,26 @@ module.exports = yacona => {
     
     yacona.setSocket( 'share', ( socket, value ) => {
         
-        yacona.notifier( 'Shared' )
-        setTimeout( () => { socket.emit( 'shared', true ) }, 3000 )
+        if( yacona.config.check( yacona.getName(), 'config.yaml' ) ){
+            let config = yaml.parser( yacona.config.load( 'config.yaml' ) ).server_url
+            if( config ){
+                config += '/report'
+                console.log( config )
+                request.post( {
+                    uri: config,
+                    form: yacona.documents.load( 'log', value + '/statuses.json' ),
+                    json: false
+                }, ( error, response, body ) => {
+                    if( response.statusCode !== 200 ){
+                        yacona.notifier( 'Rejected' )
+                        socket.emit( 'reject', true )
+                    } else {
+                        yacona.notifier( 'Shared' )
+                        socket.emit( 'shared', true )
+                    }
+                } )
+            }
+        }
         
     } )
     
