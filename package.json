@@ -2,6 +2,9 @@
   "name": "spotlight",
   "version": "0.5.4",
   "main": "index",
+  "scripts":{
+    "start": "electron ."
+  },
   "repository": {
     "url": "https://github.com/calmery/Spotlight.git",
     "type": "git"
