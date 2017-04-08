@@ -1,0 +1,15 @@
+{
+  "name": "spotlight",
+  "version": "0.5.4",
+  "description": "Search for harmful information on twitter",
+  "main": "index",
+  "repository": {
+    "url": "http://github.com/calmery/Spotlight",
+    "type": "git"
+  },
+  "author": "calmery <contact@calmery.me>",
+  "license": "GPL-2.0",
+  "dependencies": {
+    "yacona": "^17.4.9"
+  }
+}
