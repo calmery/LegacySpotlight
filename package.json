@@ -10,6 +10,10 @@
   "author": "calmery <contact@calmery.me>",
   "license": "GPL-2.0",
   "dependencies": {
+    "express-session": "^1.15.2",
+    "passport": "^0.3.2",
+    "passport-twitter": "^1.0.4",
+    "twitter": "^1.7.0",
     "yacona": "^17.4.9"
   }
 }

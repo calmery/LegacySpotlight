@@ -52,7 +52,13 @@
                 </a>
                 
             </nav>
-
+            
+            <div id="profile">
+                <img src="" id="profile-icon">
+                <div id="user_name"></div>
+                <div id="screen_name"></div>
+            </div>
+       
         </section>
         
         <section id="utility">
@@ -65,23 +71,6 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="/yacona/init"></script>
-    <script>
-        
-        const loading = {
-            e: document.getElementById( 'loading' ),
-            show: () => {
-                loading.e.className = 'show fadeIn' 
-            },
-            hide: () => {
-                loading.e.className = 'fadeOut'
-                setTimeout( () => { loading.e.className = 'hide' }, 1000 )
-            }
-        }
-        
-        document.addEventListener( 'DOMContentLoaded', () => {
-            loading.hide()
-        }, false )
-        
-    </script>
+    <script src="main.js"></script>
 
 </html>
