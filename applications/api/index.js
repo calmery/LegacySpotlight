@@ -99,8 +99,8 @@ module.exports = yacona => {
         if( typeof id === 'function' ){
             callback = id
             id = userSetting.id
+            if( userProfile !== undefined ) callback( userProfile )
         }
-        if( userProfile !== undefined ) callback( userProfile )
         return getProfile( id ).then( profile => {
             userProfile = profile
             callback( userProfile )
