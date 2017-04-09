@@ -4,55 +4,56 @@
     <head>
 
         <meta charset="utf-8">
-        <title>Spotlight</title>
+        <title>Spotlight Setup</title>
 
         <link rel="stylesheet" href="/yacona/base">
-
+        <link rel="stylesheet" href="/yacona/fonts">
+    
     </head>
 
     <body>
 
-        <section id="application" class="controller">
+        <section id="application">
 
             <nav id="controller">
-               
+
                 <div class="menu title">
                     <div class="name">Launcher</div>
                     <div class="isRunning"></div>
                 </div>
-                
+
                 <a href="javascript: void(0)" onclick="appLoader( 'search' )">
                     <div class="menu">
-                        <div class="name">検索</div>
+                        <div class="name">Menu 1</div>
                         <div class="isRunning active"></div>
                     </div>
                 </a>
-                
+
                 <a href="javascript: void(0)" onclick="appLoader( 'manage' )">
                     <div class="menu">
                         <div class="name">管理</div>
                         <div class="isRunning active"></div>
                     </div>
                 </a>
-                
+
                 <a href="javascript: void(0)" onclick="appLoader( 'share' )">
                     <div class="menu">
                         <div class="name">共有</div>
                         <div class="isRunning active"></div>
                     </div>
                 </a>
-                
+
                 <div class="menu title">
                     <div class="name">Add-ons</div>
                     <div class="isRunning">
                         <a href="javascript: void(0)" onclick="appLoader( 'addon' )" style="color: rgba( 2, 159, 218, 1 )">+</a>
                     </div>
                 </div>
-                
+
                 <div id="addons"></div>
-                
+
             </nav>
-            
+
             <div id="profile">
                 <div id="profile-area" class="hide">
                     <img src="" id="profile-icon">
@@ -60,9 +61,9 @@
                     <div id="screen_name"></div>
                 </div>
             </div>
-       
+
         </section>
-        
+
         <section id="utility">
             <div id="loading" class="show">
                 <img src="/yacona/loading">
@@ -70,9 +71,19 @@
         </section>
 
     </body>
-
+    
     <script src="/socket.io/socket.io.js"></script>
     <script src="/yacona/init"></script>
-    <script src="main.js"></script>
+    <script>
+        if( document.getElementById( 'profile' ) !== null ){
+            socket.emit( 'getMyProfile' )
+            socket.on( 'myProfile', profile => {
+                document.getElementById( 'profile-icon' ).src = profile.icon
+                document.getElementById( 'user_name' ).innerHTML = profile.name
+                document.getElementById( 'screen_name' ).innerHTML = '@' + profile.screen_name
+                document.getElementById( 'profile-area' ).className = 'fadeIn'
+            } )
+        }
+    </script>
 
 </html>
