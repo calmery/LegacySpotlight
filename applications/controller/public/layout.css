@@ -7,6 +7,7 @@ nav {
 nav .menu {
     width: 150px;
     height: 13px;
+    line-height: 13px;
     padding: 13px 25px;
     color: rgba( 255, 255, 255, 1 );
     background: rgba( 2, 159, 218, 1 );

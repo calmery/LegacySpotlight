@@ -107,8 +107,14 @@ module.exports = yacona => {
         } )
     } )
     
-    yacona.on( 'app/launch', ( appName ) => {
-        yacona.localAppLoader( '../' + appName )
+    yacona.on( 'addons', () => yacona.getInstalledAppList() )
+    yacona.on( 'launch', ( appName ) => {
+        let installed = yacona.getInstalledAppList()
+        if( installed.indexOf( appName ) !== -1 ){
+            return yacona.appLoader( appName )
+        } else {
+            return yacona.localAppLoader( '../' + appName ) 
+        }
     } )
     
     emitIsReady()
