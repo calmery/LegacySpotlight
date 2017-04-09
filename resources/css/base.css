@@ -64,3 +64,93 @@ body {
     animation-fill-mode: forwards;
 }
 
+/* ----- Navigation ----- */
+
+nav {
+    width: 150px;
+    height: 100%;
+    background: rgba( 255, 255, 255, 1 );
+    border-right: 1px solid rgba( 2, 159, 218, 1 );
+    top: 0;
+    left: 0;
+    position: fixed;
+}
+
+.controller nav {
+    width: 200px;
+    position: static;
+    border: 0;
+}
+
+nav .menu {
+    width: 100px;
+    height: 13px;
+    line-height: 13px;
+    padding: 13px 25px;
+    color: rgba( 255, 255, 255, 1 );
+    background: rgba( 2, 159, 218, 1 );
+    font-family: Quicksand, sans-serif;
+    font-weight: 500;
+    border-bottom: 1px solid rgba( 255, 255, 255, 1 );
+}
+
+.controller nav .menu {
+    width: 150px;
+}
+
+nav .menu.title {
+    background: rgba( 255, 255, 255, 1 );
+    color: rgba( 2, 159, 218, 1 );
+}
+
+nav .menu .name {
+    width: 80px;
+    float: left;
+}
+
+.controller nav .menu .name {
+    width: 120px;
+}
+
+nav .menu .isRunning {
+    width: 19px;
+    float: right;
+    text-align: right;
+}
+
+.controller nav .menu .isRunning {
+    width: 30px;
+}
+
+nav .menu .isRunning.active:before {
+    content: '●'
+}
+
+#profile {
+    width: 150px;
+    border-top: 1px solid rgba( 255, 255, 255, 1 );
+    height: 100px;
+    padding: 40px 0;
+    text-align: center;
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    background: rgba( 2, 159, 218, 1 );
+    color: rgba( 255, 255, 255, 1 );
+    font-family: Quicksand, sans-serif
+}
+
+.controller #profile {
+    width: 200px;
+}
+
+#profile #profile-icon {
+    width: 50px;
+    border-radius: 100%;
+    border: 2px solid rgba( 255, 255, 255, 1 );
+    margin-bottom: 15px;
+}
+
+#profile #screen_name {
+    font-size: 10px;
+}

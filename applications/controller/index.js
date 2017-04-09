@@ -45,7 +45,6 @@ module.exports = yacona => {
     
     yacona.setSocket( 'launch', ( socket, appName ) => {
         let status = yacona.emit( 'api/launch', appName )
-        console.log( status )
         if( status.status === false ) socket.emit( 'reject', status.statusText )
     } )
     
