@@ -7,7 +7,6 @@ body {
     line-height: 15px;
     font-family: sans-serif;
     background: rgba( 245, 245, 245, 1 );
-    overflow:hidden
 }
 
 .hide {
@@ -45,7 +44,7 @@ body {
 
 .fadeOut {
     animation-name: fadeOut;
-    animation-duration: 1.5s;
+    animation-duration: 0.5s;
     animation-timing-function: ease;
     animation-iteration-count: 1;
     animation-fill-mode: forwards;
@@ -58,7 +57,7 @@ body {
 
 .fadeIn {
     animation-name: fadeIn;
-    animation-duration: 1.5s;
+    animation-duration: 0.5s;
     animation-timing-function: ease;
     animation-iteration-count: 1;
     animation-fill-mode: forwards;

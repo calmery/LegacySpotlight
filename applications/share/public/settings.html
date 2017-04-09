@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+    <head>
+
+        <meta charset="utf-8">
+        <title>Share</title>
+
+        <link rel="stylesheet" href="/yacona/base">
+        <style>
+            #operationBlocker {
+                width: 100%;
+                height: 100%;
+                background: rgba( 0, 0, 0, .5 );
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                position: fixed;
+            }
+        </style>
+
+    </head>
+
+    <body>
+
+        <section id="application">
+
+            <nav id="controller">
+
+                <div class="menu title">
+                    <div class="name">Share</div>
+                    <div class="isRunning"></div>
+                </div>
+
+                <a href="index.html">
+                    <div class="menu">
+                        <div class="name">共有</div>
+                        <div class="isRunning"></div>
+                    </div>
+                </a>
+
+                <a href="javascript: void(0)">
+                    <div class="menu">
+                        <div class="name">設定</div>
+                        <div class="isRunning active"></div>
+                    </div>
+                </a>
+
+            </nav>
+
+            <div id="profile">
+                <div id="profile-area" class="hide">
+                    <img src="" id="profile-icon">
+                    <div id="user_name"></div>
+                    <div id="screen_name"></div>
+                </div>
+            </div>
+
+            <div id="main">
+
+                <div class="title" style="margin-top: 0">共有先</div>
+                <div class="content clearfix">
+                    <textarea id="share_target" placeholder="http://localhost:3000"></textarea>
+                    <div class="btn float_r" onclick="save()">保存</div>
+                </div>
+
+            </div>
+            
+            <section id="utility">
+                <div id="loading" class="show">
+                    <img src="/yacona/loading">
+                </div>
+                <div id="operationBlocker" class="hide"></div>
+            </section>
+
+        </section>
+
+    </body>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/yacona/init"></script>
+    <script>
+        
+        if( document.getElementById( 'profile' ) !== null ){
+            socket.emit( 'getMyProfile' )
+            socket.on( 'myProfile', profile => {
+                document.getElementById( 'profile-icon' ).src = profile.icon
+                document.getElementById( 'user_name' ).innerHTML = profile.name
+                document.getElementById( 'screen_name' ).innerHTML = '@' + profile.screen_name
+                document.getElementById( 'profile-area' ).className = 'fadeIn'
+            } )
+        }
+        
+        function save(){
+            let url = document.getElementById( 'share_target' ).value
+            if( url === '' ) return false
+            socket.emit( 'saveUrl', url )
+        }
+        
+        socket.emit( 'getUrl', true )
+        socket.on( 'saved', function(){ alert( 'Saved' ); socket.emit( 'getUrl', true ) } )
+        socket.on( 'reject', function(){ alert( 'Rejected' ) } )
+        
+        socket.on( 'url', function( config ){
+            document.getElementById( 'share_target' ).placeholder = config.server_url
+        } )
+        
+    </script>
+
+</html>
