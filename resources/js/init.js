@@ -11,7 +11,7 @@ if( document.getElementById( 'loading' ) !== null ){
         },
         hide: () => {
             loading.e.className = 'fadeOut'
-            setTimeout( () => { loading.e.className = 'hide' }, 1000 )
+            setTimeout( () => { loading.e.className = 'hide' }, 500 )
         }
     }
 

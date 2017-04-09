@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+    <head>
+
+        <meta charset="utf-8">
+        <title>Manage</title>
+
+        <link rel="stylesheet" href="/yacona/base">
+
+        <style>
+            .server {
+                float: left;
+                line-height: 22pt;
+            }
+            
+            #operationBlocker {
+                width: 100%;
+                height: 100%;
+                background: rgba( 0, 0, 0, .5 );
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                position: fixed;
+            }
+            #result {
+                display: none
+            }
+
+            #archive .content .left {
+                width: 50px;
+            }
+
+            #archive .content .left img {
+                width: 46px;
+                border: 2px solid rgba( 255, 255, 255, 1 );
+                border-radius: 100%;
+            }
+
+            #archive .content .right {
+                width: 424px;
+            }
+
+            #archive .content .right .name {
+                font-weight: bold
+            }
+
+            #archive .content .right .screen_name {
+                font-size: 10px;
+            }
+
+            #archive .content .right .text {
+                margin-top: 10px
+            }
+
+            .danger {
+                background: red
+            }
+        </style>
+
+    </head>
+
+    <body>
+
+        <section id="application">
+
+            <nav id="controller">
+
+                <div class="menu title">
+                    <div class="name">Manage</div>
+                    <div class="isRunning"></div>
+                </div>
+                
+                <a href="javascript: void(0)" onclick="window.location.reload()">
+                    <div class="menu">
+                        <div class="name">編集</div>
+                        <div class="isRunning active"></div>
+                    </div>
+                </a>
+
+            </nav>
+
+            <div id="profile">
+                <div id="profile-area" class="hide">
+                    <img src="" id="profile-icon">
+                    <div id="user_name"></div>
+                    <div id="screen_name"></div>
+                </div>
+            </div>
+
+            <div id="main">
+
+                <div id="save_field" style="display: block">
+                    <div class="title" id="words_list_tag" style="margin-top: 0">リスト</div>
+                    <div id="lists"></div>
+                </div>
+
+                <div id="search_field" style="display: nonr"></div>
+
+                <div id="result">
+                    <div id="list_edit" class="content clearfix">
+                        <textarea id="list_name" placeholder="リスト名"></textarea>
+                        <div class="btn float_r" onclick="save()">保存</div>
+                    </div>
+                    <div id="archive"></div>
+                </div>
+
+                <section id="utility">
+                    <div id="loading" class="show">
+                        <img src="/yacona/loading">
+                    </div>
+                    <div id="operationBlocker" class="hide"></div>
+                </section>
+
+            </div>
+
+        </section>
+
+    </body>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/yacona/init"></script>
+    <script src="resources/js/index.js"></script>
+    <script>
+        
+        if( document.getElementById( 'profile' ) !== null ){
+            socket.emit( 'getMyProfile' )
+            socket.on( 'myProfile', profile => {
+                document.getElementById( 'profile-icon' ).src = profile.icon
+                document.getElementById( 'user_name' ).innerHTML = profile.name
+                document.getElementById( 'screen_name' ).innerHTML = '@' + profile.screen_name
+                document.getElementById( 'profile-area' ).className = 'fadeIn'
+            } )
+        }
+        
+        function edit( listName ){
+            saveToggle()
+            document.getElementById( 'loading' ).style.display ='block'
+            socket.emit( 'edit', listName )
+        }
+        
+        function remove( listName ){
+            if( confirm( 'Remove ?' ) ){
+                socket.emit( 'remove', listName )
+                window.location.reload()
+            } else return false
+        }
+        
+        socket.on( 'removed', function(){
+            alert( 'Removed' )
+        } )
+
+        socket.emit( 'getList', true )
+        socket.on( 'list', function( list ){
+            let e = document.getElementById( 'lists' )
+            for( let i=0; i<list.length; i++ )
+                e.innerHTML += '<div class="content clearfix"><div class="server float_l">' + list[i] + '</div><div class="btn float_r" style="margin-left:10px;background:rgba(255,96,96,1)" onclick="remove(\'' + list[i] + '\')">消去</div><div class="btn float_r" onclick="edit(\'' + list[i] + '\')">編集</div></div>'
+        } )
+        
+        let raw
+        let meta = []
+        let statuses = []
+        let flag
+
+        let archive = document.getElementById( 'archive' )
+        let count = -1
+
+        socket.on( 'edit', ( result ) => {
+            
+            document.getElementById( 'list_name' ).value = result.name
+            raw = result.raw
+            flag = result.flag
+            console.log( flag )
+            
+            document.getElementById( 'result' ).style.display = 'block'
+
+            for( let i=0; i<raw.length; i++ ){
+                
+                meta.push( raw[i].search_metadata )
+                
+                let isOverlap
+                for( let j=0; j<raw[i].statuses.length; j++ ){
+                    isOverlap = false
+                    for( let k=0; k<statuses.length; k++ ){
+                        if( raw[i].statuses[j].id === statuses[k].id ){
+                            isOverlap = true
+                        }
+                    }
+                    if( isOverlap ) continue
+                    count++
+                    statuses.push( raw[i].statuses[j] )
+                    archive.innerHTML = '<div class="content clearfix" style="' + ( flag[count] === 'clean' ? 'border-color: rgba( 126, 211, 33, 1 )' : '' ) + '" id="n' + count + '" onclick="change( ' + count + ', ' + raw[i].statuses[j].id + ' )" flag="' + flag[count] + '"><div class="left float_l"><img src="' + raw[i].statuses[j].user.profile_image_url + '"></div><div class="right float_r"><div class="name">' + raw[i].statuses[j].user.name + '</div><div class="screen_name">@' + raw[i].statuses[j].user.screen_name+'</div><div class="text">' + raw[i].statuses[j].text + '</div></div></div>' + archive.innerHTML
+                }
+                
+                archive.innerHTML = '<div class="title">' + decodeURIComponent( raw[i].search_metadata.query ).replace( /\+/g, ' ' ) + '</div>' + archive.innerHTML
+                   
+            }
+
+            document.getElementById( 'loading' ).style.display = 'none'
+        } )
+
+    </script>
+
+</html>

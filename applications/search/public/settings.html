@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+    <head>
+
+        <meta charset="utf-8">
+        <title>Search Setting</title>
+
+        <link rel="stylesheet" href="/yacona/base">
+        <style>
+
+            .server {
+                line-height: 22pt;
+            }
+
+        </style>
+
+    </head>
+
+    <body>
+
+        <section id="application">
+
+            <nav id="controller">
+
+                <div class="menu title">
+                    <div class="name">Search</div>
+                    <div class="isRunning"></div>
+                </div>
+                
+                <a href="index.html">
+                    <div class="menu">
+                        <div class="name">検索</div>
+                        <div class="isRunning"></div>
+                    </div>
+                </a>
+
+                <a href="advanced.html">
+                    <div class="menu">
+                        <div class="name">高度な検索</div>
+                        <div class="isRunning"></div>
+                    </div>
+                </a>
+
+                <a href="javascript: void(0)">
+                    <div class="menu">
+                        <div class="name">設定</div>
+                        <div class="isRunning active"></div>
+                    </div>
+                </a>
+
+            </nav>
+
+            <div id="profile">
+                <div id="profile-area" class="hide">
+                    <img src="" id="profile-icon">
+                    <div id="user_name"></div>
+                    <div id="screen_name"></div>
+                </div>
+            </div>
+
+            <div id="main">
+
+                <div class="title" style="margin-top: 0">検索件数</div>
+                <div class="content clearfix">
+                    <textarea id="search_count" placeholder="件数（最大 100 件）"></textarea>
+                    <div class="btn float_r" onclick="save( 'search_count' )">保存</div>
+                </div>
+
+            </div>
+            
+            <section id="utility">
+                <div id="loading" class="show">
+                    <img src="/yacona/loading">
+                </div>
+                <div id="operationBlocker" class="hide"></div>
+            </section>
+
+        </section>
+
+    </body>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/yacona/init"></script>
+    <script>
+        
+        if( document.getElementById( 'profile' ) !== null ){
+            socket.emit( 'getMyProfile' )
+            socket.on( 'myProfile', profile => {
+                document.getElementById( 'profile-icon' ).src = profile.icon
+                document.getElementById( 'user_name' ).innerHTML = profile.name
+                document.getElementById( 'screen_name' ).innerHTML = '@' + profile.screen_name
+                document.getElementById( 'profile-area' ).className = 'fadeIn'
+            } )
+        }
+
+        socket.on( 'saved', () => alert( 'Saved' ) )
+        
+        socket.emit( 'getConfig', true )
+        socket.on( 'config', value => {
+            if( value.search_count ) 
+                document.getElementById( 'search_count' ).placeholder = value.search_count
+        } )
+        
+        const save = type => {
+            let count = document.getElementById( 'search_count' ).value
+            if( count === '' ) return false
+            if( type === 'search_count' && count.match( /\d+/ ) && count.match( /\d+/ ).input === count ){
+                socket.emit( 'config', { search_count: Number( count ) } )
+            } else alert( '使用できない文字が含まれています' )
+        }
+
+    </script>
+
+</html>

@@ -109,6 +109,18 @@ module.exports = yacona => {
             callback( userProfile )
         } )
     } )
+    yacona.on( 'twitter/search', query => {
+        return new Promise( function( resolve, reject ){
+            client.get( 'search/tweets', {
+                q: query.query,
+                count: query.count
+            }, function( error, tweet, response ){
+                if( error === null ) resolve( tweet )
+                else reject( error )
+            } )
+        } )
+    } )
+    
     
     yacona.on( 'addons', () => yacona.getInstalledAppList() )
     yacona.on( 'app/launch', ( appName ) => {
@@ -120,7 +132,6 @@ module.exports = yacona => {
         }
     } )
     yacona.on( 'app/install', ( options, callback ) => {
-        console.log( options )
         if( options.overwrite === true ){
             console.log( options.url )
             appRemover( options.url.split( '/' ).pop().replace( RegExp( '.zip' ), '' ), ( status ) => {
