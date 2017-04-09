@@ -25,3 +25,7 @@ if( document.getElementById( 'profile' ) !== null ){
         document.getElementById( 'profile-area' ).className = 'fadeIn'
     } )
 }
+
+socket.on( 'refresh', () => {
+    window.location.reload()
+} )

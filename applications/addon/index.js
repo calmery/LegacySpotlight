@@ -20,4 +20,27 @@ module.exports = yacona => {
         } )
     } )
     
+    yacona.setSocket( 'installRequest', ( socket, options ) => {
+        yacona.emit( 'api/app/install', options, ( status ) => {
+            if( status && status.status === false ){
+                socket.emit( 'confirm', { url: options.url, message: status.statusText } )
+            } else {
+                socket.emit( 'log', 'installed' )
+                socket.emit( 'complete', true )
+                yacona.emit( 'controller/refresh' )
+            }
+        } )
+    } )
+    
+    yacona.setSocket( 'getInstalledAddons', socket => socket.emit( 'installedAddons', yacona.emit( 'api/addons' ) ) )
+    
+    yacona.setSocket( 'remove', ( socket, appName ) => {
+        yacona.emit( 'api/app/uninstall', appName, ( status ) => {
+            if( status && status.status === true ){
+                socket.emit( 'complete', true )
+                yacona.emit( 'controller/refresh' )
+            } else socket.emit( 'reject', status.statusText )
+        } )
+    } )
+    
 }

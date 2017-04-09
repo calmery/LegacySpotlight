@@ -30,6 +30,9 @@ module.exports = yacona => {
         } )
     } )
     
+    let s
+    yacona.setSocket( 'connection', socket => s = socket  )
+    
     yacona.setSocket( 'getMyProfile', socket => {
         yacona.emit( 'api/twitter/profile', profile => {
             if( profile.profile_image_url.indexOf( '_normal' ) !== -1 ) 
@@ -44,10 +47,14 @@ module.exports = yacona => {
     } )
     
     yacona.setSocket( 'launch', ( socket, appName ) => {
-        let status = yacona.emit( 'api/launch', appName )
+        let status = yacona.emit( 'api/app/launch', appName )
         if( status.status === false ) socket.emit( 'reject', status.statusText )
     } )
     
     yacona.setSocket( 'getInstalledAddons', socket => socket.emit( 'installedAddons', yacona.emit( 'api/addons' ) ) )
+    
+    yacona.on( 'refresh', () => {
+        s.emit( 'refresh', true )
+    } )
     
 }

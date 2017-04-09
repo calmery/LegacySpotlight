@@ -8,7 +8,30 @@
 
         <link rel="stylesheet" href="/yacona/base">
         <link rel="stylesheet" href="/yacona/fonts">
-    
+        
+        <style>
+            .warm {
+                background: rgba( 255, 96, 96, 1 ) !important
+            }
+            .appName {
+                width: 200px;
+                float: left;
+                line-height: 25pt;
+                font-weight: bold;
+            }
+            
+            #operationBlocker {
+                width: 100%;
+                height: 100%;
+                background: rgba( 0, 0, 0, .5 );
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                position: fixed;
+            }
+        </style>
+
     </head>
 
     <body>
@@ -21,20 +44,22 @@
                     <div class="name">Add-ons</div>
                     <div class="isRunning"></div>
                 </div>
-                
-                <a href="javascript: void(0)">
+
+                <a href="index.html">
                     <div class="menu">
                         <div class="name">追加</div>
-                        <div class="isRunning active"></div>
-                    </div>
-                </a>
-                
-                <a href="manage.html">
-                    <div class="menu">
-                        <div class="name">管理</div>
                         <div class="isRunning"></div>
                     </div>
                 </a>
+
+                <a href="javascript: void(0)">
+                    <div class="menu">
+                        <div class="name">管理</div>
+                        <div class="isRunning active"></div>
+                    </div>
+                </a>
+
+                <a href="#" onclick="window.location.reload()">Reload</a>
 
             </nav>
 
@@ -45,22 +70,9 @@
                     <div id="screen_name"></div>
                 </div>
             </div>
-            
+
             <section id="main">
-               
-                <div id="install_field">
-                    <div class="title">Install</div>
-                    <div class="content clearfix">
-                        <textarea id="url" placeholder="Absolute URL (Only .zip)"></textarea>
-                        <div class="btn float_r long" onclick="install()">インストール</div>
-                    </div>
-                </div>
-                
-                <div id="log_field">
-                    <div class="title">Log</div>
-                    <div id="log" class="content"></div>
-                </div>
-                
+                <div id="addons"></div>
             </section>
 
         </section>
@@ -69,12 +81,13 @@
             <div id="loading" class="show">
                 <img src="/yacona/loading">
             </div>
+            <div id="operationBlocker" class="hide"></div>
         </section>
 
     </body>
-    
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="/yacona/init"></script>
-    <script src="index.js"></script>
-
+    <script src="manage.js"></script>
+    
 </html>
