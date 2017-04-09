@@ -20,6 +20,16 @@ const makeOption = condition => {
     return option
 }
 
+// Status
+// Ready -> Available
+
+// Ready
+// isReady === true
+
+// Available
+// isAuthorized === true
+// isAvailable === true
+
 module.exports = yacona => {
     
     const yaml = yacona.moduleLoader( 'yaml' )
@@ -40,11 +50,7 @@ module.exports = yacona => {
         else isReadyCallbackTargets.push( callback )
     } )
     yacona.on( 'available', callback => {
-        console.log( 'isAvailable : ' + isAvailable )
-        if( isAvailable === true ){
-            console.log( 'ava true' )
-            callback()
-        }
+        if( isAvailable === true ) callback()
         else isAvailableCallbackTargets.push( callback )
     } )
     yacona.on( 'isAuthorized', () => isAuthorized )
@@ -54,7 +60,6 @@ module.exports = yacona => {
         for( ;isReadyCallbackTargets.length; ) isReadyCallbackTargets.shift()()
     }
     const emitIsAvailable = () => {
-        console.log( 'Change is available' )
         isAvailable = true
         for( ;isAvailableCallbackTargets.length; ) isAvailableCallbackTargets.shift()()
     }
@@ -77,11 +82,8 @@ module.exports = yacona => {
     const load = () => {
         userSetting = yaml.parser( yacona.config.load( 'twitter/authorization.yaml' ) )
         client      = getClient( userSetting.access_token, userSetting.access_token_secret )
-        getProfile( userSetting.id ).then( profile => {
-            isAvailable = true
-            emitIsAvailable()
-            console.log( profile )
-        } )
+        isAvailable = true
+        emitIsAvailable()
     }
     
     yacona.on( 'twitter/key', () => requestKey )
@@ -92,7 +94,20 @@ module.exports = yacona => {
         return true
     } )
     
-    yacona.on( 'app/startup', ( appName ) => {
+    yacona.on( 'twitter/profile', ( id, callback ) => {
+        if( isAvailable === false ) return false
+        if( typeof id === 'function' ){
+            callback = id
+            id = userSetting.id
+        }
+        if( userProfile !== undefined ) callback( userProfile )
+        return getProfile( id ).then( profile => {
+            userProfile = profile
+            callback( userProfile )
+        } )
+    } )
+    
+    yacona.on( 'app/launch', ( appName ) => {
         yacona.localAppLoader( '../' + appName )
     } )
     
