@@ -13,6 +13,8 @@ const loading = {
     }
 }
 
+socket.emit( 'getMyProfile' )
+
 socket.on( 'myProfile', ( profile ) => {
     document.getElementById( 'profile-icon' ).src = profile.icon
     document.getElementById( 'user_name' ).innerHTML = profile.name

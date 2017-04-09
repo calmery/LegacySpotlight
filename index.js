@@ -16,4 +16,4 @@ yacona.addClientModule( 'loading', 'resources/img/loading.gif' )
 yacona.addClientModule( 'icon', 'resources/img/icon.ico' )
 
 yacona.localAppLoader( 'applications/api' )
-yacona.localAppLoader( 'applications/oauth' )
+yacona.localAppLoader( 'applications/controller' )
