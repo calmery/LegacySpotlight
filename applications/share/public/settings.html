@@ -7,18 +7,6 @@
         <title>Share</title>
 
         <link rel="stylesheet" href="/yacona/base">
-        <style>
-            #operationBlocker {
-                width: 100%;
-                height: 100%;
-                background: rgba( 0, 0, 0, .5 );
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                position: fixed;
-            }
-        </style>
 
     </head>
 
@@ -81,16 +69,6 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="/yacona/init"></script>
     <script>
-        
-        if( document.getElementById( 'profile' ) !== null ){
-            socket.emit( 'getMyProfile' )
-            socket.on( 'myProfile', profile => {
-                document.getElementById( 'profile-icon' ).src = profile.icon
-                document.getElementById( 'user_name' ).innerHTML = profile.name
-                document.getElementById( 'screen_name' ).innerHTML = '@' + profile.screen_name
-                document.getElementById( 'profile-area' ).className = 'fadeIn'
-            } )
-        }
         
         function save(){
             let url = document.getElementById( 'share_target' ).value

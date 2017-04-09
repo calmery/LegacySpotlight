@@ -1,13 +1,3 @@
-if( document.getElementById( 'profile' ) !== null ){
-    socket.emit( 'getMyProfile' )
-    socket.on( 'myProfile', profile => {
-        document.getElementById( 'profile-icon' ).src = profile.icon
-        document.getElementById( 'user_name' ).innerHTML = profile.name
-        document.getElementById( 'screen_name' ).innerHTML = '@' + profile.screen_name
-        document.getElementById( 'profile-area' ).className = 'fadeIn'
-    } )
-}
-
 const remove = ( appName ) => {
     if( confirm( 'Are you sure you want to permanently delete this app ?' ) ){
         socket.emit( 'remove', appName )

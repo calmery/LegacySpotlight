@@ -13,50 +13,6 @@
                 float: left;
                 line-height: 22pt;
             }
-            
-            #operationBlocker {
-                width: 100%;
-                height: 100%;
-                background: rgba( 0, 0, 0, .5 );
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                position: fixed;
-            }
-            #result {
-                display: none
-            }
-
-            #archive .content .left {
-                width: 50px;
-            }
-
-            #archive .content .left img {
-                width: 46px;
-                border: 2px solid rgba( 255, 255, 255, 1 );
-                border-radius: 100%;
-            }
-
-            #archive .content .right {
-                width: 424px;
-            }
-
-            #archive .content .right .name {
-                font-weight: bold
-            }
-
-            #archive .content .right .screen_name {
-                font-size: 10px;
-            }
-
-            #archive .content .right .text {
-                margin-top: 10px
-            }
-
-            .danger {
-                background: red
-            }
         </style>
 
     </head>
@@ -123,16 +79,6 @@
     <script src="/yacona/init"></script>
     <script src="resources/js/index.js"></script>
     <script>
-        
-        if( document.getElementById( 'profile' ) !== null ){
-            socket.emit( 'getMyProfile' )
-            socket.on( 'myProfile', profile => {
-                document.getElementById( 'profile-icon' ).src = profile.icon
-                document.getElementById( 'user_name' ).innerHTML = profile.name
-                document.getElementById( 'screen_name' ).innerHTML = '@' + profile.screen_name
-                document.getElementById( 'profile-area' ).className = 'fadeIn'
-            } )
-        }
         
         function edit( listName ){
             saveToggle()
