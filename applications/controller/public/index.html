@@ -22,24 +22,32 @@
                     <div class="isRunning"></div>
                 </div>
                 
-                <div class="menu">
-                    <div class="name">検索</div>
-                    <div class="isRunning active"></div>
-                </div>
+                <a href="javascript: void(0)" onclick="appLoader( 'search' )">
+                    <div class="menu">
+                        <div class="name">検索</div>
+                        <div class="isRunning active"></div>
+                    </div>
+                </a>
                 
-                <div class="menu">
-                    <div class="name">管理</div>
-                    <div class="isRunning active"></div>
-                </div>
+                <a href="javascript: void(0)" onclick="appLoader( 'manage' )">
+                    <div class="menu">
+                        <div class="name">管理</div>
+                        <div class="isRunning active"></div>
+                    </div>
+                </a>
                 
-                <div class="menu">
-                    <div class="name">共有</div>
-                    <div class="isRunning active"></div>
-                </div>
+                <a href="javascript: void(0)" onclick="appLoader( 'share' )">
+                    <div class="menu">
+                        <div class="name">共有</div>
+                        <div class="isRunning active"></div>
+                    </div>
+                </a>
                 
                 <div class="menu title">
                     <div class="name">Add-ons</div>
-                    <div class="isRunning">+</div>
+                    <div class="isRunning">
+                        <a href="javascript: void(0)" onclick="appLoader( 'addon' )">+</a>
+                    </div>
                 </div>
                 
                 <div class="menu">
@@ -54,9 +62,11 @@
             </nav>
             
             <div id="profile">
-                <img src="" id="profile-icon">
-                <div id="user_name"></div>
-                <div id="screen_name"></div>
+                <div id="profile-area" class="hide">
+                    <img src="" id="profile-icon">
+                    <div id="user_name"></div>
+                    <div id="screen_name"></div>
+                </div>
             </div>
        
         </section>

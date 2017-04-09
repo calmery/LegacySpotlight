@@ -1,5 +1,4 @@
 const twitter = require( 'twitter' )
-
 const requestKey = require( './requestKey' )
 
 const getClient = ( access_token_key, access_token_secret ) => {
@@ -12,43 +11,61 @@ const getClient = ( access_token_key, access_token_secret ) => {
     } )
     return client
 }
+const makeOption = condition => {
+    var option = {}
+    if( typeof( condition ) === 'number' )
+        option.user_id = condition
+    else
+        option.screen_name = condition
+    return option
+}
 
 module.exports = yacona => {
     
     const yaml = yacona.moduleLoader( 'yaml' )
     
-    let client
-    let user
+    let userSetting
     let userProfile
-    const load = () => {
-        if( yacona.config.check( 'twitter/authorization.yaml' ) === true ){
-            user = yaml.parser( yacona.config.load( 'twitter/authorization.yaml' ) )
-            client = getClient( user.access_token, user.access_token_secret )
-            getProfile( user.id ).then( ( profile ) => myProfile = profile )
-        }
-    }
+    let client
     
-    yacona.on( 'requestKey', () => requestKey )
-    yacona.on( 'config/save/oauth', data => {
-        data.id = Number( data.id )
-        yacona.config.save( 'twitter/authorization.yaml', yaml.dump( data ) )
-        load()
+    let isReady      = false
+    let isAuthorized = false
+    let isAvailable  = false
+    
+    let isReadyCallbackTargets = []
+    let isAvailableCallbackTargets = []
+    
+    yacona.on( 'ready', callback => {
+        if( isReady === true ) callback()
+        else isReadyCallbackTargets.push( callback )
     } )
-    yacona.on( 'config/load/oauth', () => user )
+    yacona.on( 'available', callback => {
+        console.log( 'isAvailable : ' + isAvailable )
+        if( isAvailable === true ){
+            console.log( 'ava true' )
+            callback()
+        }
+        else isAvailableCallbackTargets.push( callback )
+    } )
+    yacona.on( 'isAuthorized', () => isAuthorized )
     
-    /* ----- Twitter Api ----- */
-    
-    const makeOption = function( condition ){
-        var option = {}
-        if( typeof( condition ) === 'number' )
-            option.user_id = condition
-        else
-            option.screen_name = condition
-        return option
+    const emitIsReady = () => {
+        isReady = true
+        for( ;isReadyCallbackTargets.length; ) isReadyCallbackTargets.shift()()
+    }
+    const emitIsAvailable = () => {
+        console.log( 'Change is available' )
+        isAvailable = true
+        for( ;isAvailableCallbackTargets.length; ) isAvailableCallbackTargets.shift()()
     }
     
-    const getProfile = ( id ) => {
-        if( id === undefined ) id = Number( user.id )
+    /* ----- Check ----- */
+    
+    if( yacona.config.check( 'twitter/authorization.yaml' ) === true ) isAuthorized = true
+    
+
+    const getProfile = id => {
+        if( id === undefined ) return false
         return new Promise( ( resolve, reject ) => {
             client.get( 'users/show', makeOption( id ), ( error, profile, response ) => {
                 if( error === null ) resolve( profile )
@@ -57,14 +74,30 @@ module.exports = yacona => {
         } )
     }
     
-    yacona.on( 'getProfile', ( id ) => getProfile( id ) )
+    const load = () => {
+        userSetting = yaml.parser( yacona.config.load( 'twitter/authorization.yaml' ) )
+        client      = getClient( userSetting.access_token, userSetting.access_token_secret )
+        getProfile( userSetting.id ).then( profile => {
+            isAvailable = true
+            emitIsAvailable()
+            console.log( profile )
+        } )
+    }
     
-    let myProfile
-    yacona.on( 'setMyProfile', ( profile ) => myProfile = profile )
-    yacona.on( 'getMyProfile', () => myProfile )
+    yacona.on( 'twitter/key', () => requestKey )
+    yacona.on( 'twitter/authorized', data => {
+        data.id = Number( data.id )
+        yacona.config.save( 'twitter/authorization.yaml', yaml.dump( data ) )
+        load()
+        return true
+    } )
     
-    /* ----- Ready ----- */
+    yacona.on( 'app/startup', ( appName ) => {
+        yacona.localAppLoader( '../' + appName )
+    } )
     
-    load()
+    emitIsReady()
     
-} 
+    if( isAuthorized === true ) load()
+    
+}

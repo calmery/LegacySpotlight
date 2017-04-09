@@ -45,7 +45,7 @@ body {
 
 .fadeOut {
     animation-name: fadeOut;
-    animation-duration: 1s;
+    animation-duration: 2s;
     animation-timing-function: ease;
     animation-iteration-count: 1;
     animation-fill-mode: forwards;
@@ -58,7 +58,7 @@ body {
 
 .fadeIn {
     animation-name: fadeIn;
-    animation-duration: 1s;
+    animation-duration: 2s;
     animation-timing-function: ease;
     animation-iteration-count: 1;
     animation-fill-mode: forwards;

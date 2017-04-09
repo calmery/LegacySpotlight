@@ -17,4 +17,5 @@ socket.on( 'myProfile', ( profile ) => {
     document.getElementById( 'profile-icon' ).src = profile.icon
     document.getElementById( 'user_name' ).innerHTML = profile.name
     document.getElementById( 'screen_name' ).innerHTML = '@' + profile.screen_name
+    document.getElementById( 'profile-area' ).className = 'fadeIn'
 } )
