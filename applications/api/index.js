@@ -30,6 +30,9 @@ const makeOption = condition => {
 // isAuthorized === true
 // isAvailable === true
 
+const appInstaller = require( 'yacona' ).appInstaller
+const appRemover   = require( 'yacona' ).appRemover
+
 module.exports = yacona => {
     
     const yaml = yacona.moduleLoader( 'yaml' )
@@ -108,13 +111,28 @@ module.exports = yacona => {
     } )
     
     yacona.on( 'addons', () => yacona.getInstalledAppList() )
-    yacona.on( 'launch', ( appName ) => {
+    yacona.on( 'app/launch', ( appName ) => {
         let installed = yacona.getInstalledAppList()
         if( installed.indexOf( appName ) !== -1 ){
             return yacona.appLoader( appName )
         } else {
             return yacona.localAppLoader( '../' + appName ) 
         }
+    } )
+    yacona.on( 'app/install', ( options, callback ) => {
+        console.log( options )
+        if( options.overwrite === true ){
+            console.log( options.url )
+            appRemover( options.url.split( '/' ).pop().replace( RegExp( '.zip' ), '' ), ( status ) => {
+                console.log( status )
+                appInstaller( options.url, callback )
+            } )
+        } else {
+            appInstaller( options.url, callback )
+        }
+    } )
+    yacona.on( 'app/uninstall', ( appName, callback ) => {
+        return appRemover( appName, callback )
     } )
     
     emitIsReady()
