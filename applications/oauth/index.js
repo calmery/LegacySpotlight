@@ -1,9 +1,8 @@
 module.exports = yacona => {
     
-    const requestKey = yacona.emit( 'api/requestKey' )
+    const requestKey = yacona.emit( 'api/twitter/key' )
 
-    const yaml    = yacona.moduleLoader( 'yaml' ),
-          utility = yacona.moduleLoader( 'utility' )
+    const utility = yacona.moduleLoader( 'utility' )
 
     let server = yacona.createOwnServer()
     let app = server.server.app
@@ -16,12 +15,16 @@ module.exports = yacona => {
     app.use( passport.session() )
     app.use( session( { secret: 'lectern' } ) )
     
+    const sendFile = ( response, fileName ) => response.sendFile( utility.fixPath( __dirname, 'public', fileName ) )
+    
     let routes = {
-        '/'        : ( request, response ) => { response.sendFile( utility.fixPath( __dirname, 'public', 'index.html' ) ) },
+        '/'        : ( _, response ) => { sendFile( response, 'index.html' ) },
+        '/layout'  : ( _, response ) => { sendFile( response, 'layout.css' ) },
+        '/fail'    : ( _, response ) => { sendFile( response, 'fail.html' ) },
         '/oauth'   : passport.authenticate( 'twitter' ),
         '/callback': passport.authenticate( 'twitter', { 
             successRedirect: '/',
-            failureRedirect: '/' 
+            failureRedirect: '/fail' 
         } )
     }
     
@@ -35,17 +38,19 @@ module.exports = yacona => {
         consumerKey   : requestKey.consumer_key,
         consumerSecret: requestKey.consumer_secret,
         callbackURL   : server.url + 'callback'
-    }, function( token, tokenSecret, profile, done ){
-        yacona.emit( 'api/config/save/oauth', { 
+    }, ( token, token_secret, profile, done ) => {
+        yacona.emit( 'api/twitter/authorized', { 
             access_token: token, 
-            access_token_secret: tokenSecret, 
+            access_token_secret: token_secret, 
             id: profile.id,
             screen_name: profile.username
         } )
-        yacona.localAppLoader( '../controller' )
         yacona.kill( yacona.getName() )
     } ) )
 
-    yacona.createWindow( server.url, { setMenu: null, setResizable: false } )
+    yacona.createWindow( server.url, { 
+        setMenu: null, 
+        setResizable: false
+    } )
 
 }
