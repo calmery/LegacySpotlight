@@ -212,9 +212,13 @@ nav .menu .isRunning.active:before {
     width: 125px;
 }
 
-/* ----- Search ----- */
+#application .content .list_name {
+    float: left;
+    width: 200px;
+    line-height: 26pt;
+}
 
-#operationBlocker {
+#utility #operationBlocker {
     width: 100%;
     height: 100%;
     background: rgba( 0, 0, 0, .5 );
@@ -225,6 +229,7 @@ nav .menu .isRunning.active:before {
     position: fixed;
 }
 
+/* ----- Search ----- */
 
 #result {
     display: none

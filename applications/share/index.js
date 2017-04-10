@@ -5,7 +5,14 @@ module.exports = yacona => {
     const yaml = yacona.moduleLoader( 'yaml' )
     
     yacona.addRoute( './public' )
-    yacona.createWindow( { setMenu: null, isResizable: false, openDevTools: true } )
+    yacona.createWindow( {
+        setMenu: null,
+        isResizable: false,
+        openDevTools: true
+    } )
+    
+    const checkConfig = () => yacona.config.check( yacona.getName(), 'config.yaml' )
+    const loadConfig  = () => yaml.parser( yacona.config.load( 'config.yaml' ) )
     
     yacona.setSocket( 'getMyProfile', socket => {
         yacona.emit( 'api/twitter/profile', profile => {
@@ -20,45 +27,58 @@ module.exports = yacona => {
         } )
     } )
     
-    yacona.setSocket( 'getUrl', ( socket, value ) => {
-        if( yacona.config.check( yacona.getName(), 'config.yaml' ) )
-            socket.emit( 'url', yaml.parser( yacona.config.load( 'config.yaml' ) ) )
+    yacona.setSocket( 'getUrl', socket => {
+        if( checkConfig() )
+            socket.emit( 'url', loadConfig() )
         else
-            socket.emit( 'url', { server_url: 'http://example.com' } )
+            socket.emit( 'url', { server_url: 'http://localhost:3000' } )
     } )
     
     yacona.setSocket( 'saveUrl', ( socket, value ) => {
-        let conf = {}
-        if( yacona.config.check( yacona.getName(), 'config.yaml' ) )
-            conf = yaml.parser( yacona.config.load( 'config.yaml' ) )
-        conf.server_url = value
-        let status = yacona.config.save( 'config.yaml', yaml.dump( conf ) )
-        if( status.status === true ) socket.emit( 'saved', true )
-        else socket.emit( 'reject', true )
+        let config = {}
+        if( checkConfig() )
+            config = loadConfig()
+        config.server_url = value
+        let status = yacona.config.save( 'config.yaml', yaml.dump( config ) )
+        
+        if( status.status === true ) 
+            socket.emit( 'saved', true )
+        else 
+            socket.emit( 'reject', true )
     } )
     
-    yacona.setSocket( 'getList', ( socket, value ) => {
+    yacona.setSocket( 'getList', socket => {
         let list = []
         let l = yacona.documents.list( 'log', './' )
-        for( let i=0; i<l.length; i++ ){
-            if( l[i].toLowerCase() !== '.ds_store' && l[i].toLowerCase() !== 'thumbs.db' ){
+        for( let i=0; i<l.length; i++ )
+            if( l[i].toLowerCase() !== '.ds_store' && l[i].toLowerCase() !== 'thumbs.db' ) 
                 list.push( l[i] )
-            }
-        }
         socket.emit( 'list', list )
     } )
     
     yacona.setSocket( 'share', ( socket, value ) => {
         
-        if( yacona.config.check( yacona.getName(), 'config.yaml' ) ){
-            let config = yaml.parser( yacona.config.load( 'config.yaml' ) ).server_url
-            if( config ){
-                config += '/report'
+        console.log( 'share' )
+        
+        const unknown = socket => socket.emit( 'reject', 'Unknown server. Please check server setting' )
+        
+        if( checkConfig() ){
+            let server_url = loadConfig().server_url
+            if( server_url ){
+                server_url += '/report'
+                
+                let user = yacona.emit( 'api/twitter/me' )
+                let data = {
+                    user: user.screen_name + '@' + user.id,
+                    data: JSON.parse( yacona.documents.load( 'log', value + '/statuses.json' ) )
+                }
+                
                 request.post( {
-                    uri: config,
-                    form: yacona.documents.load( 'log', value + '/statuses.json' ),
+                    uri: server_url,
+                    form: JSON.stringify( data ),
                     json: false
                 }, ( error, response, body ) => {
+                    console.log( body )
                     if( error !== null || response.statusCode !== 200 ){
                         yacona.notifier( 'Rejected' )
                         socket.emit( 'reject', 'Bad request' )
@@ -67,9 +87,9 @@ module.exports = yacona => {
                         socket.emit( 'shared', true )
                     }
                 } )
-            } else socket.emit( 'reject', 'Unknown server. Please check server setting' )
-        } else socket.emit( 'reject', 'Unknown server. Please check server setting' )
-        
+            } else unknown()
+        } else unknown()
+
     } )
     
 }

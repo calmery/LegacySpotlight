@@ -29,3 +29,16 @@ if( document.getElementById( 'profile' ) !== null ){
         document.getElementById( 'profile-area' ).className = 'fadeIn'
     } )
 }
+
+let operationBlocker
+if( document.getElementById( 'operationBlocker' ) !== null ){
+    console.log( 'aaaaa' )
+    operationBlocker = {
+        e: document.getElementById( 'operationBlocker' ),
+        show: () => { operationBlocker.e.className = 'show fadeIn' },
+        hide: () => {
+            operationBlocker.e.className = 'fadeOut'
+            setTimeout( () => operationBlocker.e.className = 'hide', 500 )
+        }
+    }
+}

@@ -231,7 +231,7 @@
             }
         } )
         
-        function loadWord( word ){
+        const loadWord = ( word ) => {
             
             document.getElementById( 'search_and_field' ).innerHTML = ''
             document.getElementById( 'search_or_field' ).innerHTML = ''
@@ -271,9 +271,9 @@
             
         }
         
-        function advanced_search(){
+        const advanced_search = () => {
             
-            document.getElementById( 'operationBlocker' ).className = 'fadeIn show'
+            operationBlocker.show()
             
             let e_and = document.getElementsByClassName( 'search_and' )
             let e_or  = document.getElementsByClassName( 'search_or' )

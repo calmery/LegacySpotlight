@@ -89,6 +89,13 @@ module.exports = yacona => {
         emitIsAvailable()
     }
     
+    yacona.on( 'twitter/me', () => {
+        return {
+            id: userSetting.id,
+            screen_name: userSetting.screen_name
+        }
+    } )
+    
     yacona.on( 'twitter/key', () => requestKey )
     yacona.on( 'twitter/authorized', data => {
         data.id = Number( data.id )

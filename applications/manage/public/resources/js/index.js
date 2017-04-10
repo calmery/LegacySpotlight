@@ -1,4 +1,4 @@
-function saveToggle(){
+const saveToggle = () => {
     let e = document.getElementById( 'save_field' )
     let s = document.getElementById( 'search_field' )
     if( e.style.display === 'block' ){
@@ -10,7 +10,7 @@ function saveToggle(){
     }
 }
 
-function change( num, id ){
+const change( num, id ) => {
     let e = document.getElementById( 'n' + num )
     let f = e.getAttribute( 'flag' )
     if( f === 'clean' ){
@@ -27,7 +27,7 @@ function change( num, id ){
 socket.on( 'saved', function(){ document.getElementById( 'loading' ).style.display = 'none'; alert( 'Saved' ) } )
 socket.on( 'reject', function(){ document.getElementById( 'loading' ).style.display = 'none'; alert( 'Already use' ) } )
 
-function save(){
+const save = () => {
 
     let name = document.getElementById( 'list_name' ).value
     if( name === '' || name.indexOf( '/' ) !== -1 ) return false
