@@ -1,39 +1,33 @@
 <!DOCTYPE html>
 <html lang="ja">
-
+    
     <head>
-
+        
         <meta charset="utf-8">
         <title>Share</title>
-
+        
         <link rel="stylesheet" href="/yacona/base">
-        <style>
-            .server {
-                float: left;
-                line-height: 22pt;
-            }
-        </style>
-
+        
     </head>
-
+    
     <body>
-
+        
         <section id="application">
-
+            
             <nav id="controller">
 
                 <div class="menu title">
                     <div class="name">Share</div>
                     <div class="isRunning"></div>
                 </div>
-
+                
                 <a href="javascript: void(0)">
                     <div class="menu">
                         <div class="name">共有</div>
                         <div class="isRunning active"></div>
                     </div>
                 </a>
-
+                
                 <a href="settings.html">
                     <div class="menu">
                         <div class="name">設定</div>
@@ -42,7 +36,7 @@
                 </a>
 
             </nav>
-
+            
             <div id="profile">
                 <div id="profile-area" class="hide">
                     <img src="" id="profile-icon">
@@ -50,54 +44,26 @@
                     <div id="screen_name"></div>
                 </div>
             </div>
-
-            <div id="main">
-
-                <div id="result">
-                    <div id="lists"></div>
-                </div>
-
-            </div>
             
-            <section id="utility">
-                <div id="loading" class="show">
-                    <img src="/yacona/loading">
-                </div>
-                <div id="operationBlocker" class="hide"></div>
+            <section id="main">
+                
+                <div id="list"></div>
+                
             </section>
-
+            
         </section>
-
+        
+        <section id="utility">
+            <div id="loading" class="show">
+                <img src="/yacona/loading">
+            </div>
+            <div id="operationBlocker" class="hide"></div>
+        </section>
+        
     </body>
-
+    
     <script src="/socket.io/socket.io.js"></script>
     <script src="/yacona/init"></script>
-    <script>
+    <Script src="index.js"></Script>
     
-        socket.emit( 'getList', true )
-        socket.on( 'list', function( list ){
-            let e = document.getElementById( 'lists' )
-            for( let i=0; i<list.length; i++ )
-                e.innerHTML += '<div class="content clearfix"><div class="server float_l">' + list[i] + '</div><div class="btn float_r" onclick="share(\'' + list[i] + '\')">共有</div></div>'
-        } )
-        
-        socket.on( 'shared', () => { 
-            alert( 'Shared' )
-            document.getElementById( 'loading' ).className = 'fadeOut'
-            setTimeout( () => document.getElementById( 'loading' ).className = 'hide', 500 )
-        } )
-        socket.on( 'reject', ( message ) => { 
-            alert( 'Rejected\n' + message )
-            document.getElementById( 'loading' ).className = 'fadeOut'
-            setTimeout( () => document.getElementById( 'loading' ).className = 'hide', 500 )
-        } )
-        const share = logName => {
-            if( confirm( 'Do you want to send it ?' ) ){
-                document.getElementById( 'loading' ).className = 'fadeIn show'
-                socket.emit( 'share', logName )
-            }
-        }
-        
-    </script>
-
 </html>

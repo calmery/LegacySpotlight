@@ -2,7 +2,7 @@ function search(){
     let word = document.getElementById( 'word' ).value
     if( word === '' ) return false
     
-    document.getElementById( 'operationBlocker' ).className = 'fadeIn show'
+    operationBlocker.show()
     socket.emit( 'search', word )
 }
 
@@ -36,8 +36,7 @@ socket.on( 'result', ( result ) => {
         archive.innerHTML = '<div class="content clearfix" id="n' + count + '" onclick="change( ' + count + ', ' + result.statuses[i].id + ' )" flag="danger"><div class="left float_l"><img src="' + result.statuses[i].user.profile_image_url + '"></div><div class="right float_r"><div class="name">' + result.statuses[i].user.name + '</div><div class="screen_name">@' + result.statuses[i].user.screen_name+'</div><div class="text">' + result.statuses[i].text + '</div></div></div>' + archive.innerHTML
     }
     archive.innerHTML = '<div class="title">' + decodeURIComponent( result.search_metadata.query ).replace( /\+/g, ' ' ) + '</div>' + archive.innerHTML
-    document.getElementById( 'operationBlocker' ).className = 'fadeOut'
-    setTimeout( () => document.getElementById( 'operationBlocker' ).className = 'hide', 1000 )
+    operationBlocker.hide()
 } )
 
 function saveToggle(){
