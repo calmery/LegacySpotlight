@@ -8,10 +8,11 @@ const remove = ( appName ) => {
 socket.emit( 'getInstalledAddons' )
 socket.on( 'installedAddons', list => {
     let output = ''
-    list.forEach( appName => {
+    list.app.forEach( appName => {
         output += '<div class="content clearfix">' +
             '<div class="appName">' + appName + '</div>' +
             '<div class="btn warm float_r" onclick="remove( \'' + appName + '\' )">Remove</div>' +
+            ( ( list.startup.indexOf( appName ) !== -1 ) ? '<div class="btn float_r long" style="margin-right: 15px" onclick="autostart( \'' + appName + '\' )">Run at Startup</div>' : '' ) +
             '</div>'
     } )
     document.getElementById( 'addons' ).innerHTML = output

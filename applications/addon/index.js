@@ -1,5 +1,7 @@
 module.exports = yacona => {
     
+    const yaml = yacona.moduleLoader( 'yaml' )
+    
     yacona.addRoute( './public' )
     yacona.createWindow( { 
         setMenu: null, 
@@ -23,8 +25,19 @@ module.exports = yacona => {
     yacona.setSocket( 'installRequest', ( socket, options ) => {
         yacona.emit( 'api/app/install', options, ( status ) => {
             if( status && status.status === false ){
-                socket.emit( 'confirm', { url: options.url, message: status.statusText } )
+                socket.emit( 'confirm', { url: options.url, message: status.statusText, auto: options.auto } )
             } else {
+                if( options.auto === true ){
+                    let name = options.url.split( '/' ).pop().replace( RegExp( '.zip' ), '' )
+                    let autostart = { app: [] }
+                    if( yacona.config.check( 'autostart.yaml' ) ){
+                        autostart = yaml.parser( yacona.config.load( 'autostart.yaml' ) )
+                        if( autostart.app === undefined ) autostart.app = []
+                    }
+                    if( autostart.app.indexOf( name ) !== -1 ) return true
+                    autostart.app.push( name )
+                    yacona.config.save( 'autostart.yaml', yaml.dump( autostart ) )
+                }
                 socket.emit( 'log', 'installed' )
                 socket.emit( 'complete', true )
                 yacona.emit( 'controller/refresh' )
@@ -32,11 +45,31 @@ module.exports = yacona => {
         } )
     } )
     
-    yacona.setSocket( 'getInstalledAddons', socket => socket.emit( 'installedAddons', yacona.emit( 'api/addons' ) ) )
+    yacona.setSocket( 'getInstalledAddons', socket => {
+        let list = yacona.emit( 'api/addons' )
+        
+        let autostart = { app: [] }
+        if( yacona.config.check( 'autostart.yaml' ) )
+            autostart = yaml.parser( yacona.config.load( 'autostart.yaml' ) )
+        
+        socket.emit( 'installedAddons', {
+            app: list,
+            startup: autostart.app
+        } )
+    } )
     
     yacona.setSocket( 'remove', ( socket, appName ) => {
         yacona.emit( 'api/app/uninstall', appName, ( status ) => {
             if( status && status.status === true ){
+                let autostart = { app: [] }
+                if( yacona.config.check( 'autostart.yaml' ) )
+                    autostart = yaml.parser( yacona.config.load( 'autostart.yaml' ) )
+                    
+                if( autostart.app.indexOf( appName ) !== -1 ){
+                    autostart.app.splice( autostart.app.indexOf( appName ), 1 )
+                    yacona.config.save( 'autostart.yaml', yaml.dump( autostart ) )
+                }
+                
                 socket.emit( 'complete', true )
                 yacona.emit( 'controller/refresh' )
             } else socket.emit( 'reject', status.statusText )
