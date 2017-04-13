@@ -153,6 +153,69 @@ module.exports = yacona => {
         return appRemover( appName, callback )
     } )
     
+    yacona.on( 'data/load', name => {
+        let dumps = yacona.documents.list( 'log', name + '/dump' )
+        let dump = []
+        for( let i=0; i<dumps.length; i++ )
+            if( dumps[i].match( /d\d+.json/ ) ) 
+                dump.push( JSON.parse( yacona.documents.share.load( 'log', name + '/dump/' + dumps[i] ) ) )
+        return {
+            raw : dump,
+            flag: JSON.parse( yacona.documents.share.load( 'log', name + '/flag.json' ) ),
+            meta: JSON.parse( yacona.documents.share.load( 'log', name + '/meta.json' ) ),
+            statuses: JSON.parse( yacona.documents.share.load( 'log', name + '/statuses.json' ) ),
+        }
+    } )
+    
+    yacona.on( 'data/remove', name => {
+        if( yacona.documents.check( 'log', name ) === true ){
+            yacona.documents.share.rmdir( 'log', name )
+            return true
+        }
+        return false
+    } )
+    
+    yacona.on( 'data/save', data => {
+        
+        let name     = data.name,
+            raw      = data.raw,
+            flag     = data.flag,
+            meta     = data.meta,
+            statuses = data.statuses
+        
+        if( name === undefined || raw === undefined || flag === undefined || meta === undefined || statuses === undefined )
+            return false
+
+        if( yacona.documents.check( 'log', name ) === true )
+            yacona.documents.share.rmdir( 'log', name )
+
+        for( let i=0; i<raw.length; i++ )
+            yacona.documents.share.save( 'log', name + '/dump/d' + i + '.json', JSON.stringify( raw[i] ) )
+
+        yacona.documents.share.save( 'log', name + '/flag.json', JSON.stringify( flag ) )
+        yacona.documents.share.save( 'log', name + '/meta.json', JSON.stringify( meta ) )
+
+        let s = []
+        for( let i=0; i<statuses.length; i++ ){
+            s.push( {
+                id: statuses[i].id,
+                text: statuses[i].text,
+                media: statuses[i].media_url,
+                user: {
+                    name: statuses[i].user.name,
+                    screen_name: statuses[i].user.screen_name,
+                    id: statuses[i].user.id
+                },
+                flag: flag[i]
+            } )
+        }
+
+        yacona.documents.share.save( 'log', name + '/statuses.json', JSON.stringify( s ) )
+        
+        return true
+        
+    } )
+    
     emitIsReady()
     
     if( isAuthorized === true ) load()

@@ -32,7 +32,6 @@ if( document.getElementById( 'profile' ) !== null ){
 
 let operationBlocker
 if( document.getElementById( 'operationBlocker' ) !== null ){
-    console.log( 'aaaaa' )
     operationBlocker = {
         e: document.getElementById( 'operationBlocker' ),
         show: () => { operationBlocker.e.className = 'show fadeIn' },
@@ -41,4 +40,19 @@ if( document.getElementById( 'operationBlocker' ) !== null ){
             setTimeout( () => operationBlocker.e.className = 'hide', 500 )
         }
     }
+}
+
+const fadeIn = e => {
+    if( typeof e === 'string' ) e = document.getElementById( e )
+    e.className = 'fadeIn show'
+    e.style.display = 'block'
+}
+
+const fadeOut = e => {
+    if( typeof e === 'string' ) e = document.getElementById( e )
+    e.className = 'fadeOut'
+    setTimeout( () => {
+        e.className = 'hide'
+        e.style.display = 'none'
+    }, 500 )
 }
