@@ -1,0 +1,29 @@
+#edit .content .left {
+    width: 50px;
+}
+
+#edit .content .left img {
+    width: 46px;
+    border: 2px solid rgba( 255, 255, 255, 1 );
+    border-radius: 100%;
+}
+
+#edit .content .right {
+    width: 424px;
+}
+
+#edit .content .right .name {
+    font-weight: bold
+}
+
+#edit .content .right .screen_name {
+    font-size: 10px;
+}
+
+#edit .content .right .text {
+    margin-top: 10px
+}
+
+#edit_field {
+    display: none
+}
