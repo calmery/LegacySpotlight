@@ -9,6 +9,10 @@ body {
     background: rgba( 245, 245, 245, 1 );
 }
 
+body::-webkit-scrollbar {
+    display: none
+}
+
 .hide {
     display: none
 }
