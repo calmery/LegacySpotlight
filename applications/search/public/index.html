@@ -11,9 +11,9 @@
     </head>
 
     <body>
-
+    
         <section id="application">
-
+            
             <nav id="controller">
 
                 <div class="menu title">
@@ -34,26 +34,26 @@
                         <div class="isRunning"></div>
                     </div>
                 </a>
-                
+
                 <a href="settings.html">
                     <div class="menu">
                         <div class="name">設定</div>
                         <div class="isRunning"></div>
                     </div>
                 </a>
-                
+
                 <div class="menu title">
                     <div class="name">Menu</div>
                     <div class="isRunning"></div>
                 </div>
-                
+
                 <a href="javascript: void(0)" onclick="saveToggle()">
                     <div class="menu" id="toggle">
                         <div class="name">保存</div>
                         <div id="s" class="isRunning"></div>
                     </div>
                 </a>
-                
+
             </nav>
 
             <div id="profile">
@@ -63,24 +63,28 @@
                     <div id="screen_name"></div>
                 </div>
             </div>
-
-            <div id="main">
-                
-                <div class="content clearfix" id="save_field" style="display: none">
-                    <textarea id="list_name" placeholder="リスト名"></textarea>
-                    <div class="btn float_r" onclick="save()" style="width: 150px;">検索結果を保存</div>
+            
+            <section id="main">
+               
+                <div id="save_field" style="display: none">
+                    <div class="content clearfix">
+                        <textarea id="list_name" placeholder="リスト名"></textarea>
+                        <div class="btn float_r long" onclick="save()">検索結果を保存</div>
+                    </div>
                 </div>
-
-                <div class="content clearfix" id="search_field">
-                    <textarea id="word" placeholder="キーワード検索"></textarea>
-                    <div class="btn float_r" onclick="search()">検索</div>
+                
+                <div id="search_field">
+                    <div class="content clearfix">
+                        <textarea id="word" placeholder="キーワード検索"></textarea>
+                        <div class="btn float_r" onclick="search()">検索</div>
+                    </div>
                 </div>
                 
                 <div id="result">
                     <div id="archive"></div>
                 </div>
-
-            </div>
+                
+            </section>
             
             <section id="utility">
                 <div id="loading" class="show">
@@ -88,13 +92,14 @@
                 </div>
                 <div id="operationBlocker" class="hide"></div>
             </section>
-       
+            
         </section>
-        
+    
     </body>
-
+    
     <script src="/socket.io/socket.io.js"></script>
     <script src="/yacona/init"></script>
-    <script src="resources/js/index.js"></script>
+    <script src="common.js"></script>
+    <script src="index.js"></script>
 
-</html>
+</html>  

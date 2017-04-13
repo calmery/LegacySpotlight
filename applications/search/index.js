@@ -27,7 +27,10 @@ module.exports = yacona => {
     yacona.setSocket( 'search', ( socket, value ) => {
         if( isSearch === false ){
             isSearch = true
-            yacona.emit( 'api/twitter/search', { query: value, count: 15 } ).then( ( tweet ) => {
+            let count = 15
+            if( yacona.config.check( yacona.getName(), 'config.yaml' ) )
+                count = yaml.parser( yacona.config.load( 'config.yaml' ) ).search_count
+            yacona.emit( 'api/twitter/search', { query: value, count: count } ).then( ( tweet ) => {
                 yacona.notifier( '検索が終了しました' )
                 isSearch = false
                 socket.emit( 'result', tweet )
@@ -78,45 +81,9 @@ module.exports = yacona => {
         
     } )
     
-    yacona.setSocket( 'save', ( socket, value ) => {
-        
-        let name     = value.name,
-            raw      = value.raw,
-            flag     = value.flag,
-            meta     = value.meta,
-            statuses = value.statuses
-        
-        if( yacona.documents.check( 'log', name ) === true ){
-            socket.emit( 'reject', 'exists' )
-            return false
-        }
-        
-        for( let i=0; i<raw.length; i++ ){
-            yacona.documents.share.save( 'log', name + '/dump/d' + i + '.json', JSON.stringify( raw[i] ) )
-        }
-        
-        yacona.documents.share.save( 'log', name + '/flag.json', JSON.stringify( flag ) )
-        yacona.documents.share.save( 'log', name + '/meta.json', JSON.stringify( meta ) )
-        
-        let s = []
-        for( let i=0; i<statuses.length; i++ ){
-            s.push( {
-                id: statuses[i].id,
-                text: statuses[i].text,
-                media: statuses[i].media_url,
-                user: {
-                    name: statuses[i].user.name,
-                    screen_name: statuses[i].user.screen_name,
-                    id: statuses[i].user.id
-                },
-                flag: flag[i]
-            } )
-        }
-        
-        yacona.documents.share.save( 'log', name + '/statuses.json', JSON.stringify( s ) )
-        
-        socket.emit( 'saved', true )
-        
+    yacona.setSocket( 'save', ( socket, data ) => {
+        if( yacona.emit( 'api/data/save', data ) ) socket.emit( 'saved', true )
+        else socket.emit( 'reject', true )
     } )
     
 }
