@@ -2,6 +2,8 @@ module.exports = yacona => {
     
     let controller
     
+    const yaml = yacona.moduleLoader( 'yaml' )
+    
     yacona.addRoute( './public' )
     yacona.createWindow( {
         setMinimumSize: { 
@@ -27,6 +29,12 @@ module.exports = yacona => {
 
         yacona.emit( 'api/available', () => {
             controller.show()
+            
+            if( yacona.config.check( 'addon', 'autostart.yaml' ) ){
+                console.log( 'checked' )
+                let autostart = yaml.parser( yacona.config.share.load( 'addon', 'autostart.yaml' ) )
+                autostart.app.forEach( name => yacona.emit( 'api/app/launch', name ) )
+            }
         } )
     } )
     

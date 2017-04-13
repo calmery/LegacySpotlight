@@ -1,6 +1,6 @@
 socket.on( 'confirm', ( options ) => {
     if( confirm( options.message + '\nOverwrite ?' ) === true ){
-        socket.emit( 'installRequest', { url: options.url, overwrite: true } )
+        socket.emit( 'installRequest', { url: options.url, overwrite: true, auto: options.auto } )
         addLog( options.message )
         addLog( 'Overwrite ? : Yes' )
         addLog( 'Retrying...' )
@@ -14,7 +14,7 @@ socket.on( 'confirm', ( options ) => {
 
 socket.on( 'complete', () => {
     setTimeout( () => {
-        if( confirm( 'Application was installed. Reflash ?' ) === true ) window.location.reload()
+        if( confirm( 'Application was installed. Reflesh ?' ) === true ) window.location.reload()
     }, 1500 )
 } )
 
@@ -32,6 +32,7 @@ let isInstall = false
 
 const install = () => {
     let appPath = document.getElementById( 'url' ).value
+    let autostartup = document.getElementById( 'autostart' ).checked
     if( appPath === '' ) return false
     install_field.className = 'fadeOut'
     setTimeout( () => {
@@ -39,5 +40,5 @@ const install = () => {
         log_field.className = 'show fadeIn'
     }, 1500 )
     addLog( 'Request : ' + appPath )
-    socket.emit( 'installRequest', { url: appPath } )
+    socket.emit( 'installRequest', { url: appPath, auto: autostartup } )
 }
