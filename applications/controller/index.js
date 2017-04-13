@@ -22,7 +22,7 @@ module.exports = yacona => {
         
         yacona.emit( 'api/ready', () => {
             if( yacona.emit( 'api/isAuthorized' ) === false ){
-                yacona.emit( 'api/launch', 'oauth' )
+                yacona.emit( 'api/app/launch', 'oauth' )
                 controller.hide()
             }
         } )
