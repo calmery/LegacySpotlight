@@ -268,3 +268,11 @@ nav .menu .isRunning.active:before {
 .danger {
     background: red
 }
+
+.images {
+    padding-top: 15px;
+}
+
+.images img {
+    border-radius: 5px;
+}
