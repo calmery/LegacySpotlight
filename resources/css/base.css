@@ -269,10 +269,6 @@ nav .menu .isRunning.active:before {
     background: red
 }
 
-.images {
-    padding-top: 15px;
-}
-
-.images img {
+.media_image {
     border-radius: 5px;
 }

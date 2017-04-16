@@ -78,6 +78,9 @@ let raw      = [],
 let archive = document.getElementById( 'archive' )
 let count = -1
 
+let urlPattern = /(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/g
+let hashTagPattern = /[#＃][Ａ-Ｚａ-ｚA-Za-z一-鿆0-9０-９ぁ-ヶｦ-ﾟー]+/g
+
 socket.on( 'result', result => {
     raw.push( result )
 
@@ -98,13 +101,40 @@ socket.on( 'result', result => {
         let image = ''
         if( result.statuses[i].entities.media ){
             result.statuses[i].entities.media.forEach( media => {
-                image += '<img src="' + media.media_url + '" width="100%"><br>'
+                console.log( media.type )
+                if( media.type === 'photo' )
+                    image += '<img src="' + media.media_url + '" class="media_image" width="100%"><br>'
+                else if( media.type === 'video' )
+                    image += '<video src="' + media.media_url + '" width="100%"><br>'
             } )
         }
 
         count++
         flag.push( 'danger' )
         statuses.push( result.statuses[i] )
+        
+        let text = result.statuses[i].text
+        let urls = text.match( urlPattern )
+        let hashTags = text.match( hashTagPattern )
+        let users = text.match( /@\w+/g )
+        
+        if( urls !== null ){
+            urls.forEach( url => {
+                text = text.replace( url, '<span class="tweet_url">' + url + '</span>' )
+            } )
+        }
+        
+        if( users !== null ){
+            users.forEach( user => {
+                text = text.replace( user, '<span class="tweet_mention">' + user + '</span>' )
+            } )
+        }
+        
+        if( hashTags !== null ){
+            hashTags.forEach( hashTag => {
+                text = text.replace( hashTag, '<span class="tweet_hashTag">' + hashTag + '</span>' )
+            } )
+        }
 
         archive.innerHTML = '<div class="content clearfix" id="n' + count + '" onclick="change( ' + count + ', ' + result.statuses[i].id + ' )" flag="danger">' +
             '<div class="left float_l">' +
@@ -113,12 +143,12 @@ socket.on( 'result', result => {
             '<div class="right float_r">' + 
             '<div class="name">' + result.statuses[i].user.name + '</div>' +
             '<div class="screen_name">@' + result.statuses[i].user.screen_name+'</div>' + 
-            '<div class="text">' + result.statuses[i].text + '</div>' + 
+            '<div class="text">' + text + '</div>' + 
             ( image !== '' ? ( 
                 '<br>' + 
                 '<a href="javascript: void( 0 )" id="img' + count + 'Show" onclick="imageShow( \'' + count + '\' )">画像を表示</a>' +
-                '<a href="javascript: void( 0 )" style="display: none" id="img' + count + 'Hide" onclick="imageHide( \'' + count + '\' )">画像を非表示</a>' + 
-                '<div style="display: none" class="images" id="img' + count + '">' + image + '</div>' 
+                '<a href="javascript: void( 0 )" style="display: none" id="img' + count + 'Hide" onclick="imageHide( \'' + count + '\' )">画像を非表示</a>' +
+                '<div style="display: none;" id="img' + count + '"><br>' + image + '</div>' 
             ) : '' ) +
             '</div>' + 
             '</div>' + archive.innerHTML
