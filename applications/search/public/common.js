@@ -42,6 +42,20 @@ const saveToggle = () => {
     }
 }
 
+const imageShow = id => {
+   fadeIn( document.getElementById( 'img' + id ) )
+   document.getElementById( 'img' + id + 'Show' ).style.display = 'none'
+   document.getElementById( 'img' + id + 'Hide' ).style.display = 'block'
+   document.getElementById( 'n' + id ).click()
+}
+
+const imageHide = id => {
+    fadeOut( document.getElementById( 'img' + id ) )
+    document.getElementById( 'img' + id + 'Show' ).style.display = 'block'
+    document.getElementById( 'img' + id + 'Hide' ).style.display = 'none'
+    document.getElementById( 'n' + id ).click()
+}
+
 const change = ( num, id ) => {
     let e = document.getElementById( 'n' + num )
     let f = e.getAttribute( 'flag' )
@@ -80,6 +94,13 @@ socket.on( 'result', result => {
         }
 
         if( isOverlap ) continue
+        
+        let image = ''
+        if( result.statuses[i].entities.media ){
+            result.statuses[i].entities.media.forEach( media => {
+                image += '<img src="' + media.media_url + '" width="100%"><br>'
+            } )
+        }
 
         count++
         flag.push( 'danger' )
@@ -93,6 +114,12 @@ socket.on( 'result', result => {
             '<div class="name">' + result.statuses[i].user.name + '</div>' +
             '<div class="screen_name">@' + result.statuses[i].user.screen_name+'</div>' + 
             '<div class="text">' + result.statuses[i].text + '</div>' + 
+            ( image !== '' ? ( 
+                '<br>' + 
+                '<a href="javascript: void( 0 )" id="img' + count + 'Show" onclick="imageShow( \'' + count + '\' )">画像を表示</a>' +
+                '<a href="javascript: void( 0 )" style="display: none" id="img' + count + 'Hide" onclick="imageHide( \'' + count + '\' )">画像を非表示</a>' + 
+                '<div style="display: none" class="images" id="img' + count + '">' + image + '</div>' 
+            ) : '' ) +
             '</div>' + 
             '</div>' + archive.innerHTML
     }
