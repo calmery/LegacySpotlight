@@ -3,6 +3,9 @@
   "version": "0.5.4",
   "description": "Search for harmful information on twitter",
   "main": "index",
+  "scripts": {
+    "start": "electron ."
+  },
   "repository": {
     "url": "http://github.com/calmery/Spotlight",
     "type": "git"
