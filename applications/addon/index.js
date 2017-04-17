@@ -28,7 +28,7 @@ module.exports = yacona => {
                 socket.emit( 'confirm', { url: options.url, message: status.statusText, auto: options.auto } )
             } else {
                 if( options.auto === true ){
-                    let name = options.url.split( '/' ).pop().replace( RegExp( '.zip' ), '' )
+                    let name = options.url.split( /\/|\\/ ).pop().replace( RegExp( '.zip' ), '' )
                     let autostart = { app: [] }
                     if( yacona.config.check( 'autostart.yaml' ) ){
                         autostart = yaml.parser( yacona.config.load( 'autostart.yaml' ) )
