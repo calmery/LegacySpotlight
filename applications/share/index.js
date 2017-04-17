@@ -82,10 +82,10 @@ module.exports = yacona => {
                 }, ( error, response, body ) => {
                     console.log( body )
                     if( error !== null || response.statusCode !== 200 ){
-                        yacona.notifier( 'Rejected' )
+                        yacona.emit( 'api/notify', 'Rejected' )
                         socket.emit( 'reject', 'Bad request' )
                     } else {
-                        yacona.notifier( 'Shared' )
+                        yacona.emit( 'api/notify', 'Shared' )
                         socket.emit( 'shared', true )
                     }
                 } )
