@@ -1,4 +1,6 @@
+const os      = require( 'os' )
 const twitter = require( 'twitter' )
+
 const requestKey = require( './requestKey' )
 
 const getClient = ( access_token_key, access_token_secret ) => {
@@ -151,6 +153,15 @@ module.exports = yacona => {
     } )
     yacona.on( 'app/uninstall', ( appName, callback ) => {
         return appRemover( appName, callback )
+    } )
+    
+    yacona.on( 'share/getIdentifier', () => {
+        return {
+            os      : os.type(),
+            arch    : os.arch(),
+            release : os.release(),
+            username: os.userInfo().username
+        }
     } )
     
     yacona.on( 'data/load', name => {

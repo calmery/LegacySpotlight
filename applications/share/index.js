@@ -58,9 +58,7 @@ module.exports = yacona => {
     
     yacona.setSocket( 'share', ( socket, value ) => {
         
-        console.log( 'share' )
-        
-        const unknown = socket => socket.emit( 'reject', 'Unknown server. Please check server setting' )
+        const unknown = () => socket.emit( 'reject', 'Unknown server. Please check server setting' )
         
         if( checkConfig() ){
             let server_url = loadConfig().server_url
@@ -69,7 +67,11 @@ module.exports = yacona => {
                 
                 let user = yacona.emit( 'api/twitter/me' )
                 let data = {
-                    user: user.screen_name + '@' + user.id,
+                    user: {
+                        screen_name: user.screen_name,
+                        id: user.id
+                    },
+                    identifier: yacona.emit( 'api/share/getIdentifier' ),
                     data: JSON.parse( yacona.documents.load( 'log', value + '/statuses.json' ) )
                 }
                 
