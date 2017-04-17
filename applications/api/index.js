@@ -38,6 +38,7 @@ const appRemover   = require( 'yacona' ).appRemover
 module.exports = yacona => {
     
     const yaml = yacona.moduleLoader( 'yaml' )
+    const utility = yacona.moduleLoader( 'utility' )
     
     let userSetting
     let userProfile
@@ -225,6 +226,14 @@ module.exports = yacona => {
         
         return true
         
+    } )
+    
+    yacona.on( 'notify', message => {
+        yacona.node_notifier.notify( {
+            title: 'Spotlight',
+            message: message,
+            icon: utility.fixPath( __dirname, '../../resources/img/icon.ico' )
+        } )
     } )
     
     emitIsReady()

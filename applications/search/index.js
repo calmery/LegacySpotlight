@@ -31,7 +31,7 @@ module.exports = yacona => {
             if( yacona.config.check( yacona.getName(), 'config.yaml' ) )
                 count = yaml.parser( yacona.config.load( 'config.yaml' ) ).search_count
             yacona.emit( 'api/twitter/search', { query: value, count: count } ).then( ( tweet ) => {
-                yacona.notifier( '検索が終了しました' )
+                yacona.emit( 'api/notify', 'Search finished' )
                 isSearch = false
                 socket.emit( 'result', tweet )
             } )
