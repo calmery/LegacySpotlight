@@ -7,7 +7,7 @@ module.exports = yacona => {
     yacona.createWindow( { 
         setMenu: null, 
         isResizable: false, 
-        openDevTools: true
+        openDevTools: false
     } )
     
     yacona.setSocket( 'getMyProfile', socket => {
