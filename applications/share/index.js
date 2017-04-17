@@ -8,7 +8,7 @@ module.exports = yacona => {
     yacona.createWindow( {
         setMenu: null,
         isResizable: false,
-        openDevTools: true
+        openDevTools: false
     } )
     
     const checkConfig = () => yacona.config.check( yacona.getName(), 'config.yaml' )
