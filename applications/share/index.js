@@ -80,7 +80,6 @@ module.exports = yacona => {
                     form: JSON.stringify( data ),
                     json: false
                 }, ( error, response, body ) => {
-                    console.log( body )
                     if( error !== null || response.statusCode !== 200 ){
                         yacona.emit( 'api/notify', 'Rejected' )
                         socket.emit( 'reject', 'Bad request' )

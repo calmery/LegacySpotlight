@@ -31,7 +31,6 @@ module.exports = yacona => {
             controller.show()
             
             if( yacona.config.check( 'addon', 'autostart.yaml' ) ){
-                console.log( 'checked' )
                 let autostart = yaml.parser( yacona.config.share.load( 'addon', 'autostart.yaml' ) )
                 autostart.app.forEach( name => yacona.emit( 'api/app/launch', name ) )
             }

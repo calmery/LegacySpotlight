@@ -143,9 +143,7 @@ module.exports = yacona => {
     } )
     yacona.on( 'app/install', ( options, callback ) => {
         if( options.overwrite === true ){
-            console.log( options.url )
             appRemover( options.url.split( '/' ).pop().replace( RegExp( '.zip' ), '' ), ( status ) => {
-                console.log( status )
                 appInstaller( options.url, callback )
             } )
         } else {
