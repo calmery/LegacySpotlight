@@ -28,6 +28,7 @@ module.exports = yacona => {
         } )
 
         yacona.emit( 'api/available', () => {
+            s.emit( 'refresh', true )
             controller.show()
             
             if( yacona.config.check( 'addon', 'autostart.yaml' ) ){
