@@ -50,7 +50,8 @@ module.exports = yacona => {
 
     yacona.createWindow( server.url, { 
         setMenu: null, 
-        setResizable: false
+        setResizable: false,
+        width: 800
     } )
 
 }
