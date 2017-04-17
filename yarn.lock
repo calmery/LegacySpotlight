@@ -1392,8 +1392,8 @@ xtraverse@0.1.x:
     xmldom "0.1.x"
 
 yacona:
-  version "17.4.14"
-  resolved "https://registry.yarnpkg.com/yacona/-/yacona-17.4.14.tgz#314e6e4c2b777a9100bf36f0dcaec1a8c79bf629"
+  version "17.4.17"
+  resolved "https://registry.yarnpkg.com/yacona/-/yacona-17.4.17.tgz#6cb90d0b4141f1d9aef153a7b72de8a91f98c985"
   dependencies:
     ejs "^2.5.5"
     express "^4.14.1"
