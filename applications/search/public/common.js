@@ -101,7 +101,6 @@ socket.on( 'result', result => {
         let image = ''
         if( result.statuses[i].entities.media ){
             result.statuses[i].entities.media.forEach( media => {
-                console.log( media.type )
                 if( media.type === 'photo' )
                     image += '<img src="' + media.media_url + '" class="media_image" width="100%"><br>'
                 else if( media.type === 'video' )
