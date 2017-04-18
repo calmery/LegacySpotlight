@@ -1,7 +1,7 @@
 const remove = ( appName ) => {
     if( confirm( 'Are you sure you want to permanently delete this app ?' ) ){
         socket.emit( 'remove', appName )
-        document.getElementById( 'operationBlocker' ).className = 'fadeIn show'
+        operationBlocker.show()
     }
 }
 
@@ -20,12 +20,12 @@ socket.on( 'installedAddons', list => {
 
 socket.on( 'complete', () => {
     alert( 'App has been successfully deleted' )
-    document.getElementById( 'operationBlocker' ).className = 'fadeOut'
-    setTimeout( () => { document.getElementById( 'operationBlocker' ).className = 'hide'; window.location.reload() }, 1000 )
+    operationBlocker.hide()
+    window.location.reload()
 } )
 
 socket.on( 'reject', ( message ) => {
     alert( message )
-    document.getElementById( 'operationBlocker' ).className = 'fadeOut'
-    setTimeout( () => { document.getElementById( 'operationBlocker' ).className = 'hide'; window.location.reload() }, 1000 )
+    operationBlocker.hide()
+    window.location.reload()
 } )
