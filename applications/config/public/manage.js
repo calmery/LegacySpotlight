@@ -3,7 +3,7 @@ socket.on( 'config', list => {
     let output = ''
     for( let key in list ){
         output += '<div class="content clearfix">' +
-            '<div class="appName">' + key + '</div>' +
+            '<div class="appName">' + key + '<br><span class="value">' + list[key].value + '</span></div>' +
             '<div class="btn warm float_r" onclick="remove( \'' + key + '\' )">Remove</div>' +
             '<div class="btn float_r' + ( list[key].enable ? '' : ' disable' ) + '" id="able_' + key + '" style="margin-right: 15px" onclick="toggle( \'' + key + '\' )" able="' + 
             ( list[key].enable ? 'enable">Enable' : 'disable">Disable' ) + '</div>' +
