@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+    <head>
+
+        <meta charset="utf-8">
+        <title>Config</title>
+
+        <link rel="stylesheet" href="/yacona/base">
+        <link rel="stylesheet" href="/yacona/fonts">
+    
+    </head>
+
+    <body>
+
+        <section id="application">
+
+            <nav id="controller">
+
+                <div class="menu title">
+                    <div class="name">Config</div>
+                    <div class="isRunning"></div>
+                </div>
+                
+                <a href="javascript: void(0)">
+                    <div class="menu">
+                        <div class="name">追加</div>
+                        <div class="isRunning active"></div>
+                    </div>
+                </a>
+                
+                <a href="manage.html">
+                    <div class="menu">
+                        <div class="name">管理</div>
+                        <div class="isRunning"></div>
+                    </div>
+                </a>
+
+            </nav>
+
+            <div id="profile">
+                <div id="profile-area" class="hide">
+                    <img src="" id="profile-icon">
+                    <div id="user_name"></div>
+                    <div id="screen_name"></div>
+                </div>
+            </div>
+            
+            <section id="main">
+               
+                <div id="install_field">
+                    <div class="title">Add</div>
+                    <div class="content clearfix">
+                        <textarea id="key" placeholder="Key"></textarea>
+                        <textarea id="value" placeholder="Value"></textarea>
+                        <div style="padding: 5px 0" class="float_l">
+                            <input type="checkbox" id="overwrite"> Overwrite
+                        </div>
+                        <div class="btn float_r" onclick="add()">追加</div>
+                    </div>
+                </div>
+                
+            </section>
+
+        </section>
+
+        <section id="utility">
+            <div id="loading" class="show">
+                <img src="/yacona/loading">
+            </div>
+            <div id="operationBlocker" class="hide"></div>
+        </section>
+
+    </body>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/yacona/init"></script>
+    <script src="index.js"></script>
+
+</html>

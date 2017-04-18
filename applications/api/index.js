@@ -74,6 +74,7 @@ module.exports = yacona => {
     
     if( yacona.config.check( 'twitter/authorization.yaml' ) === true ) isAuthorized = true
     
+    /* Twitter */
 
     const getProfile = id => {
         if( id === undefined ) return false
@@ -98,7 +99,6 @@ module.exports = yacona => {
             screen_name: userSetting.screen_name
         }
     } )
-    
     yacona.on( 'twitter/key', () => requestKey )
     yacona.on( 'twitter/authorized', data => {
         data.id = Number( data.id )
@@ -106,7 +106,6 @@ module.exports = yacona => {
         load()
         return true
     } )
-    
     yacona.on( 'twitter/profile', ( id, callback ) => {
         if( isAvailable === false ) return false
         if( typeof id === 'function' ){
@@ -131,8 +130,10 @@ module.exports = yacona => {
         } )
     } )
     
+    /* App */
     
     yacona.on( 'addons', () => yacona.getInstalledAppList() )
+    
     yacona.on( 'app/launch', ( appName ) => {
         let installed = yacona.getInstalledAppList()
         if( installed.indexOf( appName ) !== -1 ){
@@ -154,6 +155,8 @@ module.exports = yacona => {
         return appRemover( appName, callback )
     } )
     
+    /* Share */
+    
     yacona.on( 'share/getIdentifier', () => {
         return {
             os      : os.type(),
@@ -162,6 +165,8 @@ module.exports = yacona => {
             username: os.userInfo().username
         }
     } )
+    
+    /* Data */
     
     yacona.on( 'data/load', name => {
         let dumps = yacona.documents.list( 'log', name + '/dump' )
@@ -176,7 +181,6 @@ module.exports = yacona => {
             statuses: JSON.parse( yacona.documents.share.load( 'log', name + '/statuses.json' ) ),
         }
     } )
-    
     yacona.on( 'data/remove', name => {
         if( yacona.documents.check( 'log', name ) === true ){
             yacona.documents.share.rmdir( 'log', name )
@@ -184,7 +188,6 @@ module.exports = yacona => {
         }
         return false
     } )
-    
     yacona.on( 'data/save', data => {
         
         let name     = data.name,
@@ -226,6 +229,8 @@ module.exports = yacona => {
         
     } )
     
+    /* Notify */
+    
     yacona.on( 'notify', message => {
         yacona.node_notifier.notify( {
             title: 'Spotlight',
@@ -233,6 +238,79 @@ module.exports = yacona => {
             icon: utility.fixPath( __dirname, '../../resources/img/icon.ico' )
         } )
     } )
+    
+    /* Config */
+    
+    let conf
+    const loadConfig = () => {
+        if( yacona.config.check( 'config/config.yaml' ) === true )
+            conf = yaml.parser( yacona.config.load( 'config/config.yaml' ) )
+        else
+            conf = {}
+    }
+    
+    loadConfig()
+    
+    yacona.on( 'config', () => conf )
+    
+    yacona.on( 'config/add', ( key, value, overwrite ) => {
+        if( conf[key] !== undefined && !overwrite ) return false
+        
+        conf[key] = {
+            value: value,
+            enable: true
+        }
+        
+        if( yacona.config.save( 'config/config.yaml', yaml.dump( conf ) ).status === true )
+            return true
+        else
+            return false
+    } )
+    
+    yacona.on( 'config/remove', key => {
+        let value = conf[key]
+        delete conf[key]
+        
+        if( yacona.config.save( 'config/config.yaml', yaml.dump( conf ) ).status === true )
+            return true
+        else {
+            // Fail
+            conf[key] = value
+            return false
+        }
+    } )
+    
+    yacona.on( 'config/enable', key => {
+        if( conf[key] === undefined ) return false
+        
+        let flag = conf[key].enable
+        conf[key].enable = true
+        
+        if( yacona.config.save( 'config/config.yaml', yaml.dump( conf ) ).status === true )
+            return true
+        else {
+            // Fail
+            conf[key].enable = flag
+            return false
+        }
+    } )
+    
+    yacona.on( 'config/disable', key => {
+        if( conf[key] === undefined ) return false
+
+        let flag = conf[key].enable
+        conf[key].enable = false
+
+        if( yacona.config.save( 'config/config.yaml', yaml.dump( conf ) ).status === true )
+            return true
+        else {
+            // Fail
+            conf[key].enable = flag
+            return false
+        }
+    } )
+    
+    /* Ready */
     
     emitIsReady()
     
