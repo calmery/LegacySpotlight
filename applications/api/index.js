@@ -3,16 +3,6 @@ const twitter = require( 'twitter' )
 
 const requestKey = require( './requestKey' )
 
-const getClient = ( access_token_key, access_token_secret ) => {
-    if( access_token_key === undefined || access_token_secret === undefined ) return false
-    let client = new twitter( {
-        consumer_key       : requestKey.consumer_key,
-        consumer_secret    : requestKey.consumer_secret,
-        access_token_key   : access_token_key,
-        access_token_secret: access_token_secret
-    } )
-    return client
-}
 const makeOption = condition => {
     var option = {}
     if( typeof( condition ) === 'number' )
@@ -74,7 +64,38 @@ module.exports = yacona => {
     
     if( yacona.config.check( 'twitter/authorization.yaml' ) === true ) isAuthorized = true
     
+    /* Config Preload */
+    
+    let conf
+    const loadConfig = () => {
+        if( yacona.config.check( 'config/config.yaml' ) === true )
+            conf = yaml.parser( yacona.config.load( 'config/config.yaml' ) )
+        else
+            conf = {}
+        return conf
+    }
+
+    loadConfig()
+    
     /* Twitter */
+    
+    const getClient = ( access_token_key, access_token_secret ) => {
+        if( access_token_key === undefined || access_token_secret === undefined ) return false
+        let option = {
+            consumer_key       : requestKey.consumer_key,
+            consumer_secret    : requestKey.consumer_secret,
+            access_token_key   : access_token_key,
+            access_token_secret: access_token_secret
+        }
+        let conf = loadConfig()
+        if( conf.proxy !== undefined && conf.proxy.enable === true ){
+            option.request_options = {
+                proxy: conf.proxy.value
+            }
+        }
+        let client = new twitter( option )
+        return client
+    }
 
     const getProfile = id => {
         if( id === undefined ) return false
@@ -240,16 +261,6 @@ module.exports = yacona => {
     } )
     
     /* Config */
-    
-    let conf
-    const loadConfig = () => {
-        if( yacona.config.check( 'config/config.yaml' ) === true )
-            conf = yaml.parser( yacona.config.load( 'config/config.yaml' ) )
-        else
-            conf = {}
-    }
-    
-    loadConfig()
     
     yacona.on( 'config', () => conf )
     

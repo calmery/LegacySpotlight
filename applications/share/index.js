@@ -76,6 +76,13 @@ module.exports = yacona => {
                     data: JSON.parse( yacona.documents.load( 'log', value + '/statuses.json' ) )
                 }
                 
+                let req
+                let config = yacona.emit( 'api/config' )
+                if( config.proxy !== undefined && config.proxy.enable === true )
+                    req = request.defaults( { proxy: config.proxy.value } )
+                else
+                    req = request
+                    
                 request.post( {
                     uri: server_url,
                     form: JSON.stringify( data ),
