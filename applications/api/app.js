@@ -2,6 +2,7 @@ const Twitter = require( 'twitter' )
 
 const configJson        = './config.json'
 const authorizationJson = './authorization.json'
+const addonJson         = './addon.json'
 
 const consumerKey = {
   consumer_key   : 'nDnk9b8WsPVE5hLoY44qNSevM',
@@ -10,6 +11,7 @@ const consumerKey = {
 
 let config
 let authorization
+let addonConfig
 
 let client
 
@@ -19,6 +21,44 @@ let isAvailable  = false
 // Launched -> Authorized -> Available
 
 module.exports.launch = app => {
+
+  // --- Addon --- //
+
+  const loadAddonConfig = () => {
+    let f = app.loadAppData( addonJson )
+    return addonConfig = ( f !== null ) ? JSON.parse( f ) : {}
+  }
+
+  const saveAddonConfig = config => {
+    return app.saveAppData( addonJson, JSON.stringify( config ) )
+  }
+
+  app.addListener( 'addon', () => {
+    return { apps: app.getAllApps(), auto: loadAddonConfig() }
+  } )
+
+  app.addListener( 'addon/add', path => {
+    return app.addApp( path )
+  } )
+
+  app.addListener( 'addon/remove', name => {
+    let config = loadAddonConfig()
+    delete config[name]
+    saveAddonConfig( config )
+    return app.removeApp( name )
+  } )
+
+  app.addListener( 'addon/auto/set', name => {
+    let config = loadAddonConfig()
+    config[name] = true
+    return saveAddonConfig( config )
+  } )
+
+  app.addListener( 'addon/auto/release', name => {
+    let config = loadAddonConfig()
+    delete config[name]
+    return saveAddonConfig( config )
+  } )
 
   // --- Event --- //
 
@@ -177,6 +217,14 @@ module.exports.launch = app => {
   if( client ){
     isAvailable = true
     for( ;isAvailableCallbacks.length; ) isAvailableCallbacks.shift()()
+  }
+
+  let apps = loadAddonConfig()
+  for( let i in apps ){
+    const path = app.getAppPath( i )
+    const instance = app.attachApp( path !== null ? path : ( '../' + name ) )
+
+    instance.launch()
   }
 
 }
