@@ -1,0 +1,7 @@
+{
+  "name": "spotlight",
+  "main": "main",
+  "dependencies": {
+    "yacona": "^17.8.2"
+  }
+}
