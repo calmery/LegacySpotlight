@@ -151,6 +151,22 @@ module.exports.launch = app => {
     return response
   } )
 
+  // API
+
+  let me
+
+  app.addListener( 'twitter/me', () => {
+    return new Promise( ( resolve, reject ) => {
+      if( me === undefined )
+        client.get( 'users/show', { user_id: authorization.id }, ( error, profile ) => {
+          if( error ) reject( error )
+          else resolve( me = profile )
+        } )
+      else
+        resolve( me )
+    } )
+  } )
+
   // Init
 
   getAuthorization()

@@ -463,3 +463,29 @@ body#_application:after {
 ._show {
   display: block
 }
+
+@keyframes fadeOut {
+    0%   { opacity: 1 }
+    100% { opacity: 0 }
+}
+
+.fadeOut {
+    animation-name: fadeOut;
+    animation-duration: 0.5s;
+    animation-timing-function: ease;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fadeIn {
+    0%   { opacity: 0 }
+    100% { opacity: 1 }
+}
+
+.fadeIn {
+    animation-name: fadeIn;
+    animation-duration: 0.5s;
+    animation-timing-function: ease;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
