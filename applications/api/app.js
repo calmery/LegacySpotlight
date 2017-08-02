@@ -125,7 +125,7 @@ module.exports.launch = app => {
     let option = {
       consumer_key       : consumerKey.consumer_key,
       consumer_secret    : consumerKey.consumer_secret,
-      access_token_key   : access_token_key,
+      access_token_key   : access_token,
       access_token_secret: access_token_secret
     }
     let config = loadConfig()
@@ -134,7 +134,7 @@ module.exports.launch = app => {
         proxy: conf.proxy.value
       }
 
-    client = new twitter( option )
+    client = new Twitter( option )
     return client
   }
 

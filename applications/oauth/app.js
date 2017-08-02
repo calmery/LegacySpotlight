@@ -41,12 +41,12 @@ module.exports.launch = app => {
     consumerSecret: key.consumer_secret,
     callbackURL   : 'http://' + server.getUrl() + '/callback'
   }, ( access_token, access_token_secret, profile, done ) => {
+    app.getApp().getYacona().detachApp( app.getApp() )
     app.callListener( 'api/twitter/key/register', {
       access_token       : access_token,
       access_token_secret: access_token_secret,
       id                 : parseInt( profile.id )
     } )
-    app.getApp().getYacona().detachApp( app.getApp() )
   } ) )
 
   app.addWebSocket( socket => {
