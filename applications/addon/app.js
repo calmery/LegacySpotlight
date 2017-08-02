@@ -9,7 +9,6 @@ module.exports.launch = app => {
     window.setMaximumSize( 800, 600 )
     window.setMinimumSize( 800, 600 )
     window.setMenu( null )
-    window.openDevTools()
   } )
 
   app.addWebSocket( socket => {
