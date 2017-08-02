@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+  <head>
+    <meta charset="utf-8">
+    <title>Setting</title>
+    <link rel="stylesheet" href="/spotlight/css/common">
+    <style>
+      ._sidebar {
+        top: 0;
+        left: 0;
+        height: 100%;
+        position: fixed;
+        border-right: 1px solid rgba( 0, 139, 198, 1 )
+      }
+      ._main {
+        top: 0;
+        right: 0;
+        position: absolute;
+      }
+      ._value {
+        font-size: 10px;
+        color: rgba( 150, 150, 150, 1 )
+      }
+    </style>
+  </head>
+
+  <body id="_application">
+
+    <section class="_sidebar _profile_active">
+
+      <div class="_label">
+        <div class="_text">
+          Setting
+        </div>
+      </div>
+
+      <nav class="_navigator">
+
+        <div class="_menu _active">
+          <div class="_text">
+            設定
+            <div class="_description">Setting</div>
+          </div>
+        </div>
+
+      </nav>
+
+      <div class="_label">
+        <div class="_text">
+          Menu
+        </div>
+      </div>
+
+      <nav class="_navigator">
+        <div class="_menu" onclick="showDialog()">
+          <div class="_text">
+            追加
+            <div class="_description">Add</div>
+          </div>
+        </div>
+      </nav>
+
+    </section>
+
+    <section class="_my_profile">
+      <div id="fader" class="_hide">
+        <div class="_icon" id="my_icon"></div>
+        <div class="_name" id="my_name"></div>
+        <div class="_id" id="my_screen_name">@</div>
+      </div>
+    </section>
+
+    <section class="_main">
+      <div id="configs">
+        <div class="_content clearfix" v-for="(data, key) in configs">
+          <div class="float_l">
+            {{ key }}
+            <div class="_value">{{ data.value }}</div>
+          </div>
+          <div class="float_r">
+            <span class="_btn _bg_success" v-if="data.enable==true" v-on:click="disable(key)">Enable</span>
+            <span class="_btn _bg_warning" v-if="data.enable==false" v-on:click="enable(key)">Disable</span>
+            <span class="_btn _bg_danger" v-on:click="remove(key)">Remove</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="_support _hide" id="dialog">
+      <div class="_background"></div>
+      <div class="_layer">
+        <div class="_dialog" style="text-align: right">
+          <textarea id="key" class="_input" placeholder="プロパティ名"></textarea>
+          <textarea id="value" class="_input" placeholder="値"></textarea>
+          <span class="_btn _bg_primary" onclick="save()">保存</span>
+          <span class="_btn _bg_danger" style="margin-right: 0" onclick="hideDialog()">閉じる</span>
+        </div>
+      </div>
+    </section>
+
+    <script src="/spotlight/websocket"></script>
+    <script src="/spotlight/js/vue"></script>
+    <script src="main.js"></script>
+
+  </body>
+
+</html>

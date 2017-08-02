@@ -1,1 +1,73 @@
-Hello
+<!DOCTYPE html>
+<html lang="ja">
+
+  <head>
+    <meta charset="utf-8">
+    <title>Controller</title>
+    <link href="/spotlight/css/common" rel="stylesheet">
+  </head>
+
+  <body id="_application">
+
+    <section class="_sidebar _profile_active">
+
+      <div class="_label">
+        <div class="_text">
+          Controller
+        </div>
+      </div>
+
+      <nav class="_navigator">
+
+        <div class="_menu" onclick="launch('search')" id="app_search">
+          <div class="_text">
+            検索
+            <div class="_description">Search</div>
+          </div>
+        </div>
+
+        <div class="_menu" onclick="launch('edit')" id="app_edit">
+          <div class="_text">
+            編集
+            <div class="_description">Edit</div>
+          </div>
+        </div>
+
+        <div class="_menu" onclick="launch('share')" id="app_share">
+          <div class="_text">
+            共有
+            <div class="_description">Share</div>
+          </div>
+        </div>
+
+        <div class="_menu" onclick="launch('setting')" id="app_setting">
+          <div class="_text">
+            設定
+            <div class="_description">Setting</div>
+          </div>
+        </div>
+      </nav>
+
+      <div class="_label">
+        <div class="_text">
+          Addon
+        </div>
+        <div class="_badge" onclick="launch('addon')">+</div>
+      </div>
+
+      <nav class="_navigator"></nav>
+
+    </section>
+
+    <section class="_my_profile">
+      <div class="_icon" id="my_icon"></div>
+      <div class="_name" id="my_name"></div>
+      <div class="_id" id="my_screen_name">@</div>
+    </section>
+
+    <script src="/spotlight/websocket"></script>
+    <script src="main.js"></script>
+
+  </body>
+
+</html>
