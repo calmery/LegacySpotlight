@@ -5,6 +5,7 @@
     "express-session": "^1.15.4",
     "passport": "^0.3.2",
     "passport-twitter": "^1.0.4",
+    "twitter": "^1.7.1",
     "yacona": "^17.8.2"
   }
 }

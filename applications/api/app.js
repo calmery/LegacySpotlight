@@ -1,3 +1,5 @@
+const Twitter = require( 'twitter' )
+
 const configJson        = './config.json'
 const authorizationJson = './authorization.json'
 
@@ -9,7 +11,23 @@ const consumerKey = {
 let config
 let authorization
 
+let client
+
+let isAuthorized = false
+let isAvailable  = false
+
+// Launched -> Authorized -> Available
+
 module.exports.launch = app => {
+
+  // --- Event --- //
+
+  let isAvailableCallbacks = []
+
+  app.addListener( 'isAvailable', callback => {
+    if( isAvailable === true ) callback()
+    else isAvailableCallbacks.push( callback )
+  } )
 
   // --- Config --- //
 
@@ -58,6 +76,10 @@ module.exports.launch = app => {
     return saveConfig( config )
   } )
 
+  // Init
+
+  loadConfig()
+
   // --- App Support --- //
 
   app.addListener( 'app/launch', name => {
@@ -88,10 +110,57 @@ module.exports.launch = app => {
 
   // --- Twitter --- //
 
+  const getAuthorization = () => {
+    let f = app.loadAppData( authorizationJson )
+    if( f !== null ){
+      isAuthorized = true
+      authorization = JSON.parse( f )
+    } else {
+      authorization = {}
+    }
+    return authorization
+  }
+
+  const getClient = ( access_token, access_token_secret ) => {
+    let option = {
+      consumer_key       : consumerKey.consumer_key,
+      consumer_secret    : consumerKey.consumer_secret,
+      access_token_key   : access_token_key,
+      access_token_secret: access_token_secret
+    }
+    let config = loadConfig()
+    if( config.proxy !== undefined && config.proxy.enable === true )
+      option.request_options = {
+        proxy: conf.proxy.value
+      }
+
+    client = new twitter( option )
+    return client
+  }
+
+  app.addListener( 'twitter/isAuthorized', () => isAuthorized )
+
   app.addListener( 'twitter/key/consumer', () => consumerKey )
 
   app.addListener( 'twitter/key/register', data => {
-    return app.saveAppData( authorizationJson, JSON.stringify( data ) )
+    let response = app.saveAppData( authorizationJson, JSON.stringify( data ) )
+    getAuthorization()
+    getClient( authorization.access_token, authorization.access_token_secret )
+    isAvailable = true
+    for( ;isAvailableCallbacks.length; ) isAvailableCallbacks.shift()()
+    return response
   } )
+
+  // Init
+
+  getAuthorization()
+
+  if( isAuthorized === true )
+    getClient( authorization.access_token, authorization.access_token_secret )
+
+  if( client ){
+    isAvailable = true
+    for( ;isAvailableCallbacks.length; ) isAvailableCallbacks.shift()()
+  }
 
 }
