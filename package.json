@@ -2,6 +2,9 @@
   "name": "spotlight",
   "main": "main",
   "dependencies": {
+    "express-session": "^1.15.4",
+    "passport": "^0.3.2",
+    "passport-twitter": "^1.0.4",
     "yacona": "^17.8.2"
   }
 }
