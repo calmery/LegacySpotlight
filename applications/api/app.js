@@ -38,6 +38,7 @@ module.exports.launch = app => {
   } )
 
   app.addListener( 'addon/add', path => {
+    app.callListener( 'controller/refresh' )
     return app.addApp( path )
   } )
 
@@ -45,6 +46,7 @@ module.exports.launch = app => {
     let config = loadAddonConfig()
     delete config[name]
     saveAddonConfig( config )
+    app.callListener( 'controller/refresh' )
     return app.removeApp( name )
   } )
 
@@ -121,6 +123,10 @@ module.exports.launch = app => {
   loadConfig()
 
   // --- App Support --- //
+
+  app.addListener( 'app/running', () => {
+    return app.getApp().getYacona().getApps()
+  } )
 
   app.addListener( 'app/launch', name => {
     const alreadyRunning = app.getApp().getYacona().getApps()

@@ -12,3 +12,26 @@ socket.on( 'myProfile', profile => {
   document.getElementById( 'my_name' ).innerHTML = profile.name
   document.getElementById( 'my_screen_name' ).innerHTML = '@' + profile.screen_name
 } )
+
+socket.on( 'refresh', () => window.location.reload() )
+
+socket.on( 'addon', addons => {
+  let el = new Vue( {
+    el: '#addons',
+    data: {
+      addons: addons
+    },
+    methods: {
+      launch: addon => { return 'launch("' + addon + '")' },
+      getId: addon => { return 'app_' + addon }
+    }
+  } )
+} )
+
+socket.on( 'running', apps => {
+  let e
+  for( let app in apps ){
+    e = document.getElementById( 'app_' + app )
+    if( e ) e.className = '_menu _active'
+  }
+} )

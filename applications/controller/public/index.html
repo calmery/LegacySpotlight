@@ -55,7 +55,14 @@
         <div class="_badge" onclick="launch('addon')">+</div>
       </div>
 
-      <nav class="_navigator"></nav>
+      <nav class="_navigator" id="addons">
+        <div class="_menu" v-bind:onclick="launch(addon)" v-bind:id="getId(addon)" v-for="addon in addons">
+          <div class="_text">
+            {{ addon }}
+            <div class="_description">Addon</div>
+          </div>
+        </div>
+      </nav>
 
     </section>
 
@@ -66,6 +73,7 @@
     </section>
 
     <script src="/spotlight/websocket"></script>
+    <script src="/spotlight/js/vue"></script>
     <script src="main.js"></script>
 
   </body>
