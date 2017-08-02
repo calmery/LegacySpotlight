@@ -1,0 +1,39 @@
+#main {
+  width: 498px;
+  height: 198px;
+  background: rgba( 255, 255, 255, 1 );
+  top: 50%;
+  left: 50%;
+  position: fixed;
+  margin-top: -100px;
+  margin-left: -250px;
+  border: 1px solid rgba( 235, 235, 235, 1 );
+  border-radius: 3px;
+  text-align: center;
+  font-family: Quicksand, sans-serif;
+}
+
+#main #icon {
+  width: 98px;
+  height: 98px;
+  margin-top: -50px;
+  border: 1px solid rgba( 235, 235, 235, 1 );
+  border-radius: 100%;
+  margin-bottom: 20px;
+}
+
+#main #name {
+  font-size: 25px;
+  margin-bottom: 10px;
+}
+
+#main #description {
+  font-size: 10px;
+  color: rgba( 120, 120, 120, 1 );
+  margin-bottom: 20px;
+}
+
+#main #description #heart {
+  font-size: 10px;
+  font-family: Condense;
+}
