@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+  <head>
+    <meta charset="utf-8">
+    <title>Search</title>
+    <link rel="stylesheet" href="/spotlight/css/common">
+    <style>
+      ._sidebar {
+        top: 0;
+        left: 0;
+        height: 100%;
+        position: fixed;
+        border-right: 1px solid rgba( 0, 139, 198, 1 )
+      }
+      ._main {
+        top: 0;
+        right: 0;
+        position: absolute;
+      }
+      ._tweet {
+        -webkit-transition: 10s liner;
+      }
+      ._safe {
+        opacity: 0.5;
+        border-left-color: #8CC152 !important
+      }
+    </style>
+  </head>
+
+  <body id="_application">
+
+    <section class="_sidebar _profile_active">
+
+      <div class="_label">
+        <div class="_text">
+          Search
+        </div>
+      </div>
+
+      <nav class="_navigator">
+
+        <div class="_menu _active">
+          <div class="_text">
+            検索
+            <div class="_description">Main</div>
+          </div>
+        </div>
+
+        <div class="_menu">
+          <div class="_text">
+            高度な検索
+            <div class="_description">Advanced Search</div>
+          </div>
+        </div>
+      </nav>
+
+      <div class="_label">
+        <div class="_text">
+          Menu
+        </div>
+      </div>
+
+      <nav class="_navigator">
+        <div class="_menu" onclick="showDialog()">
+          <div class="_text">
+            保存
+            <div class="_description">Save</div>
+          </div>
+        </div>
+      </nav>
+
+    </section>
+
+    <section class="_my_profile">
+      <div class="_icon"></div>
+      <div class="_name">Calmery</div>
+      <div class="_id">@calmeryme</div>
+    </section>
+
+    <section class="_main">
+      <div class="_content" style="text-align: right" id="search_field">
+        <textarea id="query" class="_input" placeholder="検索ワードを入力"></textarea>
+        <textarea id="count" class="_input" placeholder="検索する個数の指定"></textarea>
+        <span class="_btn _bg_primary" style="margin-right: 0" onclick="search()">検索</span>
+      </div>
+
+      <div id="output" class="_hide">
+        <div class="_content">
+          <div class="_column">
+            <span class="_btn" v-on:click="ascend">時間（昇順）</span>
+            <span class="_btn" v-on:click="descend">時間（降順）</span>
+            <span class="_btn" v-on:click="ascendRT">リツイート（昇順）</span>
+            <span class="_btn" v-on:click="descendRT">リツイート（降順）</span>
+          </div>
+        </div>
+        <div class="_content _tweet" v-for="tweet in tweets" v-bind:id="el(tweet.id)" v-bind:onclick="toggle(tweet.id)">
+          <div class="_profile">
+            <div class="_icon">
+              <img v-bind:src="getProfileIcon( tweet.user.profile_image_url )">
+            </div>
+            <div class="_name">{{ tweet.user.name }}</div>
+            <div class="_screen_name">@{{ tweet.user.screen_name }}</div>
+            <div class="_id">{{ tweet.user.id }}</div>
+          </div>
+
+          <div class="_text">
+            {{ tweet.text }}
+            <div v-if="tweet.extended_entities">
+              <div class="_media">
+                <img v-bind:src="getMedia( media.media_url )" v-if="media.type == 'photo'" v-for="media in tweet.extended_entities.media">
+                <video v-bind:src="getVideo( media.video_info.variants )" v-if="media.type == 'video'" controls preload="metadata" v-for="media in tweet.extended_entities.media"></video>
+              </div>
+            </div>
+            <div class="_status">
+              <div class="_reaction">
+                <span class="_retweet">
+                  <span class="_icon_font">}</span>
+                  {{ tweet.retweet_count }}
+                </span>
+                <span class="_favorite">
+                  <span class="_icon_font">—</span>
+                  {{ tweet.favorite_count }}
+                </span>
+              </div>
+              <div class="_id">{{ tweet.id }}</div>
+              <div class="_time">{{ ( new Date( tweet.created_at ) ).toUTCString() }}</div>
+            </div>
+          </div>
+
+          <div class="_column _tag_group">
+            <div v-if="tweet.entities.user_mentions">
+              <div class="_column">
+                <span class="_tag _bg_primary" v-for="user in tweet.entities.user_mentions"><span class="_icon_font">ë</span> {{ user.screen_name }}</span>
+              </div>
+            </div>
+            <div v-if="tweet.entities.hashtags">
+              <div class="_column">
+                <span class="_tag _bg_primary" v-for="tag in tweet.entities.hashtags"><span class="_icon_font">a</span> {{ tag.text }}</span>
+              </div>
+            </div>
+            <div v-if="tweet.entities.urls">
+              <div class="_column">
+                <span class="_tag _bg_primary" v-for="url in tweet.entities.urls"><span class="_icon_font">Y</span> {{ url.url }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="_support _hide" id="save_field">
+      <div class="_background"></div>
+      <div class="_layer">
+        <div class="_dialog" style="text-align: right">
+          <textarea id="name" class="_input" placeholder="リスト名"></textarea>
+          <span class="_btn _bg_primary" onclick="save()">保存</span>
+          <span class="_btn _bg_danger" style="margin-right: 0" onclick="hideDialog()">閉じる</span>
+        </div>
+      </div>
+    </section>
+
+    <script src="/spotlight/js/vue"></script>
+    <script src="/spotlight/websocket"></script>
+    <script>
+
+      let safeId = []
+
+      const t = id => {
+        console.log( id )
+        let index
+        if( ( index = safeId.indexOf( id ) ) === -1 ){
+          safeId.push( id )
+          document.getElementById( 'id' + id ).className = '_content _tweet _safe'
+        } else {
+          safeId.splice( index, 1 )
+          document.getElementById( 'id' + id ).className = '_content _tweet'
+        }
+      }
+
+      const save = () => {
+        let name = document.getElementById( 'name' ).value
+        if( name === '' )
+          alert( 'リスト名を入力してください' )
+
+        socket.emit( 'save', {
+          name: name,
+          safe: safeId,
+          id  : id
+        } )
+      }
+
+      socket.on( 'completed', () => window.location.reload() )
+
+      const showDialog = () => {
+        document.getElementById( 'save_field' ).className = '_support'
+      }
+
+      const hideDialog = () => {
+        document.getElementById( 'save_field' ).className = '_support _hide'
+      }
+
+      const search = () => {
+        let query = document.getElementById( 'query' ).value
+        if( query === '' )
+          alert( 'キーワードを入力してください' )
+
+        let count = document.getElementById( 'count' ).value
+        if( isNaN( count ) === true )
+          count = 20
+        else
+          count = Number( count )
+
+        socket.emit( 'search', {
+          query: query,
+          count: count
+        } )
+
+        document.getElementById( 'search_field' ).style.display = 'none'
+      }
+
+      let output
+      let id
+
+      socket.on( 'tweet', tweet => {
+        id = tweet.identifier
+        for( let i=0; i<tweet.statuses.length; i++ )
+          tweet.statuses[i].flag = 1
+        document.getElementById( 'output' ).className = ''
+        output = new Vue( {
+          el: '#output',
+          data: {
+            tweets: tweet.statuses
+          },
+          methods: {
+            ascend: () => {
+              return tweet.statuses.sort( ( t1, t2 ) => {
+                let t1_t = new Date( t1.created_at )
+                let t2_t = new Date( t2.created_at )
+                if( t1_t.getTime() < t2_t.getTime() ) return -1
+                else if( t1_t.getTime() > t2_t.getTime() ) return 1
+                else return 0
+              } )
+            },
+            descend: () => {
+              return tweet.statuses.sort( ( t1, t2 ) => {
+                let t1_t = new Date( t1.created_at )
+                let t2_t = new Date( t2.created_at )
+                if( t1_t.getTime() > t2_t.getTime() ) return -1
+                else if( t1_t.getTime() < t2_t.getTime() ) return 1
+                else return 0
+              } )
+            },
+            ascendRT: () => {
+              return tweet.statuses.sort( ( t1, t2 ) => {
+                let t1_t = t1.retweet_count
+                let t2_t = t2.retweet_count
+                if( t1_t < t2_t ) return -1
+                else if( t1_t > t2_t ) return 1
+                else return 0
+              } )
+            },
+            descendRT: () => {
+              return tweet.statuses.sort( ( t1, t2 ) => {
+                let t1_t = t1.retweet_count
+                let t2_t = t2.retweet_count
+                if( t1_t > t2_t ) return -1
+                else if( t1_t < t2_t ) return 1
+                else return 0
+              } )
+            },
+            getProfileIcon: url => { return url },
+            getMedia      : url => { return url },
+            getVideo      : videos => {
+              for( let i=0; i<videos.length; i++ )
+                if( videos[i].content_type === 'video/mp4' ){
+                  return videos[i].url
+                }
+              return videos[0].url
+            },
+            toggle: id => {
+              return 't("' + id + '")'
+            },
+            el: id => {
+              return 'id' + id
+            }
+          }
+        } )
+
+        output.descend()
+      } )
+
+    </script>
+
+  </body>
+
+</html>
