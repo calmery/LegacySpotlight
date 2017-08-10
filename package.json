@@ -1,22 +1,11 @@
 {
   "name": "spotlight",
-  "version": "0.5.4",
-  "description": "Search for harmful information on twitter",
-  "main": "index",
-  "scripts": {
-    "start": "electron ."
-  },
-  "repository": {
-    "url": "http://github.com/calmery/Spotlight",
-    "type": "git"
-  },
-  "author": "calmery <contact@calmery.me>",
-  "license": "GPL-2.0",
+  "main": "main",
   "dependencies": {
-    "express-session": "^1.15.2",
+    "express-session": "^1.15.4",
     "passport": "^0.3.2",
     "passport-twitter": "^1.0.4",
-    "twitter": "^1.7.0",
-    "yacona": "^17.4.18"
+    "twitter": "^1.7.1",
+    "yacona": "^17.8.2"
   }
 }

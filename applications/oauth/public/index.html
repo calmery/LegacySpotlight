@@ -1,37 +1,28 @@
 <!DOCTYPE html>
 <html lang="ja">
 
-    <head>
+  <head>
+    <meta charset="utf-8">
+    <title>Spotlight Setup</title>
+    <link rel="stylesheet" href="/spotlight/css/common">
+    <link rel="stylesheet" href="layout.css">
+  </head>
 
-        <meta charset="utf-8">
-        <title>Spotlight Setup</title>
+  <body id="_application">
 
-        <link rel="stylesheet" href="/yacona/base">
-        <link rel="stylesheet" href="/yacona/fonts">
-        <link rel="stylesheet" href="layout">
+    <div id="main">
+      <img src="/spotlight/img/icon" id="icon">
+      <div id="name">Spotlight</div>
+      <div id="description">
+        Build with <span id="heart">—</span> by Calmery
+      </div>
 
-    </head>
+      <span class="_btn _bg_primary" id="oauth">セットアップを始める</span>
+    </div>
 
-    <body>
+  </body>
 
-        <section id="application">
-
-            <div id="app">
-                <div id="icon-field">
-                    <img src="/yacona/icon">
-                </div>
-                <div id="name-field">
-                    <div id="name">Spotlight</div>
-                    <div id="author">Build with <span id="heart">—</span> by patchworks</div>
-                </div>
-            </div>
-
-            <a href="/oauth">
-                <div id="btn">Sign in</div>
-            </a>
-
-        </section>
-
-    </body>
+  <script src="/spotlight/websocket"></script>
+  <script src="main.js"></script>
 
 </html>

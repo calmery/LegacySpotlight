@@ -3,7 +3,7 @@
 
   <head>
     <meta charset="utf-8">
-    <title>Addon</title>
+    <title>Setting</title>
     <link rel="stylesheet" href="/spotlight/css/common">
     <style>
       ._sidebar {
@@ -31,7 +31,7 @@
 
       <div class="_label">
         <div class="_text">
-          Addon
+          Setting
         </div>
       </div>
 
@@ -39,8 +39,8 @@
 
         <div class="_menu _active">
           <div class="_text">
-            アプリケーション
-            <div class="_description">Application</div>
+            設定
+            <div class="_description">Setting</div>
           </div>
         </div>
 
@@ -72,15 +72,16 @@
     </section>
 
     <section class="_main">
-      <div id="addons">
-        <div class="_content clearfix" v-for="addon in addons">
-          <div class="float_l" style="line-height: 30px;">
-            {{ addon.name }}
+      <div id="configs">
+        <div class="_content clearfix" v-for="(data, key) in configs">
+          <div class="float_l">
+            {{ key }}
+            <div class="_value">{{ data.value }}</div>
           </div>
           <div class="float_r">
-            <span class="_btn _bg_success" v-on:click="disable(addon.name)" v-if="addon.auto == true">Enable startup</span>
-            <span class="_btn _bg_warning" v-on:click="enable(addon.name)" v-if="addon.auto == false">Disable startup</span>
-            <span class="_btn _bg_danger" v-on:click="remove(addon.name)">Remove</span>
+            <span class="_btn _bg_success" v-if="data.enable==true" v-on:click="disable(key)">Enable</span>
+            <span class="_btn _bg_warning" v-if="data.enable==false" v-on:click="enable(key)">Disable</span>
+            <span class="_btn _bg_danger" v-on:click="remove(key)">Remove</span>
           </div>
         </div>
       </div>
@@ -90,8 +91,9 @@
       <div class="_background"></div>
       <div class="_layer">
         <div class="_dialog" style="text-align: right">
-          <textarea id="url" class="_input" placeholder="圧縮されたアプリケーションへの絶対パス"></textarea>
-          <span class="_btn _bg_primary" onclick="add()">追加</span>
+          <textarea id="key" class="_input" placeholder="プロパティ名"></textarea>
+          <textarea id="value" class="_input" placeholder="値"></textarea>
+          <span class="_btn _bg_primary" onclick="save()">保存</span>
           <span class="_btn _bg_danger" style="margin-right: 0" onclick="hideDialog()">閉じる</span>
         </div>
       </div>
