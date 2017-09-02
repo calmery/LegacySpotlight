@@ -27,6 +27,8 @@ const main = app => {
     width : 200,
     height: 600
   } ).then( window => {
+    console.log( 'http://' + app.getUrl() )
+    window.loadURL( 'http://' + app.getUrl() )
     window.setMaximumSize( 200, 600 )
     window.setMinimumSize( 200, 600 )
     window.setMenu( null )

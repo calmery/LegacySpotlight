@@ -1,6 +1,10 @@
 {
   "name": "spotlight",
   "main": "main",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-packager . Spotlight --platform=darwin,win32 --arch=x64 --version=1.3.6"
+  },
   "dependencies": {
     "express-session": "^1.15.4",
     "passport": "^0.3.2",
